@@ -32,6 +32,15 @@
 - Hardware PWM pins on header: GPIO1_C4=PWM1_M2, GPIO1_D3=PWM0_M1
 - Boot: U-Boot + extlinux; DTB: rk3588s-orangepi-5.dtb
 
+## CKB Whale Alert Bot
+- Running at /home/phill/ckb-whale-bot/whale-bot.js (PID saved in whale-bot.pid)
+- Monitors local node (192.168.68.87:8114), skips cellbase, alerts on any tx ≥ 10M CKB
+- Sends to Telegram group @NervosUnofficial (chat_id: -1001338982855)
+- Bot token: 8446459270:AAFltgKPOgFc0FX4PjKJNPUxTRoRzayKAlE
+- @reboot crontab installed. Systemd service file at whale-bot.service (needs sudo to install)
+- Restart: /home/phill/ckb-whale-bot/start.sh
+- 3 whales found in last 350 blocks (17M / 19.8M / 33.9M CKB)
+
 ## Phill's POS System (ESP32)
 - Elecrow ESP32 HMI 3.5", ST7789 480x320, LovyanGFX
 - QR204 thermal printer, Grow GM861S barcode scanner, Arduino

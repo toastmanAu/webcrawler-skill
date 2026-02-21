@@ -14,6 +14,10 @@ Last known: block ~18,674,521, 21 peers, healthy
 - Block stuck >2h → notify
 - Peers drop below 5 → notify
 
+## Whale Bot
+Check `ps aux | grep whale-bot | grep -v grep` — if not running, run /home/phill/ckb-whale-bot/start.sh
+PID file: /home/phill/ckb-whale-bot/whale-bot.pid
+
 ## NerdMiner CKB
 - Pushed to GitHub (dev branch) - no action needed
 - Next action when Phill wakes: `gh auth refresh -s workflow` to restore git push
