@@ -72,7 +72,7 @@ These are pure hardware board additions with no mining logic changes. Safe to ch
 
 ## Our Own TODOs for NerdMiner_CKB
 
-- [ ] **Apply IRAM_ATTR to eaglesong_permutation()** — biggest performance win
+- [x] **Apply IRAM_ATTR to eaglesong_permutation() + eaglesong()** — DONE 2026-02-22
 - [ ] **Test against a live CKB Stratum pool** (f2pool, upool, etc.)
 - [ ] **Update display labels**: "BTC" → "CKB" in monitor.cpp / display drivers
 - [ ] **Verify nonce submission format** matches pool expectations
