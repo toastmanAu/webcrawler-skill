@@ -23,7 +23,7 @@
 
 ## Projects
 - **CKB Node Dashboard** → https://github.com/toastmanAu/ckb-node-dashboard — live, Node.js proxy + HTML polling dashboard
-- **NerdMiner CKB** → https://github.com/toastmanAu/NerdMiner_CKB — ESP32 Eaglesong miner (in progress), local at /home/phill/workspace/NerdMiner_CKB/
+- **NerdMiner CKB** → https://github.com/toastmanAu/NerdMiner_CKB — ESP32 Eaglesong miner. Core implementation DONE 2026-02-22. eaglesong.cpp verified correct (both test vectors pass). Pushed via GitHub API (OAuth token lacks `workflow` scope for git push — run `gh auth refresh -s workflow` in terminal first for future pushes). PR queue: memory/nerdminer-ckb-pr-queue.md. Next: IRAM_ATTR on eaglesong_permutation(), test vs live CKB pool, BTC→CKB display labels.
 - **Fan controller** → /home/phill/fan-control/ — systemd service, GPIO1_C4 (gpio52), software PWM 25Hz
 
 ## Orange Pi 5 Hardware Notes
