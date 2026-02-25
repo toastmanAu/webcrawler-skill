@@ -27,6 +27,13 @@ Last known: block ~18,674,521, 21 peers, healthy
 - Block stuck >2h → notify
 - Peers drop below 5 → notify
 
+## Chat Bridge (Matterbridge)
+Check `systemctl --user is-active ckb-chat-bridge.service` — if inactive, restart: `systemctl --user restart ckb-chat-bridge.service`
+- Also check logs: `journalctl --user -u ckb-chat-bridge.service -n 5 --no-pager`
+- If logs show repeated `SendMessage failed` errors → notify Phill, bridge may need rejoin
+- Service bridges: Nervos Nation TG (-1001623077152) ↔ Nervos Network Discord (👾│general)
+- Config: /home/phill/ckb-chat-bridge/matterbridge.toml
+
 ## Stratum Proxy (Solo Mode)
 Check `curl -sf http://localhost:8081/` — if down, run `systemctl --user restart ckb-stratum`
 Alert Phill if it can't be restarted.
@@ -60,7 +67,16 @@ Run: `node /home/phill/ckb-antiscam/analyse-events.js 12`
 - Pushed to GitHub (dev branch) - no action needed
 - Next action when Phill wakes: `gh auth refresh -s workflow` to restore git push
 
-## Agent Collective Group (1x/day)
+## Obsidian Vault (1x/day — ~10pm ACST)
+Review recent session memory files and update the Obsidian vault:
+- Scan `memory/YYYY-MM-DD.md` for today + yesterday
+- Create/update notes in `/home/phill/obsidian-vault/` for any new projects, ideas, or decisions discussed
+- Add wikilinks between related concepts
+- Update open questions / next steps in relevant project notes
+- Commit vault to git if changes made: `cd /home/phill/obsidian-vault && git add -A && git commit -m "vault update: YYYY-MM-DD" && git push`
+- Track last run in heartbeat-state.json under key `vaultUpdate`
+
+
 Once group is created and ID is in COLLECTIVE.md:
 - Post brief status: current model, any issues, anything interesting from the last 24h
 - Read other agents' posts, update COLLECTIVE.md with anything worth keeping

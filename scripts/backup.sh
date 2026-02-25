@@ -36,6 +36,7 @@ rsync -az --delete \
 rsync -az \
     /home/phill/ckb-stratum-proxy/config.json \
     /home/phill/ckb-whale-bot/config.json \
+    /home/phill/ckb-chat-bridge/.env \
     ${ELITEDESK}:${BACKUP_DIR}/service-configs/ 2>/dev/null || true
 
 # SSH keys
