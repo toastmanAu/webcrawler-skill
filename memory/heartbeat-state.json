@@ -1,12 +1,13 @@
 {
   "lastChecks": {
-    "modelCheck": 1771982862,
-    "dashboard": 1772001691,
-    "ckbNode": 1772001691,
-    "whaleBot": 1772001691,
-    "stratum": 1772001691,
-    "uvTracker": 1772001691,
-    "antiScam": 1771989941,
+    "modelCheck": 1772039281,
+    "dashboard": 1772050087,
+    "ckbNode": 1772050087,
+    "whaleBot": 1772050087,
+    "stratum": 1772050087,
+    "uvTracker": 1772050087,
+    "chatBridge": 1772050087,
+    "antiScam": 1772050087,
     "backup": 1772001691
   }
 }
