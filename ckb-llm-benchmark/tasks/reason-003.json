@@ -1,0 +1,22 @@
+{
+  "id": "reason-003",
+  "category": "reasoning",
+  "difficulty": "medium",
+  "title": "Fiber Network channel routing and balance constraints",
+  "prompt": "A Fiber Network (CKB's Lightning-like payment channel network) has the following channel state:\n\n**Channel A-C (between Alice and Carol):**\n- Total capacity: 10,000 CKB\n- Alice's balance: 7,000 CKB\n- Carol's balance: 3,000 CKB\n\n**Channel C-B (between Carol and Bob):**\n- Total capacity: 6,000 CKB\n- Carol's balance: 4,000 CKB\n- Bob's balance: 2,000 CKB\n\n**Scenario:** Alice wants to send 4,000 CKB to Bob via Carol (route: Alice → Carol → Bob).\n\nAnswer the following with clear reasoning:\n\n1. **Is this route possible?** Analyze each hop separately.\n   - Hop 1: Can Alice send 4,000 CKB to Carol on channel A-C?\n   - Hop 2: Can Carol forward 4,000 CKB to Bob on channel C-B?\n\n2. **What are the binding constraints?** For a multi-hop payment, what determines the maximum amount that can flow along a route?\n\n3. **If the payment succeeds, what are the resulting balances** in both channels?\n\n4. **HTLC mechanics:** Briefly explain why Carol's funds are not at risk during the forwarding process, even though she forwards before receiving Alice's payment.\n\n5. **What is the maximum Alice could actually send to Bob via Carol** given the current channel states?\n\nNote: Ignore routing fees for simplicity.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "4,000",
+      "HTLC",
+      "Carol",
+      "balance",
+      "hop",
+      "impossible",
+      "2,000",
+      "maximum"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

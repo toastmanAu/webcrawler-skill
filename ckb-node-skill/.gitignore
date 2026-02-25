@@ -1,0 +1,9 @@
+# .gitignore for CKB Node Monitor Alexa Skill
+node_modules/
+lambda/node_modules/
+.env
+*.zip
+dist/
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,65 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "CKB Node Monitor",
+          "summary": "Monitor your CKB (Nervos Network) node stats on Echo Show devices.",
+          "description": "CKB Node Monitor displays real-time stats from your Nervos Network (CKB) node directly on your Echo Show. See block height, sync status, peer count, node version, and health status at a glance.\n\nNode runners: set your node IP once and get personal real-time data.\nEveryone else: see live public network data with a gentle nudge to run your own node.\n\nFeatures:\n• Live block height and sync status\n• Peer count and connection health\n• Node version info\n• Visual healthy / syncing / offline indicator\n• Tap to refresh\n• Voice queries: 'Alexa, ask CKB node monitor for my block height'",
+          "whatsNew": "Initial release — full dashboard for Echo Show with APL visuals.",
+          "examplePhrases": [
+            "Alexa, open CKB node monitor",
+            "Alexa, ask CKB node monitor for my block height",
+            "Alexa, ask CKB node monitor to set my node to 192.168.1.100"
+          ],
+          "keywords": [
+            "CKB",
+            "Nervos",
+            "blockchain",
+            "node",
+            "monitor",
+            "crypto",
+            "mining"
+          ],
+          "smallIconUri": "https://s3.amazonaws.com/BUCKET/skill-icons/ckb-node-monitor-108.png",
+          "largeIconUri": "https://s3.amazonaws.com/BUCKET/skill-icons/ckb-node-monitor-512.png"
+        }
+      },
+      "isAvailableWorldwide": true,
+      "testingInstructions": "Say 'Alexa, open CKB node monitor'. On Echo Show, a dashboard will appear. To set a custom node: 'Alexa, ask CKB node monitor to set my node to <IP address>'. Voice query: 'Alexa, ask CKB node monitor for my block height'.",
+      "category": "TOOLS",
+      "distributionCountries": []
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda"
+        },
+        "interfaces": [
+          {
+            "type": "ALEXA_PRESENTATION_APL"
+          }
+        ]
+      }
+    },
+    "manifestVersion": "1.0",
+    "permissions": [
+      {
+        "name": "alexa::persistent_unit_id::read"
+      }
+    ],
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "",
+          "termsOfUseUrl": ""
+        }
+      }
+    }
+  }
+}

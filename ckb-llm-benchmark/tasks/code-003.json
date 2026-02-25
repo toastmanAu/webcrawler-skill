@@ -1,0 +1,23 @@
+{
+  "id": "code-003",
+  "category": "code_generation",
+  "difficulty": "easy",
+  "title": "CKB node RPC monitor script",
+  "prompt": "Write a Python script that monitors a CKB node via its JSON-RPC interface. The script must:\n\n1. Poll `http://localhost:8114` every 10 seconds (configurable via `POLL_INTERVAL` constant at the top)\n2. On each poll, make TWO separate RPC calls:\n   - `get_blockchain_info` — extract and display `tip_block_number` and `is_initial_block_download`\n   - `get_peers` — count the number of peers returned\n3. Print each poll result in this exact format:\n   `[2024-01-15 10:30:45] Height: 12345678 | IBD: False | Peers: 8`\n4. Handle connection errors gracefully — print an error line and continue polling:\n   `[2024-01-15 10:30:45] ERROR: Connection refused`\n5. Handle KeyboardInterrupt cleanly with a goodbye message\n6. Use only Python standard library (requests is NOT available — use urllib.request)\n7. Set a 5 second timeout on each HTTP request\n\nThe script should be production-ready: include the shebang line, proper error handling for JSON parse errors, and a `if __name__ == '__main__':` guard.\n\nShow the complete, runnable script.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "urllib",
+      "get_blockchain_info",
+      "get_peers",
+      "tip_block_number",
+      "KeyboardInterrupt",
+      "POLL_INTERVAL",
+      "time.sleep",
+      "__main__",
+      "timeout"
+    ]
+  },
+  "max_tokens": 1024,
+  "temperature": 0
+}

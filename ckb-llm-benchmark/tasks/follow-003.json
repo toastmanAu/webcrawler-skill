@@ -1,0 +1,24 @@
+{
+  "id": "follow-003",
+  "category": "instruction_following",
+  "difficulty": "medium",
+  "title": "CKB transaction flow — strict numbered format with Gotchas",
+  "prompt": "Write a CKB transaction flow in exactly these steps, each as a numbered item, each under 20 words:\n(1) UTXO selection\n(2) Output construction\n(3) Fee calculation\n(4) Witness generation\n(5) Serialisation\n(6) Broadcast\n\nThen add a 'Gotchas' section with exactly 3 bullet points about common mistakes developers make when building CKB transactions.\n\nRules:\n- Each numbered step must be UNDER 20 words (count them)\n- The Gotchas section must have EXACTLY 3 bullet points (no more, no less)\n- Use the heading '## Gotchas' for that section\n- No other sections or text",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "1.",
+      "2.",
+      "3.",
+      "4.",
+      "5.",
+      "6.",
+      "Gotchas",
+      "UTXO",
+      "fee",
+      "witness"
+    ]
+  },
+  "max_tokens": 512,
+  "temperature": 0
+}

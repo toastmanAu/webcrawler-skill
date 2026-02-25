@@ -2,7 +2,11 @@
 
 Skills define _how_ tools work. This file is for _your_ specifics — the stuff that's unique to your setup.
 
-## What Goes Here
+## Ollama (Local Inference)
+- N100 endpoint: http://192.168.68.91:11434
+- Model: llama3.2:3b (CPU only, ~5-8 tok/s on N100)
+- LAN accessible from all machines
+- Use as fallback when HuggingFace is rate-limited
 
 Things like:
 

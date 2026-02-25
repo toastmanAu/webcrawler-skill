@@ -1,0 +1,22 @@
+{
+  "id": "code-005",
+  "category": "code_generation",
+  "difficulty": "hard",
+  "title": "CKB transaction skeleton builder",
+  "prompt": "Write a JavaScript function `buildTransaction(utxos, recipientAddress, amountShannons)` that constructs a CKB transaction skeleton.\n\nInputs:\n- `utxos`: array of objects `{ txHash, index, capacity }` where capacity is in shannons (1 CKB = 10^8 shannons)\n- `recipientAddress`: a CKB address string (you may assume it's already decoded to a lock script `{ code_hash, hash_type, args }`)\n- `amountShannons`: BigInt, amount to send\n\nThe function must:\n1. Select enough UTXOs to cover amount + fee (greedy selection)\n2. Construct outputs:\n   - Output 0: recipient, `amountShannons` capacity\n   - Output 1 (change): sender's first UTXO lock script, remaining capacity minus fee\n3. Calculate fee: `Math.ceil(txSizeBytes / 1000) * 1000` shannons where txSizeBytes is estimated as:\n   - Base: 96 bytes\n   - Per input: 44 bytes  \n   - Per output: 33 bytes + output_data length\n   - Per witness: 85 bytes (secp256k1 signature witness)\n4. Return an object:\n```js\n{\n  version: '0x0',\n  cell_deps: [{\n    out_point: { tx_hash: '0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', index: '0x0' },\n    dep_type: 'dep_group'\n  }],\n  header_deps: [],\n  inputs: [{ previous_output: { tx_hash, index }, since: '0x0' }],\n  outputs: [{ capacity, lock: { code_hash, hash_type, args } }],\n  outputs_data: ['0x'],\n  witnesses: ['0x5500000010000000550000005500000041000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000']\n}\n```\n5. Throw if insufficient funds\n\nAll numeric values in the returned object must be hex strings with 0x prefix.\n\nInclude a demo at the bottom showing a transaction with 2 UTXOs of 500 CKB each sending 800 CKB.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "fee",
+      "shannon",
+      "cell_deps",
+      "witnesses",
+      "previous_output",
+      "capacity",
+      "change",
+      "BigInt"
+    ]
+  },
+  "max_tokens": 2048,
+  "temperature": 0
+}

@@ -1,0 +1,24 @@
+{
+  "id": "know-002",
+  "category": "domain_knowledge",
+  "difficulty": "medium",
+  "title": "CKB-VM: RISC-V, design rationale, and developer implications",
+  "prompt": "Explain CKB-VM in depth. Your answer must address:\n\n1. **Instruction Set Architecture:**\n   - Which RISC-V standard does CKB-VM implement? (base ISA + which extensions)\n   - Is it 32-bit or 64-bit?\n   - Does it support floating point? Why or why not?\n\n2. **Why RISC-V over EVM or WASM:**\n   - Give at least 3 specific technical reasons why Nervos chose RISC-V\n   - What are the tradeoffs compared to EVM (Ethereum's approach)?\n   - What are the tradeoffs compared to WASM (used by Polkadot/Near)?\n\n3. **Determinism and consensus safety:**\n   - What makes CKB-VM's execution deterministic?\n   - How does CKB handle the absence of floating point (which has platform-specific behaviour)?\n\n4. **Practical developer implications:**\n   - What languages can developers use to write CKB contracts?\n   - What is the primary language used in practice and why?\n   - How does cycle accounting work, and why is it important?\n\n5. **Security model:**\n   - What is the CKB-VM execution sandbox?\n   - Can a CKB script access the network or file system? Why not?\n   - How are system calls handled?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "RISC-V",
+      "RV64IMC",
+      "deterministic",
+      "EVM",
+      "WASM",
+      "cycle",
+      "C",
+      "Rust",
+      "floating point",
+      "sandbox"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

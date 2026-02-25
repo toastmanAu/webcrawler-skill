@@ -1,0 +1,96 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CKB Node Monitor — Alexa Skill Infrastructure
+
+Parameters:
+  SkillId:
+    Type: String
+    Description: Alexa Skill ID (amzn1.ask.skill.xxxx)
+  TableName:
+    Type: String
+    Default: ckb-node-monitor-attributes
+
+Resources:
+
+  # ── DynamoDB table for persistent user attributes ──────────────────────────
+  CkbAttributesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Project
+          Value: ckb-node-monitor
+
+  # ── Lambda execution role ──────────────────────────────────────────────────
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ckb-node-monitor-lambda-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:CreateTable
+                  - dynamodb:DescribeTable
+                Resource: !GetAtt CkbAttributesTable.Arn
+
+  # ── Lambda function ────────────────────────────────────────────────────────
+  CkbSkillLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: ckb-node-monitor-skill
+      Runtime: nodejs18.x
+      Handler: index.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 15
+      MemorySize: 256
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref TableName
+      Code:
+        ZipFile: |
+          // Placeholder — replaced by ask deploy
+          exports.handler = async () => ({ statusCode: 200 });
+
+  # ── Alexa trigger permission ───────────────────────────────────────────────
+  AlexaTriggerPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt CkbSkillLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: alexa-appkit.amazon.com
+      EventSourceToken: !Ref SkillId
+
+Outputs:
+  LambdaArn:
+    Description: Lambda function ARN — paste into Alexa Developer Console
+    Value: !GetAtt CkbSkillLambda.Arn
+  DynamoTableName:
+    Description: DynamoDB table name
+    Value: !Ref CkbAttributesTable

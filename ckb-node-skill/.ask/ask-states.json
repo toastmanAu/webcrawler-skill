@@ -1,0 +1,18 @@
+{
+  "askcliStatesVersion": "2020-03-31",
+  "profiles": {
+    "default": {
+      "skillId": "",
+      "skillMetadata": {
+        "src": "./skill-package",
+        "lastDeployHash": ""
+      },
+      "code": {
+        "default": {
+          "src": "./lambda",
+          "lastDeployHash": ""
+        }
+      }
+    }
+  }
+}

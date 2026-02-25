@@ -1,0 +1,23 @@
+{
+  "id": "know-001",
+  "category": "domain_knowledge",
+  "difficulty": "easy",
+  "title": "Lock script vs type script in CKB",
+  "prompt": "What is the difference between CKB's lock script and type script? Provide a thorough explanation covering:\n\n1. **Fundamental purpose of each:**\n   - What does a lock script control?\n   - What does a type script control?\n   - Which one is mandatory on every cell?\n\n2. **Execution context:**\n   - When is each script executed (inputs vs outputs)?\n   - What is the significance of lock scripts running on inputs and type scripts running on both inputs AND outputs?\n\n3. **Concrete examples — give one real example of each:**\n   - A use case where only a lock script is needed\n   - A use case where a type script is essential\n   - A use case where both matter and interact\n\n4. **The secp256k1-blake160 lock script specifically:**\n   - What does it verify?\n   - What is in the `args` field for this lock script?\n   - Why is Blake160 used instead of the full public key?\n\n5. **Transaction validation flow:**\n   - Walk through what happens when a CKB node validates a simple CKB transfer transaction: which scripts run, in what order, and what do they check?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "lock script",
+      "type script",
+      "input",
+      "output",
+      "ownership",
+      "secp256k1",
+      "blake160",
+      "validation",
+      "mandatory"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

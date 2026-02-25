@@ -1,0 +1,16 @@
+{
+  "id": "code-002",
+  "category": "code_generation",
+  "difficulty": "hard",
+  "title": "Blake2b-256 pure JavaScript implementation",
+  "prompt": "Implement Blake2b-256 in pure JavaScript with no external libraries. Your implementation must:\n\n1. Export or define a function `blake2b256(input)` where `input` is a Uint8Array or hex string (with or without 0x prefix)\n2. Return the hash as a lowercase hex string with 0x prefix\n3. Use the correct Blake2b parameters: digest length 32, no key, no salt, no personalisation (unless specified)\n4. Correctly handle the Blake2b initialisation vector, sigma permutation table, and G mixing function\n\nVerification — your implementation MUST produce these correct outputs:\n- Empty input `''` → `0x0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8`\n- Input `'abc'` (as UTF-8 bytes) → `0xbddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319`\n\nInclude test code at the bottom that runs both verifications and prints PASS or FAIL for each, then prints the hash for the string 'CKB' in UTF-8.\n\nNote: Blake2b operates on 64-bit words. In JavaScript, use BigInt or split each 64-bit word into two 32-bit halves (hi/lo) for correctness. Do NOT approximate with regular numbers.",
+  "evaluation": {
+    "type": "code_execution",
+    "setup": "",
+    "test_code": "const emptyResult = blake2b256(new Uint8Array(0));\nconst abcResult = blake2b256(new TextEncoder().encode('abc'));\nconsole.log(emptyResult === '0x0e5751c026e543b2e8ab2eb06099daa1d1e5df47778f7787faab45cdf12fe3a8' ? 'EMPTY:PASS' : 'EMPTY:FAIL:'+emptyResult);\nconsole.log(abcResult === '0xbddd813c634239723171ef3fee98579b94964e3bb1cb3e427262c8c068d52319' ? 'ABC:PASS' : 'ABC:FAIL:'+abcResult);",
+    "expected_output": "EMPTY:PASS\nABC:PASS",
+    "keywords": ["blake2b", "BigInt", "sigma", "IV", "mixing"]
+  },
+  "max_tokens": 4096,
+  "temperature": 0
+}

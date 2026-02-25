@@ -1,0 +1,21 @@
+{
+  "id": "follow-005",
+  "category": "instruction_following",
+  "difficulty": "medium",
+  "title": "CKB CLI simulator — realistic terminal output",
+  "prompt": "You are a CKB node CLI. Respond to the following commands exactly as the CKB CLI would, with realistic mock data (use plausible block numbers, peer counts, version numbers, hashes). Format each as a terminal block with a $ prompt on the command line.\n\nCommands to simulate:\n1. `ckb --version`\n2. `ckb rpc get_blockchain_info`\n3. `ckb rpc get_peers | jq length`\n\nRules:\n- Each command must be in a separate fenced code block with `bash` or `shell` language tag\n- The get_blockchain_info response must be valid JSON with realistic field values\n- The jq output must just be a single integer on its own line\n- Do not explain the commands — just show the terminal output\n- Use CKB mainnet values (chain='ckb', not 'ckt')",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "ckb --version",
+      "get_blockchain_info",
+      "chain",
+      "tip_block_number",
+      "```",
+      "epoch",
+      "is_initial_block_download"
+    ]
+  },
+  "max_tokens": 1024,
+  "temperature": 0
+}

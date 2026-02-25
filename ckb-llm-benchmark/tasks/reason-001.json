@@ -1,0 +1,20 @@
+{
+  "id": "reason-001",
+  "category": "reasoning",
+  "difficulty": "easy",
+  "title": "CKB transaction capacity arithmetic",
+  "prompt": "A CKB transaction has the following structure:\n\n- Input 0: 500 CKB\n- Input 1: 500 CKB\n- Output 0: 400 CKB (to recipient A)\n- Output 1: 350 CKB (to recipient B)\n- Output 2: ? CKB (change output back to sender)\n- Transaction size: 597 bytes\n- Fee rate: 1000 shannons per kilobyte\n\nNote: 1 CKB = 100,000,000 shannons (10^8)\n\nQuestion: What is the capacity of the change output (Output 2)? Show your working step by step.\n\nHints:\n- The fee is calculated as: ceil(tx_size / 1000) * fee_rate (where size is in bytes and 1 KB = 1000 bytes for CKB fee calculation)\n- Total inputs must equal total outputs PLUS fee\n- All arithmetic should be done in shannons for precision",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "597",
+      "1000",
+      "shannons",
+      "change",
+      "249",
+      "fee"
+    ]
+  },
+  "max_tokens": 1024,
+  "temperature": 0
+}

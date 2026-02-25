@@ -1,0 +1,127 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "c k b node monitor",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "LaunchRequest",
+          "samples": []
+        },
+        {
+          "name": "GetStatsIntent",
+          "slots": [],
+          "samples": [
+            "show me my node stats",
+            "show node stats",
+            "get stats",
+            "check my node",
+            "what are my node stats",
+            "node status",
+            "check status",
+            "show dashboard",
+            "my block height",
+            "for my block height",
+            "block height",
+            "what is my block height",
+            "current block height",
+            "show block height",
+            "sync status",
+            "am I synced",
+            "is my node synced",
+            "how many peers",
+            "peer count",
+            "node version",
+            "refresh stats",
+            "update stats"
+          ]
+        },
+        {
+          "name": "SetNodeIPIntent",
+          "slots": [
+            {
+              "name": "ipAddress",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "set my node to {ipAddress}",
+            "set node to {ipAddress}",
+            "my node is {ipAddress}",
+            "configure my node to {ipAddress}",
+            "update my node to {ipAddress}",
+            "change my node to {ipAddress}",
+            "set my node IP to {ipAddress}",
+            "node IP is {ipAddress}"
+          ]
+        },
+        {
+          "name": "ClearNodeIPIntent",
+          "slots": [],
+          "samples": [
+            "clear my node",
+            "remove my node",
+            "delete my node",
+            "reset my node",
+            "clear node setting",
+            "forget my node",
+            "use public node",
+            "switch to public node"
+          ]
+        }
+      ],
+      "types": []
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "SetNodeIPIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "ipAddress",
+              "type": "AMAZON.SearchQuery",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.SetNodeIPIntent.ipAddress"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "SKILL_RESPONSE"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.SetNodeIPIntent.ipAddress",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What is your node's IP address?"
+          }
+        ]
+      }
+    ]
+  }
+}

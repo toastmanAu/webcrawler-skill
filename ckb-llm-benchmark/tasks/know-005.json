@@ -1,0 +1,24 @@
+{
+  "id": "know-005",
+  "category": "domain_knowledge",
+  "difficulty": "medium",
+  "title": "NervosDAO: deposit, withdrawal phases, and compensation formula",
+  "prompt": "Explain the NervosDAO contract in depth. Cover all of the following:\n\n1. **Purpose:**\n   - What economic problem does NervosDAO solve for CKB holders?\n   - What does 'protected from secondary issuance dilution' mean in practice?\n\n2. **Deposit phase:**\n   - What does a user do to deposit into NervosDAO? (describe the transaction structure)\n   - What gets locked in the NervosDAO cell?\n   - Can the deposit be partially withdrawn?\n\n3. **Withdrawal — two phases:**\n   - Phase 1 (withdraw request): What transaction does the user submit? What changes in the cell?\n   - Phase 2 (unlock): What condition must be met before Phase 2 can be submitted?\n   - What is the minimum lock period and why does this specific period exist?\n   - What is an 'epoch' in CKB and how does it relate to withdrawal timing?\n\n4. **Compensation formula:**\n   - Write out the compensation formula (or describe it precisely)\n   - What two block numbers are used in the calculation?\n   - If Alice deposits when the AR (accumulated rate) is 1.0 and withdraws when AR is 1.05, and she deposited 1,000 CKB, approximately how much does she receive?\n\n5. **Edge case:**\n   - What happens if the user starts Phase 1 but never completes Phase 2? Is their CKB locked forever?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "NervosDAO",
+      "secondary issuance",
+      "deposit",
+      "withdrawal",
+      "epoch",
+      "180",
+      "compensation",
+      "AR",
+      "accumulated rate",
+      "dilution"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

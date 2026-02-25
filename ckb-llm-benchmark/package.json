@@ -1,0 +1,19 @@
+{
+  "name": "ckb-llm-benchmark",
+  "version": "1.0.0",
+  "description": "CKB/Nervos-flavoured LLM benchmark harness for comparing AI model capabilities",
+  "main": "runner.js",
+  "type": "commonjs",
+  "scripts": {
+    "benchmark": "node runner.js",
+    "report": "node report.js",
+    "dry-run": "node runner.js --dry-run"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "license": "MIT"
+}

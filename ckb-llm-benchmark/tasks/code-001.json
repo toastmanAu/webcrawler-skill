@@ -1,0 +1,16 @@
+{
+  "id": "code-001",
+  "category": "code_generation",
+  "difficulty": "medium",
+  "title": "CKB address decoder",
+  "prompt": "Write a JavaScript function `decodeCKBAddress(address)` that decodes a CKB full address (bech32m format) and returns an object with the lock script fields: `code_hash` (hex string with 0x prefix), `hash_type` (string: 'type', 'data', or 'data1'), and `args` (hex string with 0x prefix).\n\nThe CKB full address format (RFC 0021):\n- Encoded with bech32m\n- Human-readable part (HRP): 'ckb' for mainnet, 'ckt' for testnet\n- Payload: [0x00] + code_hash (32 bytes) + hash_type (1 byte) + args (variable)\n- hash_type byte: 0x00 = 'data', 0x01 = 'type', 0x02 = 'data1'\n\nInclude a test that decodes this address and prints the result:\n`ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtj5ses5f88ggyeggrz7f9zh0kch40ctxsas20ze`\n\nExpected result for the test address:\n- code_hash: 0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8\n- hash_type: type\n- args: 0x36c329ed630d6ce750712a477543672adab57f4c\n\nDo NOT use any external libraries. Implement bech32m decoding from scratch or use the algorithm directly. The function should throw a descriptive error for invalid addresses.",
+  "evaluation": {
+    "type": "code_execution",
+    "setup": "",
+    "test_code": "const result = decodeCKBAddress('ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtj5ses5f88ggyeggrz7f9zh0kch40ctxsas20ze');\nconsole.log(JSON.stringify({code_hash: result.code_hash, hash_type: result.hash_type, args: result.args}));",
+    "expected_output": "{\"code_hash\":\"0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8\",\"hash_type\":\"type\",\"args\":\"0x36c329ed630d6ce750712a477543672adab57f4c\"}",
+    "keywords": ["bech32m", "code_hash", "hash_type", "args"]
+  },
+  "max_tokens": 2048,
+  "temperature": 0
+}

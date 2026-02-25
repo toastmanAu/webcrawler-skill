@@ -1,0 +1,11 @@
+{
+  "aws": {
+    "runtime": "nodejs18.x",
+    "handler": "index.handler",
+    "timeout": 15,
+    "memorySize": 256,
+    "environment": {
+      "DYNAMODB_TABLE": "ckb-node-monitor-attributes"
+    }
+  }
+}

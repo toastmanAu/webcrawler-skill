@@ -1,0 +1,23 @@
+{
+  "id": "code-004",
+  "category": "code_generation",
+  "difficulty": "hard",
+  "title": "CKB script hash in C with Molecule encoding",
+  "prompt": "Write a C function `ckb_script_hash` that computes the CKB script hash. The script hash is Blake2b-256 of the Molecule-serialised Script struct.\n\nThe Molecule Script struct layout:\n```\nTable Script {\n    code_hash: Byte32,\n    hash_type: byte,\n    args: Bytes,\n}\n```\n\nMolecule table serialisation format:\n- 4 bytes: total byte length (little-endian uint32)\n- 4 bytes: number of fields (little-endian uint32) — for Script this is always 3\n- 4 bytes per field: offset of each field from start of table (little-endian uint32)\n- Field data concatenated\n  - code_hash: 32 bytes raw\n  - hash_type: 1 byte\n  - args: 4 bytes length prefix (little-endian uint32) + raw bytes\n\nFunction signature:\n```c\n// Returns 0 on success, -1 on error\n// out_hash must be 32 bytes\nint ckb_script_hash(\n    const uint8_t *code_hash,  // 32 bytes\n    uint8_t hash_type,          // 0=data, 1=type, 2=data1\n    const uint8_t *args,        // variable length\n    size_t args_len,\n    uint8_t *out_hash           // 32 bytes output\n);\n```\n\nFor Blake2b-256, you may use this simplified interface (assume it's available):\n```c\nvoid blake2b_256(const uint8_t *input, size_t len, uint8_t *out);\n```\n\nInclude:\n1. The complete `ckb_script_hash` function with Molecule encoding\n2. A `main()` that tests with: code_hash = all zeros (32 bytes), hash_type = 0x01 (type), args = empty\n3. Print the resulting hash as hex\n4. Comments explaining each part of the Molecule encoding\n\nDo NOT use dynamic allocation — use a fixed stack buffer sized for reasonable script sizes (max 1024 byte args).",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "molecule",
+      "little-endian",
+      "uint32",
+      "blake2b",
+      "code_hash",
+      "hash_type",
+      "args",
+      "offset",
+      "serialis"
+    ]
+  },
+  "max_tokens": 2048,
+  "temperature": 0
+}

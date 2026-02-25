@@ -1,0 +1,20 @@
+{
+  "id": "debug-001",
+  "category": "debugging",
+  "difficulty": "medium",
+  "title": "Broken CKB address validator",
+  "prompt": "The following JavaScript code is supposed to validate CKB addresses (bech32m format) but contains exactly 3 bugs. Find and fix all of them. Explain each bug clearly.\n\n```javascript\nconst BECH32M_CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'; // bech32 charset\nconst BECH32M_CONST = 0x2bc830a3;\n\nfunction bech32mPolymod(values) {\n  const GEN = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];\n  let chk = 1;\n  for (const v of values) {\n    const b = chk >> 25;\n    chk = ((chk & 0x1ffffff) << 5) ^ v;\n    for (let i = 0; i < 5; i++) {\n      if ((b >> i) & 1) chk ^= GEN[i];\n    }\n  }\n  return chk;\n}\n\nfunction bech32mDecode(str) {\n  str = str.toLowerCase();\n  const sepPos = str.lastIndexOf('1');\n  if (sepPos < 1 || sepPos + 7 > str.length) throw new Error('Invalid bech32m string');\n  \n  const hrp = str.slice(0, sepPos);\n  const data = [];\n  for (let i = sepPos + 1; i < str.length; i++) {\n    const d = BECH32M_CHARSET.indexOf(str[i]);\n    if (d === -1) throw new Error('Invalid character: ' + str[i]);\n    data.push(d);\n  }\n  \n  const hrpExpanded = [];\n  for (const c of hrp) {\n    hrpExpanded.push(c.charCodeAt(0) >> 5);\n  }\n  hrpExpanded.push(0);\n  for (const c of hrp) {\n    hrpExpanded.push(c.charCodeAt(0) & 31);\n  }\n  \n  if (bech32mPolymod([...hrpExpanded, ...data]) !== BECH32M_CONST) {\n    throw new Error('Invalid checksum');\n  }\n  \n  return { hrp, data: data.slice(0, -6) };\n}\n\nfunction validateCKBAddress(address) {\n  const { hrp, data } = bech32mDecode(address);\n  \n  if (hrp !== 'ckb' && hrp !== 'ckt') {\n    throw new Error('Invalid HRP: ' + hrp);\n  }\n  \n  // Convert 5-bit groups to bytes\n  const bytes = [];\n  let acc = 0, bits = 0;\n  for (const val of data) {\n    acc = (acc << 5) | val;\n    bits += 5;\n    while (bits >= 8) {\n      bits -= 8;\n      bytes.push((acc >> bits) & 0xff);\n    }\n  }\n  \n  // Full address format: [0x00] + code_hash (32 bytes) + hash_type (1 byte) + args\n  if (data[0] !== 0x00) throw new Error('Not a full address (payload[0] must be 0x00)');\n  if (bytes.length < 34) throw new Error('Payload too short');  // should be < 34\n  \n  const code_hash = bytes.slice(1, 33);\n  const hash_type_byte = bytes[33];\n  const args = bytes.slice(34);\n  \n  const hashTypeMap = { 0x00: 'data', 0x01: 'type', 0x02: 'data1' };\n  const hash_type = hashTypeMap[hash_type_byte];\n  if (!hash_type) throw new Error('Unknown hash_type byte: ' + hash_type_byte);\n  \n  return {\n    network: hrp === 'ckb' ? 'mainnet' : 'testnet',\n    code_hash: '0x' + Buffer.from(code_hash).toString('hex'),\n    hash_type,\n    args: '0x' + Buffer.from(args).toString('hex')\n  };\n}\n\n// Test\ntry {\n  const result = validateCKBAddress('ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtj5ses5f88ggyeggrz7f9zh0kch40ctxsas20ze');\n  console.log(result);\n} catch(e) {\n  console.error('Failed:', e.message);\n}\n```\n\nBug hints:\n1. One bug is in the charset used for decoding\n2. One bug is in the minimum payload length check\n3. One bug relates to which byte is checked for the full address format indicator\n\nFor each bug: (a) identify the line, (b) explain why it's wrong, (c) show the corrected code.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "qpzry9x8gf2tvdw0s3jn54khce6mua7l",
+      "charset",
+      "bytes[0]",
+      "34",
+      "33",
+      "data[0]"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

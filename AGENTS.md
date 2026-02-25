@@ -207,6 +207,46 @@ Think of it like a human reviewing their journal and updating their mental model
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
 
+## 🧠 Model Selection — Use Resources Wisely
+
+Phill's request: use expensive models for heavy work, free models for simple stuff.
+
+**At the start of each response, classify the task and switch model if needed using `session_status(model=X)`.**
+
+### Use FREE model (`ckbdev/claude-sonnet-4-6`) for:
+- Status checks, heartbeats, health polls
+- Quick factual questions
+- Memory reads/writes
+- Simple file edits (1–2 lines)
+- "Is X running?", "What's the block height?", "Remind me of Y"
+- Sending a message or notification
+
+### Use PRIMARY model (`anthropic/claude-sonnet-4-6`) for:
+- Writing or debugging code (any non-trivial amount)
+- Multi-file changes / refactoring
+- Architecture decisions
+- Anything where being wrong has consequences
+- Complex reasoning or analysis
+- First-time implementation of a feature
+
+### How to switch:
+```python
+# Switch to free before doing simple work:
+session_status(model="ckbdev/claude-sonnet-4-6")
+
+# Switch back to primary for heavy work:
+session_status(model="anthropic/claude-sonnet-4-6")
+
+# Reset to default:
+session_status(model="default")
+```
+
+### Rules:
+- Default assumption: if in doubt, use free. Upgrade to primary only when needed.
+- Don't switch mid-task. Decide upfront and commit.
+- Heartbeat checks → always free (or spawn sub-agent)
+- After heavy code work, switch back to free for the reply/summary.
+
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.

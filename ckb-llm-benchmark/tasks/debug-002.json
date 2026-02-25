@@ -1,0 +1,20 @@
+{
+  "id": "debug-002",
+  "category": "debugging",
+  "difficulty": "hard",
+  "title": "Broken Molecule codec — wrong offset byte order",
+  "prompt": "The following JavaScript code serialises a CKB Script struct using the Molecule binary format, but produces incorrect output. The bug is in the offset vector byte order.\n\nMolecule Table serialisation for Script:\n- Bytes 0-3: total length (little-endian uint32)\n- Bytes 4-7: field count = 3 (little-endian uint32)  \n- Bytes 8-11: offset of code_hash field\n- Bytes 12-15: offset of hash_type field\n- Bytes 16-19: offset of args field\n- Bytes 20-51: code_hash (32 bytes)\n- Byte 52: hash_type (1 byte)\n- Bytes 53-56: args length prefix (little-endian uint32)\n- Bytes 57+: args data\n\n```javascript\nfunction serializeScript(script) {\n  const { code_hash, hash_type, args } = script;\n  \n  // Decode hex strings\n  const codeHashBytes = Buffer.from(code_hash.replace('0x', ''), 'hex'); // 32 bytes\n  const hashTypeByte = { 'data': 0, 'type': 1, 'data1': 2 }[hash_type];\n  const argsBytes = Buffer.from(args.replace('0x', ''), 'hex');\n  \n  // Field sizes\n  const HEADER_SIZE = 4 + 4 + (3 * 4); // total_len + field_count + 3 offsets = 20\n  const CODE_HASH_SIZE = 32;\n  const HASH_TYPE_SIZE = 1;\n  const ARGS_SIZE = 4 + argsBytes.length; // length prefix + data\n  \n  const totalSize = HEADER_SIZE + CODE_HASH_SIZE + HASH_TYPE_SIZE + ARGS_SIZE;\n  const buf = Buffer.alloc(totalSize);\n  let offset = 0;\n  \n  // Write total length\n  buf.writeUInt32BE(totalSize, offset); offset += 4;  // BUG: should be LE\n  \n  // Write field count\n  buf.writeUInt32LE(3, offset); offset += 4;\n  \n  // Write offsets (where each field starts, from beginning of table)\n  const codeHashOffset = HEADER_SIZE;                              // = 20\n  const hashTypeOffset = HEADER_SIZE + CODE_HASH_SIZE;             // = 52\n  const argsOffset = HEADER_SIZE + CODE_HASH_SIZE + HASH_TYPE_SIZE; // = 53\n  \n  buf.writeUInt32BE(codeHashOffset, offset); offset += 4;  // BUG: should be LE\n  buf.writeUInt32BE(hashTypeOffset, offset); offset += 4;  // BUG: should be LE\n  buf.writeUInt32BE(argsOffset, offset); offset += 4;      // BUG: should be LE\n  \n  // Write fields\n  codeHashBytes.copy(buf, offset); offset += CODE_HASH_SIZE;\n  buf[offset] = hashTypeByte; offset += 1;\n  buf.writeUInt32LE(argsBytes.length, offset); offset += 4;\n  argsBytes.copy(buf, offset);\n  \n  return '0x' + buf.toString('hex');\n}\n\n// Test case\nconst script = {\n  code_hash: '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8',\n  hash_type: 'type',\n  args: '0x36c329ed630d6ce750712a477543672adab57f4c'\n};\n\nconsole.log('Buggy output:  ', serializeScript(script));\nconsole.log('Expected start:', '0x590000001400000020000000350000003600000001...');\n```\n\nThe correct serialised output for this script should start with:\n`0x590000001400000020000000350000003600000001`\n\nBut the buggy version produces a different result because `writeUInt32BE` is used where `writeUInt32LE` is required.\n\nTasks:\n1. Identify ALL occurrences of the wrong byte-order write (there are 4 total)\n2. Explain why Molecule requires little-endian\n3. Show the corrected function\n4. Verify your fix produces the correct hex output for the test case\n5. Explain what the first 8 bytes `59000000 14000000` mean",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "little-endian",
+      "writeUInt32LE",
+      "writeUInt32BE",
+      "0x59000000",
+      "total",
+      "offset"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

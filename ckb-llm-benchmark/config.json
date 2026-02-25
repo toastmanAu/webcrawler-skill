@@ -1,0 +1,52 @@
+{
+  "models": [
+    {
+      "id": "anthropic/claude-sonnet-4-6",
+      "name": "Claude Sonnet 4.6 (Anthropic)",
+      "baseUrl": "https://api.anthropic.com/v1",
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "provider": "anthropic"
+    },
+    {
+      "id": "ckbdev/claude-sonnet-4-6",
+      "name": "Claude Sonnet 4.6 (CKBDev shared)",
+      "baseUrl": "https://share-ai.ckbdev.com/v1",
+      "apiKeyEnv": "CKBDEV_API_KEY",
+      "provider": "openai-compat"
+    },
+    {
+      "id": "deepseek-ai/DeepSeek-V3.2",
+      "name": "DeepSeek V3.2 (HuggingFace)",
+      "baseUrl": "https://router.huggingface.co/v1",
+      "apiKeyEnv": "HF_API_KEY",
+      "provider": "openai-compat"
+    },
+    {
+      "id": "meta-llama/Llama-3.3-70B-Instruct",
+      "name": "Llama 3.3 70B (HuggingFace)",
+      "baseUrl": "https://router.huggingface.co/v1",
+      "apiKeyEnv": "HF_API_KEY",
+      "provider": "openai-compat"
+    },
+    {
+      "id": "Qwen/Qwen3-32B",
+      "name": "Qwen3 32B (HuggingFace)",
+      "baseUrl": "https://router.huggingface.co/v1",
+      "apiKeyEnv": "HF_API_KEY",
+      "provider": "openai-compat"
+    },
+    {
+      "id": "qwen2.5:3b",
+      "name": "Qwen2.5 3B (Local OPi5+)",
+      "baseUrl": "http://192.168.68.100:11434/v1",
+      "apiKeyEnv": null,
+      "provider": "ollama"
+    }
+  ],
+  "settings": {
+    "timeoutMs": 30000,
+    "retryOnce": true,
+    "pauseBetweenModelsMs": 2000,
+    "resultsDir": "results"
+  }
+}

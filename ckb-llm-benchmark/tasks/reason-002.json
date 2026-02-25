@@ -1,0 +1,22 @@
+{
+  "id": "reason-002",
+  "category": "reasoning",
+  "difficulty": "medium",
+  "title": "CKB Type ID system — uniqueness guarantee",
+  "prompt": "Explain step by step how CKB's Type ID system prevents two cells from having the same type script, and why this matters for upgradeable contracts.\n\nYour explanation must cover:\n1. What a Type ID is and how it is computed (the exact inputs to the hash)\n2. Why the computation makes it impossible for two cells to share the same Type ID, even across different transactions\n3. The role of the first input's OutPoint in the Type ID formula\n4. How contract upgrades work using Type ID — specifically:\n   - How the old cell is consumed and a new cell is created\n   - Why the type_args stays the same across upgrades\n   - What the Type ID script itself validates during a transaction\n5. A concrete example: if a DeFi protocol deploys a lock script using Type ID, what guarantees does a user have when they lock funds to that script?\n6. What is the one scenario where Type ID uniqueness could theoretically be broken, and why is it not a practical concern?\n\nBe precise about what is hashed and what the Type ID script checks at validation time.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "OutPoint",
+      "hash",
+      "input",
+      "unique",
+      "upgrade",
+      "type_args",
+      "consumed",
+      "validation"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

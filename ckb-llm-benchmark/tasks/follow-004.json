@@ -1,0 +1,23 @@
+{
+  "id": "follow-004",
+  "category": "instruction_following",
+  "difficulty": "easy",
+  "title": "CKB vs Ethereum vs Bitcoin comparison table — no prose",
+  "prompt": "Compare CKB, Ethereum, and Bitcoin on these dimensions ONLY, in a markdown table: consensus mechanism, smart contract VM, state model, fee token, block time. No introduction. No conclusion. No explanation. Just the markdown table.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "CKB",
+      "Ethereum",
+      "Bitcoin",
+      "consensus",
+      "VM",
+      "state",
+      "fee",
+      "block time",
+      "| "
+    ]
+  },
+  "max_tokens": 512,
+  "temperature": 0
+}

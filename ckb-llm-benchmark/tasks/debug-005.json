@@ -1,0 +1,22 @@
+{
+  "id": "debug-005",
+  "category": "debugging",
+  "difficulty": "medium",
+  "title": "CKB transaction fee calculation bugs",
+  "prompt": "The following Python script constructs CKB transactions but calculates the fee incorrectly in two distinct ways. Find and fix both bugs.\n\n```python\nimport json\n\ndef estimate_transaction_fee(tx, fee_rate_shannons_per_kb=1000):\n    \"\"\"\n    Estimate fee for a CKB transaction.\n    Fee = ceil(tx_size_bytes / 1024) * fee_rate\n    tx_size is the Molecule-serialised size, NOT the JSON size.\n    \"\"\"\n    \n    # BUG 1: Uses JSON serialization size instead of Molecule binary size\n    # Molecule-serialised size should be calculated from field sizes, not JSON text\n    tx_json = json.dumps(tx)\n    tx_size_bytes = len(tx_json.encode('utf-8'))  # WRONG: JSON is much larger than binary\n    \n    # Correct formula for Molecule tx size estimation:\n    # - Fixed overhead: 68 bytes\n    # - Per input: 44 bytes (outpoint 36 + since 8)\n    # - Per output: 33 bytes minimum + output_data length + lock/type script size\n    #   (simple secp256k1 output with 20-byte args ≈ 61 bytes)\n    # - Per witness: actual byte length of witness data\n    \n    fee = (tx_size_bytes // 1024 + 1) * fee_rate_shannons_per_kb\n    return fee\n\ndef build_transaction(inputs, outputs, witnesses):\n    tx = {\n        'version': '0x0',\n        'cell_deps': [{'out_point': {'tx_hash': '0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c', 'index': '0x0'}, 'dep_type': 'dep_group'}],\n        'header_deps': [],\n        'inputs': inputs,\n        'outputs': outputs,\n        'outputs_data': ['0x'] * len(outputs),\n        'witnesses': witnesses\n    }\n    \n    fee = estimate_transaction_fee(tx)\n    \n    # BUG 2: Witness overhead not included in fee calculation\n    # A secp256k1 witness is 85 bytes (20-byte lock + 65-byte sig), encoded as hex = 170 chars\n    # But estimate_transaction_fee is called BEFORE witnesses are fully populated,\n    # so witness sizes are not yet reflected. The witness placeholder '0x' = 0 bytes counted,\n    # but the actual witness will be 85 bytes per input.\n    # Fix: pass expected_witness_size_per_input to the estimator\n    \n    print(f'Estimated fee: {fee} shannons ({fee/1e8:.8f} CKB)')\n    return tx, fee\n\n# Example: 2 inputs, 2 outputs\ninputs = [\n    {'previous_output': {'tx_hash': '0xabc...', 'index': '0x0'}, 'since': '0x0'},\n    {'previous_output': {'tx_hash': '0xdef...', 'index': '0x1'}, 'since': '0x0'},\n]\noutputs = [\n    {'capacity': hex(400 * 10**8), 'lock': {'code_hash': '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8', 'hash_type': 'type', 'args': '0x36c329ed630d6ce750712a477543672adab57f4c'}},\n    {'capacity': hex(99 * 10**8), 'lock': {'code_hash': '0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8', 'hash_type': 'type', 'args': '0x36c329ed630d6ce750712a477543672adab57f4c'}},\n]\nwitnesses = ['0x', '0x']  # placeholder — will be filled after signing\n\ntx, fee = build_transaction(inputs, outputs, witnesses)\n\n# What fee SHOULD we get?\n# Molecule size: 68 + (2*44) + (2*61) + (2*85) = 68 + 88 + 122 + 170 = 448 bytes\n# Fee at 1000 shannons/KB: ceil(448/1024) * 1000 = 1 * 1000 = 1000 shannons\nprint(f'Expected fee: 1000 shannons')\nprint(f'Buggy script produced: {fee} shannons')\n```\n\nFor each bug:\n1. Name the bug and explain why it matters for real transactions\n2. What would the consequence be? (overpay? underpay? rejected by node?)\n3. Show the corrected `estimate_transaction_fee` function using proper Molecule size estimation\n\nAlso: What happens if a CKB node receives a transaction with insufficient fee? Does it fail silently or return an error?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "Molecule",
+      "JSON",
+      "witness",
+      "85",
+      "1000",
+      "ceil",
+      "shannon",
+      "rejected"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

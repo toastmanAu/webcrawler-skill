@@ -1,0 +1,22 @@
+{
+  "id": "debug-003",
+  "category": "debugging",
+  "difficulty": "medium",
+  "title": "CKB RPC polling script with race condition",
+  "prompt": "The following Node.js script polls a CKB node but has multiple bugs including a race condition, missing error handling, and a connection leak. Find and fix all issues.\n\n```javascript\nconst http = require('http');\n\nlet requestId = 0;\n\nasync function rpcCall(method, params = []) {\n  return new Promise((resolve, reject) => {\n    const body = JSON.stringify({\n      id: ++requestId,\n      jsonrpc: '2.0',\n      method,\n      params\n    });\n    \n    const req = http.request({\n      hostname: 'localhost',\n      port: 8114,\n      path: '/',\n      method: 'POST',\n      headers: {\n        'Content-Type': 'application/json',\n        'Content-Length': body.length  // BUG 1: should use Buffer.byteLength\n      }\n    }, (res) => {\n      let data = '';\n      res.on('data', chunk => data += chunk);\n      res.on('end', () => {\n        const parsed = JSON.parse(data);  // BUG 2: no try/catch, throws on invalid JSON\n        resolve(parsed.result);\n      });\n    });\n    \n    req.on('error', reject);\n    req.write(body);\n    req.end();\n  });\n}\n\nasync function pollOnce() {\n  const info = rpcCall('get_blockchain_info');  // BUG 3: missing await — info is a Promise\n  const peers = await rpcCall('get_peers');\n  \n  const height = info.result?.tip_block_number;  // BUG 4: info is Promise, not result\n  console.log(`Height: ${height}, Peers: ${peers.length}`);\n}\n\nfunction startPolling(intervalMs) {\n  pollOnce();\n  const timer = setInterval(() => {\n    pollOnce();  // BUG 5: unhandled promise rejection if pollOnce throws\n  }, intervalMs);\n  return timer;\n}\n\n// Entry point\nconst timer = startPolling(10000);\n\nprocess.on('SIGINT', () => {\n  clearInterval(timer);\n  console.log('Stopped');\n  // BUG 6: no process.exit() — process hangs due to open http keep-alive\n});\n```\n\nFor each bug:\n1. Identify the line and bug type (logic error, race condition, missing error handling, resource leak, etc.)\n2. Explain the exact failure mode — what goes wrong and when\n3. Show the fixed code for that section\n\nThen provide the complete corrected script.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "await",
+      "Buffer.byteLength",
+      "try",
+      "catch",
+      "process.exit",
+      "race condition",
+      "Promise",
+      "unhandled"
+    ]
+  },
+  "max_tokens": 2048,
+  "temperature": 0
+}

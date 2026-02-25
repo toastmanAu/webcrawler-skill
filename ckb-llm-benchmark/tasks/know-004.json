@@ -1,0 +1,23 @@
+{
+  "id": "know-004",
+  "category": "domain_knowledge",
+  "difficulty": "hard",
+  "title": "CKB RFC 0044 light client protocol",
+  "prompt": "Describe the CKB light client protocol as specified in RFC 0044. Your answer must address:\n\n1. **Protocol overview:**\n   - What problem does RFC 0044 solve? What can a light client verify without downloading the full chain?\n   - Who are the peers in the protocol (light client vs full node roles)?\n\n2. **Cryptographic primitive — MMR:**\n   - What is a Merkle Mountain Range (MMR)?\n   - How does CKB use MMRs in block headers?\n   - What does the MMR root in a block header commit to?\n\n3. **FlyClient sampling:**\n   - RFC 0044 is inspired by FlyClient. Explain the sampling strategy at a high level.\n   - Why is probabilistic sampling of O(log n) headers sufficient for security?\n   - What would an attacker need to do to fool a FlyClient verifier?\n\n4. **Proof types the light client can verify:**\n   - Transaction inclusion proof\n   - Chain tip proof\n   - What can it NOT verify without additional mechanisms?\n\n5. **Trust model:**\n   - Does a light client trust the peer it connects to? Why or why not?\n   - What happens if a light client connects to a malicious peer that provides false headers?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "MMR",
+      "Merkle Mountain Range",
+      "FlyClient",
+      "sampling",
+      "log",
+      "light client",
+      "inclusion",
+      "proof",
+      "RFC 0044"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

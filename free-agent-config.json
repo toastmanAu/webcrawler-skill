@@ -1,0 +1,146 @@
+/**
+ * free-agent-config.json
+ * ──────────────────────────────────────────────────────────────────────────────
+ * OpenClaw agent config that uses ONLY free/no-cost model sources.
+ *
+ * FREE SOURCES USED:
+ *   1. HuggingFace Inference router (free tier, needs HF account + token)
+ *      → DeepSeek V3.2, Llama 3.3 70B, Qwen3 32B, GPT-OSS 120B, Kimi K2.5
+ *   2. Qwen Portal OAuth (2,000 req/day free, device-code login)
+ *      → qwen-portal/coder-model, qwen-portal/vision-model
+ *   3. Gemini CLI OAuth (Google personal account, generous free quota)
+ *      → google-gemini-cli/gemini-2.5-pro, gemini-2.0-flash
+ *
+ * SETUP (one-time per machine):
+ *
+ *   # 1. HuggingFace — get a free token from https://huggingface.co/settings/tokens
+ *   #    (fine-grained, "Make calls to Inference Providers" permission)
+ *   openclaw onboard --auth-choice huggingface-api-key
+ *   # or add to ~/.openclaw/.env:  HUGGINGFACE_HUB_TOKEN=hf_xxx
+ *
+ *   # 2. Qwen Portal OAuth (optional but good free Claude-class model for code)
+ *   openclaw plugins enable qwen-portal-auth
+ *   openclaw gateway restart
+ *   openclaw models auth login --provider qwen-portal
+ *
+ *   # 3. Gemini CLI OAuth (optional, strong free quota)
+ *   openclaw plugins enable google-gemini-cli-auth
+ *   openclaw gateway restart
+ *   openclaw models auth login --provider google-gemini-cli --set-default
+ *
+ *   # 4. Apply this config (merge into your openclaw.json):
+ *   #    Copy the "agents" and "models" blocks into ~/.openclaw/openclaw.json
+ *   #    OR use this file directly if OpenClaw supports --config flag
+ *
+ * COST: $0.00 — no API keys that bill, no credit cards needed for core usage.
+ *
+ * LIMITATIONS:
+ *   - HF free tier has rate limits (slower during peak hours)
+ *   - Qwen Portal: 2,000 req/day
+ *   - Gemini CLI: subject to Google's personal-use quota
+ *   - No image generation (all free text-only)
+ *   - Context windows smaller than paid Claude/GPT-4
+ * ──────────────────────────────────────────────────────────────────────────────
+ */
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        /**
+         * Primary: DeepSeek V3.2 via HuggingFace router.
+         * Strong general-purpose model, genuinely free.
+         * Swap to "huggingface/deepseek-ai/DeepSeek-R1" for heavy reasoning tasks.
+         */
+        "primary": "huggingface/deepseek-ai/DeepSeek-V3.2",
+
+        /**
+         * Fallback chain — all free, tried in order if primary is rate-limited.
+         */
+        "fallbacks": [
+          "huggingface/meta-llama/Llama-3.3-70B-Instruct",
+          "huggingface/Qwen/Qwen3-32B",
+          "huggingface/openai/gpt-oss-120b",
+          "huggingface/moonshotai/Kimi-K2.5",
+          "qwen-portal/coder-model",
+          "google-gemini-cli/gemini-2.0-flash"
+        ]
+      },
+
+      /**
+       * Image model — Gemini 2.0 Flash is free via OAuth and handles images.
+       * Falls back to Gemini CLI if needed.
+       */
+      "imageModel": {
+        "primary": "google-gemini-cli/gemini-2.0-flash",
+        "fallbacks": [
+          "google-gemini-cli/gemini-2.5-pro"
+        ]
+      },
+
+      /**
+       * Model catalog / allowlist.
+       * Only free sources listed — no Anthropic, no OpenAI paid.
+       */
+      "models": {
+        "huggingface/deepseek-ai/DeepSeek-V3.2": {
+          "alias": "DeepSeek V3.2 (free)"
+        },
+        "huggingface/deepseek-ai/DeepSeek-R1": {
+          "alias": "DeepSeek R1 — reasoning (free)"
+        },
+        "huggingface/deepseek-ai/DeepSeek-V3.2:fastest": {
+          "alias": "DeepSeek V3.2 fast (free)"
+        },
+        "huggingface/deepseek-ai/DeepSeek-V3.2:cheapest": {
+          "alias": "DeepSeek V3.2 cheap (free)"
+        },
+        "huggingface/meta-llama/Llama-3.3-70B-Instruct": {
+          "alias": "Llama 3.3 70B (free)"
+        },
+        "huggingface/meta-llama/Llama-3.1-8B-Instruct": {
+          "alias": "Llama 3.1 8B — fast/light (free)"
+        },
+        "huggingface/Qwen/Qwen3-32B": {
+          "alias": "Qwen3 32B (free)"
+        },
+        "huggingface/Qwen/Qwen3-8B": {
+          "alias": "Qwen3 8B — light (free)"
+        },
+        "huggingface/openai/gpt-oss-120b": {
+          "alias": "GPT-OSS 120B (free)"
+        },
+        "huggingface/moonshotai/Kimi-K2.5": {
+          "alias": "Kimi K2.5 (free)"
+        },
+        "qwen-portal/coder-model": {
+          "alias": "Qwen Coder (free OAuth)"
+        },
+        "qwen-portal/vision-model": {
+          "alias": "Qwen Vision (free OAuth)"
+        },
+        "google-gemini-cli/gemini-2.5-pro": {
+          "alias": "Gemini 2.5 Pro (free OAuth)"
+        },
+        "google-gemini-cli/gemini-2.0-flash": {
+          "alias": "Gemini 2.0 Flash (free OAuth)"
+        }
+      },
+
+      "compaction": {
+        "mode": "safeguard"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    }
+  },
+
+  /**
+   * No paid model providers — HF uses the built-in router (no models.providers entry needed).
+   * Qwen Portal and Gemini CLI providers are written by their login commands automatically.
+   */
+  "models": {
+    "mode": "merge"
+  }
+}

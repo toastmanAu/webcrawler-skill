@@ -1,0 +1,19 @@
+{
+  "id": "follow-002",
+  "category": "instruction_following",
+  "difficulty": "medium",
+  "title": "CKB RPC methods markdown table — exactly 5",
+  "prompt": "List exactly 5 CKB RPC methods. For each, provide: method name, one-line description, example request JSON, example response JSON. Format as a markdown table with columns: | Method | Description | Example Request | Example Response |. Do not include any methods not in the official CKB RPC spec. Do not include any introduction, preamble, or conclusion — just the table.",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "get_blockchain_info",
+      "get_tip_block_number",
+      "jsonrpc",
+      "| Method |",
+      "Description"
+    ]
+  },
+  "max_tokens": 1024,
+  "temperature": 0
+}

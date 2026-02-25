@@ -1,0 +1,14 @@
+{
+  "id": "follow-001",
+  "category": "instruction_following",
+  "difficulty": "easy",
+  "title": "Strict JSON-only CKB facts response",
+  "prompt": "Respond ONLY as a JSON object with these exact keys: `ckb_address_format` (string, one sentence), `molecule_purpose` (string, one sentence), `nervos_dao_apy` (string, approximate range), `ckb_vm_isa` (string), `fiber_protocol` (string, one sentence). No other text. No markdown code fences. No explanation. Just the raw JSON object.",
+  "evaluation": {
+    "type": "json_valid",
+    "required_keys": ["ckb_address_format", "molecule_purpose", "nervos_dao_apy", "ckb_vm_isa", "fiber_protocol"],
+    "keywords": ["ckb_address_format", "molecule_purpose", "nervos_dao_apy", "ckb_vm_isa", "fiber_protocol"]
+  },
+  "max_tokens": 512,
+  "temperature": 0
+}

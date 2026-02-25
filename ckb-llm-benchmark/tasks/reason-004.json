@@ -1,0 +1,22 @@
+{
+  "id": "reason-004",
+  "category": "reasoning",
+  "difficulty": "hard",
+  "title": "CKB two-layer issuance and NervosDAO dilution protection",
+  "prompt": "CKB uses a two-layer token issuance model:\n\n- **Primary issuance:** Fixed, halving every 4 years. Started at 33.6 billion CKB in year 1, halving schedule similar to Bitcoin.\n- **Secondary issuance:** Exactly 1.344 billion CKB per year, forever (no halving).\n\nThe secondary issuance is distributed proportionally based on how CKB is used:\n- Proportion used as state storage (occupied) → goes to miners\n- Proportion deposited in NervosDAO → goes to NervosDAO depositors\n- Proportion neither stored nor in DAO → goes to the treasury (burned)\n\nAnswer each of these questions with full reasoning:\n\n1. **Dilution protection mechanism:** Alice deposits 1,000 CKB into NervosDAO when total supply is 50 billion CKB, and 20% is in NervosDAO. After 1 year, she withdraws. Approximately how many CKB does she receive (including compensation)? Show your working.\n\n2. **Miner economics over time:** As primary issuance halves every 4 years and approaches zero, what sustains miner revenue? What is the incentive for miners to keep processing transactions as primary issuance approaches zero? How does state rent (via secondary issuance going to miners) change the economic model vs Bitcoin?\n\n3. **Treasury accumulation:** If 30% of all CKB is neither state-stored nor DAO-deposited, how much CKB flows to the treasury annually from secondary issuance? What is the treasury typically used for in Nervos governance?\n\n4. **Long-term equilibrium:** Describe the economic equilibrium the two-layer model aims for in the very long run (50+ years), when primary issuance is negligible. Who receives what, and what behaviour does this incentivise?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "secondary issuance",
+      "NervosDAO",
+      "dilution",
+      "miner",
+      "treasury",
+      "state",
+      "proportion",
+      "compensation"
+    ]
+  },
+  "max_tokens": 2048,
+  "temperature": 0
+}

@@ -1,0 +1,464 @@
+{
+  "type": "APL",
+  "version": "1.9",
+  "license": "Copyright 2024 CKB Node Monitor. Licensed under MIT.",
+  "theme": "dark",
+  "settings": {
+    "idleTimeout": 30000
+  },
+  "import": [
+    {
+      "name": "alexa-layouts",
+      "version": "1.5.0"
+    },
+    {
+      "name": "alexa-styles",
+      "version": "1.0.0"
+    }
+  ],
+  "resources": [
+    {
+      "description": "CKB brand colours and layout constants",
+      "colors": {
+        "ckbGreen": "#3CC68A",
+        "ckbYellow": "#F8C822",
+        "ckbRed": "#E74C3C",
+        "ckbBg": "#0D1117",
+        "ckbSurface": "#161B22",
+        "ckbBorder": "#21262D",
+        "ckbTextPrimary": "#E6EDF3",
+        "ckbTextSecondary": "#8B949E",
+        "ckbAccent": "#58A6FF"
+      },
+      "dimensions": {
+        "cardPadding": "24dp",
+        "cardBorderRadius": "16dp",
+        "cardSpacing": "12dp",
+        "statFontSize": "48dp",
+        "labelFontSize": "18dp",
+        "headerFontSize": "28dp"
+      }
+    }
+  ],
+  "layouts": {
+    "StatCard": {
+      "description": "A single stat card with label, value and optional icon",
+      "parameters": [
+        { "name": "label", "type": "string", "default": "LABEL" },
+        { "name": "value", "type": "string", "default": "—" },
+        { "name": "icon", "type": "string", "default": "" },
+        { "name": "valueColor", "type": "color", "default": "@ckbTextPrimary" },
+        { "name": "subValue", "type": "string", "default": "" }
+      ],
+      "items": [
+        {
+          "type": "Frame",
+          "backgroundColor": "@ckbSurface",
+          "borderColor": "@ckbBorder",
+          "borderWidth": "1dp",
+          "borderRadius": "@cardBorderRadius",
+          "padding": "@cardPadding",
+          "width": "100%",
+          "items": [
+            {
+              "type": "Container",
+              "direction": "column",
+              "spacing": "6dp",
+              "items": [
+                {
+                  "type": "Container",
+                  "direction": "row",
+                  "alignItems": "center",
+                  "spacing": "8dp",
+                  "items": [
+                    {
+                      "type": "Text",
+                      "text": "${icon}",
+                      "fontSize": "20dp",
+                      "when": "${icon != ''}"
+                    },
+                    {
+                      "type": "Text",
+                      "text": "${label}",
+                      "color": "@ckbTextSecondary",
+                      "fontSize": "@labelFontSize",
+                      "fontWeight": "600",
+                      "letterSpacing": "1dp"
+                    }
+                  ]
+                },
+                {
+                  "type": "Text",
+                  "text": "${value}",
+                  "color": "${valueColor}",
+                  "fontSize": "@statFontSize",
+                  "fontWeight": "700",
+                  "fontFamily": "monospace",
+                  "maxLines": 1
+                },
+                {
+                  "type": "Text",
+                  "text": "${subValue}",
+                  "color": "@ckbTextSecondary",
+                  "fontSize": "14dp",
+                  "when": "${subValue != ''}",
+                  "maxLines": 1
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "StatusBadge": {
+      "description": "Healthy / Syncing / Offline pill badge",
+      "parameters": [
+        { "name": "status", "type": "string", "default": "UNKNOWN" },
+        { "name": "statusColor", "type": "color", "default": "@ckbTextSecondary" }
+      ],
+      "items": [
+        {
+          "type": "Frame",
+          "backgroundColor": "${statusColor}",
+          "borderRadius": "20dp",
+          "paddingLeft": "20dp",
+          "paddingRight": "20dp",
+          "paddingTop": "8dp",
+          "paddingBottom": "8dp",
+          "opacity": "0.9",
+          "items": [
+            {
+              "type": "Text",
+              "text": "${status}",
+              "color": "#FFFFFF",
+              "fontSize": "18dp",
+              "fontWeight": "700",
+              "letterSpacing": "1dp"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "mainTemplate": {
+    "description": "CKB Node Monitor Dashboard",
+    "parameters": [
+      "payload"
+    ],
+    "items": [
+      {
+        "type": "Container",
+        "width": "100vw",
+        "height": "100vh",
+        "backgroundColor": "@ckbBg",
+        "direction": "column",
+        "items": [
+          {
+            "type": "Container",
+            "direction": "row",
+            "alignItems": "center",
+            "justifyContent": "spaceBetween",
+            "paddingLeft": "32dp",
+            "paddingRight": "32dp",
+            "paddingTop": "20dp",
+            "paddingBottom": "16dp",
+            "borderColor": "@ckbBorder",
+            "borderBottomWidth": "1dp",
+            "items": [
+              {
+                "type": "Container",
+                "direction": "column",
+                "items": [
+                  {
+                    "type": "Container",
+                    "direction": "row",
+                    "alignItems": "center",
+                    "spacing": "12dp",
+                    "items": [
+                      {
+                        "type": "Text",
+                        "text": "⬡",
+                        "color": "@ckbGreen",
+                        "fontSize": "32dp"
+                      },
+                      {
+                        "type": "Text",
+                        "text": "CKB Node Monitor",
+                        "color": "@ckbTextPrimary",
+                        "fontSize": "@headerFontSize",
+                        "fontWeight": "700"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Text",
+                    "text": "${payload.nodeSource}",
+                    "color": "@ckbAccent",
+                    "fontSize": "14dp",
+                    "paddingTop": "4dp"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "direction": "row",
+                "alignItems": "center",
+                "spacing": "16dp",
+                "items": [
+                  {
+                    "type": "StatusBadge",
+                    "status": "${payload.statusLabel}",
+                    "statusColor": "${payload.statusColor}"
+                  },
+                  {
+                    "type": "TouchWrapper",
+                    "onPress": [
+                      {
+                        "type": "SendEvent",
+                        "arguments": ["REFRESH"]
+                      }
+                    ],
+                    "items": [
+                      {
+                        "type": "Frame",
+                        "backgroundColor": "@ckbSurface",
+                        "borderColor": "@ckbBorder",
+                        "borderWidth": "1dp",
+                        "borderRadius": "12dp",
+                        "paddingLeft": "20dp",
+                        "paddingRight": "20dp",
+                        "paddingTop": "10dp",
+                        "paddingBottom": "10dp",
+                        "items": [
+                          {
+                            "type": "Container",
+                            "direction": "row",
+                            "alignItems": "center",
+                            "spacing": "8dp",
+                            "items": [
+                              {
+                                "type": "Text",
+                                "text": "↻",
+                                "color": "@ckbGreen",
+                                "fontSize": "20dp"
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Refresh",
+                                "color": "@ckbTextPrimary",
+                                "fontSize": "16dp",
+                                "fontWeight": "600"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "grow": 1,
+            "direction": "column",
+            "paddingLeft": "32dp",
+            "paddingRight": "32dp",
+            "paddingTop": "16dp",
+            "paddingBottom": "16dp",
+            "spacing": "@cardSpacing",
+            "items": [
+              {
+                "type": "Container",
+                "direction": "row",
+                "spacing": "@cardSpacing",
+                "width": "100%",
+                "items": [
+                  {
+                    "type": "StatCard",
+                    "grow": 1,
+                    "label": "BLOCK HEIGHT",
+                    "value": "${payload.blockHeight}",
+                    "icon": "🔗",
+                    "valueColor": "@ckbGreen",
+                    "subValue": "Tip: ${payload.tipBlockHash}"
+                  },
+                  {
+                    "type": "StatCard",
+                    "grow": 1,
+                    "label": "PEERS CONNECTED",
+                    "value": "${payload.peerCount}",
+                    "icon": "🌐",
+                    "valueColor": "${payload.peerCount == '0' ? '@ckbRed' : '@ckbAccent'}",
+                    "subValue": "${payload.peerCount == '1' ? '1 peer' : payload.peerCount + ' peers'}"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "direction": "row",
+                "spacing": "@cardSpacing",
+                "width": "100%",
+                "items": [
+                  {
+                    "type": "StatCard",
+                    "grow": 1,
+                    "label": "EPOCH",
+                    "value": "${payload.epoch}",
+                    "icon": "⏱",
+                    "valueColor": "@ckbTextPrimary"
+                  },
+                  {
+                    "type": "StatCard",
+                    "grow": 1,
+                    "label": "CHAIN",
+                    "value": "${payload.chain}",
+                    "icon": "⛓",
+                    "valueColor": "@ckbYellow"
+                  },
+                  {
+                    "type": "StatCard",
+                    "grow": 1,
+                    "label": "NODE VERSION",
+                    "value": "${payload.nodeVersion}",
+                    "icon": "🔖",
+                    "valueColor": "@ckbTextPrimary",
+                    "subValue": "ID: ${payload.nodeId}"
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "direction": "row",
+                "spacing": "@cardSpacing",
+                "width": "100%",
+                "when": "${payload.showFallbackBanner}",
+                "items": [
+                  {
+                    "type": "Frame",
+                    "grow": 1,
+                    "backgroundColor": "#1C2128",
+                    "borderColor": "@ckbYellow",
+                    "borderWidth": "1dp",
+                    "borderLeftWidth": "4dp",
+                    "borderRadius": "@cardBorderRadius",
+                    "padding": "20dp",
+                    "items": [
+                      {
+                        "type": "Container",
+                        "direction": "row",
+                        "alignItems": "center",
+                        "spacing": "12dp",
+                        "items": [
+                          {
+                            "type": "Text",
+                            "text": "💡",
+                            "fontSize": "24dp"
+                          },
+                          {
+                            "type": "Container",
+                            "direction": "column",
+                            "grow": 1,
+                            "items": [
+                              {
+                                "type": "Text",
+                                "text": "Showing public node data",
+                                "color": "@ckbYellow",
+                                "fontSize": "16dp",
+                                "fontWeight": "700"
+                              },
+                              {
+                                "type": "Text",
+                                "text": "Run your own CKB node for real-time personal stats! Say: \"Alexa, set my node to 192.168.1.100\"",
+                                "color": "@ckbTextSecondary",
+                                "fontSize": "14dp"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "Container",
+                "direction": "row",
+                "spacing": "@cardSpacing",
+                "width": "100%",
+                "when": "${payload.hasWarnings}",
+                "items": [
+                  {
+                    "type": "Frame",
+                    "grow": 1,
+                    "backgroundColor": "#1C1010",
+                    "borderColor": "@ckbRed",
+                    "borderWidth": "1dp",
+                    "borderLeftWidth": "4dp",
+                    "borderRadius": "@cardBorderRadius",
+                    "padding": "20dp",
+                    "items": [
+                      {
+                        "type": "Container",
+                        "direction": "row",
+                        "alignItems": "center",
+                        "spacing": "12dp",
+                        "items": [
+                          {
+                            "type": "Text",
+                            "text": "⚠️",
+                            "fontSize": "24dp"
+                          },
+                          {
+                            "type": "Text",
+                            "text": "${payload.warnings}",
+                            "color": "@ckbRed",
+                            "fontSize": "14dp",
+                            "grow": 1
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Container",
+            "direction": "row",
+            "alignItems": "center",
+            "justifyContent": "spaceBetween",
+            "paddingLeft": "32dp",
+            "paddingRight": "32dp",
+            "paddingTop": "8dp",
+            "paddingBottom": "12dp",
+            "borderColor": "@ckbBorder",
+            "borderTopWidth": "1dp",
+            "items": [
+              {
+                "type": "Text",
+                "text": "Nervos Network — CKB",
+                "color": "@ckbTextSecondary",
+                "fontSize": "12dp"
+              },
+              {
+                "type": "Text",
+                "text": "Updated: ${payload.lastUpdated}",
+                "color": "@ckbTextSecondary",
+                "fontSize": "12dp"
+              },
+              {
+                "type": "Text",
+                "text": "${payload.syncStatus}",
+                "color": "${payload.isSyncing ? '@ckbYellow' : '@ckbGreen'}",
+                "fontSize": "12dp"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

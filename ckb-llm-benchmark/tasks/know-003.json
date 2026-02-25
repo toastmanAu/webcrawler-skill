@@ -1,0 +1,25 @@
+{
+  "id": "know-003",
+  "category": "domain_knowledge",
+  "difficulty": "medium",
+  "title": "Molecule serialisation format",
+  "prompt": "Explain the Molecule binary serialisation format used by CKB. Your answer must cover:\n\n1. **What is Molecule and why does CKB use it:**\n   - What problem does Molecule solve?\n   - Why was a custom format chosen over protobuf or RLP?\n\n2. **Comparison with protobuf and RLP:**\n   - How does Molecule differ from Protocol Buffers in schema evolution and encoding?\n   - How does Molecule differ from RLP (used by Ethereum) in terms of self-description and type safety?\n   - What does Molecule NOT support that protobuf does? (Think: default values, optional fields, maps)\n\n3. **Core type system — explain each:**\n   - `byte` — the primitive\n   - Fixed-size arrays (e.g., `Byte32`)\n   - Dynamic vectors (e.g., `Bytes`)\n   - Structs (fixed-size, no offsets needed)\n   - Tables (dynamic, with offset vector)\n   - Options\n   - Unions\n\n4. **Write the Molecule schema definition for a CKB Script struct:**\n   The Script struct has: code_hash (32 bytes), hash_type (1 byte), args (variable bytes)\n   Show the complete .mol schema file syntax.\n\n5. **Practical implication:**\n   Why is Molecule's zero-copy design important for CKB-VM scripts running inside the VM?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "Molecule",
+      "protobuf",
+      "RLP",
+      "Table",
+      "Byte32",
+      "offset",
+      "schema",
+      "code_hash",
+      "hash_type",
+      "args",
+      "zero-copy"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}

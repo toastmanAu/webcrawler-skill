@@ -1,0 +1,21 @@
+{
+  "id": "debug-004",
+  "category": "debugging",
+  "difficulty": "hard",
+  "title": "ESP32 CKB Blake2b — buffer overflow and wrong IV personalisation",
+  "prompt": "The following ESP32 C code implements Blake2b-256 for CKB script hash computation on embedded hardware. It contains two serious bugs: a buffer overflow in the padding logic, and incorrect initialisation when using a personalisation string.\n\n```c\n#include <stdint.h>\n#include <string.h>\n\n// Blake2b constants\nstatic const uint64_t BLAKE2B_IV[8] = {\n  0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,\n  0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,\n  0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,\n  0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL\n};\n\n#define BLAKE2B_BLOCKBYTES 128\n\ntypedef struct {\n  uint64_t h[8];      // hash state\n  uint64_t t[2];      // counter\n  uint64_t f[2];      // finalization flags\n  uint8_t  buf[BLAKE2B_BLOCKBYTES];\n  size_t   buflen;\n} blake2b_state;\n\nvoid blake2b_init(blake2b_state *S, size_t outlen) {\n  memset(S, 0, sizeof(blake2b_state));\n  memcpy(S->h, BLAKE2B_IV, sizeof(BLAKE2B_IV));\n  // Parameter block: p[0] = digest_length | fanout<<8 | depth<<16 | ...\n  S->h[0] ^= 0x01010000ULL ^ (uint64_t)outlen;\n}\n\nvoid blake2b_init_with_personal(blake2b_state *S, size_t outlen, const uint8_t *personal, size_t personal_len) {\n  blake2b_init(S, outlen);\n  // XOR personalisation into h[7] — BUG 1: personalisation must be zero-padded to 16 bytes\n  // and XORed into h[7] AS PART OF the parameter block, not added after init\n  uint64_t p;\n  memcpy(&p, personal, sizeof(uint64_t));  // Only copies first 8 bytes, ignores bytes 8-15\n  S->h[7] ^= p;  // Wrong: should XOR full 16-byte personal into h[6] and h[7] during init\n}\n\nvoid blake2b_update(blake2b_state *S, const uint8_t *in, size_t inlen) {\n  while (inlen > 0) {\n    size_t left = S->buflen;\n    size_t fill = BLAKE2B_BLOCKBYTES - left;\n    \n    if (inlen > fill) {\n      memcpy(S->buf + left, in, fill);\n      S->buflen += fill;\n      // increment counter\n      S->t[0] += BLAKE2B_BLOCKBYTES;\n      if (S->t[0] < BLAKE2B_BLOCKBYTES) S->t[1]++;\n      blake2b_compress(S, S->buf);\n      S->buflen = 0;\n      in += fill;\n      inlen -= fill;\n    } else {\n      memcpy(S->buf + left, in, inlen);\n      S->buflen += inlen;\n      break;\n    }\n  }\n}\n\nvoid blake2b_final(blake2b_state *S, uint8_t *out, size_t outlen) {\n  // BUG 2: Buffer overflow — pads BLAKE2B_BLOCKBYTES bytes from current buflen,\n  // but if buflen is already BLAKE2B_BLOCKBYTES, this writes 128 bytes past end of buf\n  memset(S->buf + S->buflen, 0, BLAKE2B_BLOCKBYTES);  // Should be: BLAKE2B_BLOCKBYTES - S->buflen\n  \n  S->t[0] += (uint64_t)S->buflen;\n  if (S->t[0] < S->buflen) S->t[1]++;\n  S->f[0] = (uint64_t)-1;  // set finalization flag\n  \n  blake2b_compress(S, S->buf);\n  \n  // Output\n  memcpy(out, S->h, outlen);\n}\n```\n\nFor each bug:\n1. Identify the exact line(s) affected\n2. Classify the bug type (buffer overflow / incorrect crypto init / etc.)\n3. Describe the failure mode on ESP32 specifically — what happens at runtime?\n4. Show the corrected code\n\nAlso answer: For CKB's Blake2b-256 (used for script hashes, transaction hashes), does CKB use personalisation? If so, what is the personalisation string?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "buffer overflow",
+      "BLAKE2B_BLOCKBYTES - S->buflen",
+      "parameter block",
+      "personalisation",
+      "memset",
+      "h[6]",
+      "h[7]"
+    ]
+  },
+  "max_tokens": 2048,
+  "temperature": 0
+}

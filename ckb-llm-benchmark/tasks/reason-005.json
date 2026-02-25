@@ -1,0 +1,22 @@
+{
+  "id": "reason-005",
+  "category": "reasoning",
+  "difficulty": "hard",
+  "title": "ESP32-P4 FlyClient memory feasibility for CKB light client",
+  "prompt": "You are designing a CKB light client for an ESP32-P4 microcontroller with 32MB PSRAM.\n\n**System specs:**\n- ESP32-P4: 32MB PSRAM, 512KB internal SRAM\n- CKB chain: approximately 18,700,000 blocks as of early 2026\n- CKB block header size: 208 bytes (fixed)\n- FlyClient protocol: samples O(log₂ n) block headers to verify chain tip with high probability\n- The light client needs: sampled headers + a 512KB code stack + a 2MB working heap\n\n**Questions — show all working:**\n\n1. **Header sample count:** FlyClient samples O(log₂ n) headers. Calculate log₂(18,700,000) and round to nearest integer. In practice, FlyClient implementations use a security parameter λ (typically 50-100 samples for high security). Use λ = 64 samples as your estimate.\n\n2. **Memory for sampled headers:** At 208 bytes per header × your sample count, how many bytes are needed for the header store?\n\n3. **Total memory budget:**\n   - Header store (from Q2)\n   - Code stack: 512 KB = 524,288 bytes\n   - Working heap: 2 MB = 2,097,152 bytes\n   - FlyClient MMR proof accumulator: estimate 32 bytes × log₂(n) nodes\n   - Does everything fit in 32MB PSRAM?\n\n4. **Practical concerns:** Even if it fits in memory, what are 3 other real-world constraints for running a CKB light client on ESP32-P4 (think: network, computation, storage persistence)?\n\n5. **Feasibility verdict:** Is the ESP32-P4 a feasible platform for a CKB FlyClient light client? What is the primary bottleneck — memory, compute, or network?",
+  "evaluation": {
+    "type": "contains_keywords",
+    "keywords": [
+      "log",
+      "18,700,000",
+      "208",
+      "64",
+      "PSRAM",
+      "feasib",
+      "MMR",
+      "header"
+    ]
+  },
+  "max_tokens": 1536,
+  "temperature": 0
+}
