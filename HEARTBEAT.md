@@ -32,6 +32,13 @@ Check `curl -sf http://localhost:8081/` — if down, run `systemctl --user resta
 Alert Phill if it can't be restarted.
 Mode: SOLO — direct to ckbnode (192.168.68.87:8114). Rewards go to Phill's address.
 
+## Backup (1x/day — ~4pm ACST)
+Run `bash /home/phill/.openclaw/workspace/scripts/backup.sh` — track last run in heartbeat-state.json under key `backup`.
+- Pushes workspace to GitHub (toastmanAu/kernel-workspace, private)
+- Rsyncs configs + secrets to EliteDesk (192.168.68.97:~/backups/pi5/)
+- If EliteDesk unreachable: skip rsync, still push GitHub, log warning
+- If GitHub push fails: alert Phill
+
 ## UV Tracker
 Check `curl -sf http://localhost:9988/` — if down, run:
 `cd /home/phill/uv-tracker && setsid python3 -m http.server 9988 --bind 0.0.0.0 >> /tmp/uv-server.log 2>&1 &`
