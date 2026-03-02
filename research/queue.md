@@ -168,22 +168,22 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 ## [PENDING] obd2-canbus-esp32-analysis-injection
 **Priority:** HIGH
 **Output:** findings/obd2-canbus-esp32.md
-**Goal:** Deep research into OBD2 + CAN bus read AND write from ESP32. Two tiers: (1) passive reading — live sensor data, fault codes, ECU parameters; (2) active injection — sending CAN frames to modify ECU behaviour, unlock hidden features, change car configuration, full computer access. Specific vehicle target: Renault Clio RS 172 (Phase 1, ~2001-2002, Renault F7R 2.0L engine, Bosch Motronic ECU family). Hardware focus: ESP32 with CAN transceiver (SN65HVD230 or MCP2515), and the CAN bus module Phill mentioned (likely a USB/Bluetooth OBD2 adapter or dedicated CAN shield). Goal is full independent automotive building — reading is table stakes, writing/injecting is the prize.
+**Goal:** Deep research into OBD2 + CAN bus / K-Line read AND write from ESP32. Two tiers: (1) passive reading — live sensor data, fault codes, ECU parameters; (2) active injection/writing — sending frames to modify ECU behaviour, unlock hidden features, change car configuration, full computer access. Specific vehicle target: Renault Clio RS 172 (Phase 1, ~2001-2002, Renault F7R 2.0L engine, Bosch Motronic ECU). **Known hardware: Renault Link v1.99 USB adapter** — KKL USB-to-K-Line cable, speaks the proprietary Renault DDX/UCH diagnostic protocol used by Renault Clip software. Goal is full independent automotive building — reading is table stakes, writing/injecting is the prize.
 **Seeds:**
-- https://raw.githubusercontent.com/collin80/esp32_can/master/README.md
-- https://raw.githubusercontent.com/autowp/arduino-mcp2515/master/README.md
 - https://raw.githubusercontent.com/iDoka/awesome-canbus/master/README.md
 - https://raw.githubusercontent.com/P1kachu/talking-with-cars/master/README.md
-- https://github.com/commaai/opendbc/blob/master/docs/cars_with_obd_forwarding.md
-- https://raw.githubusercontent.com/v-ivanyshyn/parse_can_logs/master/README.md
+- https://raw.githubusercontent.com/merecarvill/OBD2-KLine-Reader/master/README.md
+- https://github.com/opengarage/carloop
+- https://raw.githubusercontent.com/jshuber/RenaultClip/master/README.md
+- https://raw.githubusercontent.com/collin80/esp32_can/master/README.md
 **Questions to answer:**
-1. What CAN transceiver works best with ESP32 for both read and write? SN65HVD230 (3.3V native, no level shift) vs MCP2515 (SPI, more libraries) vs TJA1050 (5V, needs divider)?
-2. ESP32 has a built-in TWAI (Two-Wire Automotive Interface = CAN) peripheral — what's the Arduino/ESP-IDF library status for TX (injection), not just RX?
-3. Renault Clio RS 172 specifics: which ECU? (Bosch ME7.x or Siemens SID?) What CAN bus speed? Is it CAN or K-Line/ISO9141 on OBD2 port? What PIDs are known for this car?
-4. What's the difference between OBD2 port sniffing and actual internal CAN bus access? Does the Clio 172 have a real CAN bus or just K-Line?
-5. CAN injection in practice — what can you actually change by sending frames: key programming, immobiliser bypass, instrument cluster spoofing, ECU remapping triggers, hidden menu unlock?
-6. What open source databases exist for Renault CAN frame mappings (DBC files, opendbc, RenaultDBC)?
-7. commaai/openpilot / opendbc — does it cover Renault? What's the coverage level?
-8. What brands/ECUs are most "open" to CAN injection without fighting proprietary security (seed/key challenges, UDS security access)?
-9. Safety: what can go wrong when injecting bad CAN frames? Watchdog resets, limp mode, brick risk?
-10. Practical hardware kit: what's the minimum ESP32 + transceiver circuit to get CAN TX working on a car? Any known working builds for Renault specifically?
+1. Renault Clio RS 172: K-Line or CAN on OBD2 port? Which ECU exactly (Bosch ME7.4.6? Siemens SID301?)? What diagnostic protocol does Renault Link v1.99 / Renault Clip use — is it documented/reversed?
+2. Can the Renault Link v1.99 KKL adapter protocol be replicated on ESP32 with an L9637D or similar K-Line transceiver? What's the electrical interface?
+3. What can you READ from a Clio 172 via K-Line: live PIDs (RPM, MAF, TPS, coolant), fault codes, immobiliser status, ECU variant/calibration ID?
+4. What can you WRITE: key programming, immobiliser PIN bypass, idle speed adjustment, ignition timing maps, throttle body adaptation reset, service interval reset?
+5. Open source tools that already speak Renault protocol: DDT4ALL, OpenDiag, FreeSSM — do any cover this ECU/protocol? Any reversed Renault CAN/K-Line DBC or definition files?
+6. DDT4ALL specifically — does it support the Clio 172 ECU? What's the coverage for F7R / Bosch Motronic?
+7. Is there a CAN bus present internally on the 172 (separate from OBD2 K-Line) — e.g. between ABS, UCH, instrument cluster? If so, what speed and what frames are documented?
+8. ESP32 K-Line implementation: UART + L9637D transceiver — what baud rates, init sequences, and frame formats does Renault use? Any Arduino/ESP-IDF libraries that handle K-Line ISO 14230 (KWP2000)?
+9. What brands/ECU families are most open to diagnostic write access without seed/key security challenges? Best starting points for learning injection before tackling Renault specifics.
+10. Safety: risks of bad write commands — ECU brick, immobiliser lockout, limp mode triggers. What's recoverable vs permanent?
