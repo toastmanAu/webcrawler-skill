@@ -45,7 +45,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] ckb-chess-relayer-design
+## [DONE] ckb-chess-relayer-design
 **Priority:** HIGH
 **Output:** findings/ckb-chess-relayer.md
 **Goal:** Design the ckb-chess relayer — the Node.js server that sits between two players, forwards signed moves, and monitors the CKB chain for game state. Also map Fiber invoice flow for move payments.
@@ -117,3 +117,48 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 3. How do other projects handle snapshot versioning + latest pointer?
 4. Is there a CKB community snapshot already hosted somewhere (to avoid duplication)?
 5. What's the right robots.txt / cache-control for R2-hosted snapshots?
+
+---
+
+## [PENDING] handheld-gaming-ckb-integration
+**Priority:** HIGH
+**Output:** findings/handheld-gaming-ckb-integration.md
+**Goal:** Map integration opportunities for our stack (CKB node, Fiber, ckb-chess, DOB minter, wallet) inside handheld gaming devices. Two tracks: (1) apps running inside existing gaming OS (ArkOS, JELOS, AmberELEC, Batocera, Android) — overlays, launchers, companion apps; (2) full hardware takeover — Armbian/mainline Linux on the device, running our full node stack. Focus on RK3566-based handhelds first: Anbernic RG-ARC-D, and then RK3326 (older) and Rockchip handhelds broadly. Also cover Retroid Pocket 4 Pro (Android, Dimensity 900).
+**Seeds:**
+- https://raw.githubusercontent.com/ArkOS/ArkOS/master/README.md
+- https://raw.githubusercontent.com/JELOS/JELOS/main/README.md
+- https://wiki.batocera.org/hardware_compatibility (if fetchable)
+- https://github.com/christianhaitian/arkos/wiki
+- https://retrodreamer.com/retroid-pocket-4-pro (spec page)
+- https://raw.githubusercontent.com/spruceUI/spruceOS/main/README.md
+**Questions to answer:**
+1. Which gaming OSes on RK3566 handhelds support running arbitrary Linux apps alongside the emulator frontend (ports, scripts, systemd services)?
+2. Does the Anbernic RG-ARC-D run stock Android or a gaming Linux distro? What's the root/ADB situation?
+3. Retroid Pocket 4 Pro — Android version, ADB over WiFi support, can you sideload full APKs including custom launchers?
+4. Is there prior art for running a CKB/blockchain node on a handheld gaming device? Any crypto apps in gaming OS port collections?
+5. For a full hardware takeover: does mainline Linux (Armbian/Manjaro) boot on RK3566 handhelds? Which ones have working display + WiFi + controls in mainline?
+6. What's the best approach for a persistent background service (CKB node, Fiber) on a gaming handheld that survives frontend restarts?
+7. ckb-chess angle: could the handheld BE the game client — controller input, display output, Fiber payment channel in background?
+
+---
+
+## [PENDING] hispo-s8-android-headunit-integration
+**Priority:** HIGH
+**Output:** findings/hispo-s8-headunit.md
+**Goal:** Map integration opportunities for our stack on Hispo S8 Android car head units. Key areas: (1) CKB node + Fiber running as background Android service; (2) GPS data → chain monitor / dashcam-style data logger with on-chain provenance; (3) ADB/SSH access for agent control — modifying system layout, launching apps, pushing config; (4) Picture-in-picture at >4 simultaneous windows (stock limit); (5) Modifying/replacing stock Android OS or launcher; (6) CKB dashboard as always-on overlay; (7) Using their built-in PIP module architecture at higher capacity.
+**Seeds:**
+- https://raw.githubusercontent.com/Murena-EV/hispo/main/README.md
+- https://xda-developers.com/search/?q=hispo+s8
+- https://raw.githubusercontent.com/DeskHog/deskdock/main/README.md
+- https://developer.android.com/guide/topics/ui/picture-in-picture
+- https://developer.android.com/studio/command-line/adb
+- https://github.com/search?q=android+headunit+adb+root&type=repositories
+**Questions to answer:**
+1. What Android version does the Hispo S8 run? Is it rooted or rootable? ADB enabled by default or via dev options?
+2. Can you SSH into a Hispo S8 unit (e.g. via Termux + SSHd or similar)?
+3. What is their PIP module — proprietary split-screen system? How many simultaneous windows does stock support, and is there a known way to exceed 4?
+4. Can the stock launcher be replaced (e.g. Nova, custom APK as HOME intent)? Any reports of custom launchers on Hispo/similar Qualcomm/MT headunits?
+5. GPS integration: does the unit expose GPS NMEA data to apps via standard Android Location API? Any always-on GPS logging apps known to work on headunits?
+6. CKB node feasibility: RAM/storage specs of S8? Could it run a CKB light client or full node as an Android background service (foreground service, wake lock)?
+7. Agent remote control: if ADB is accessible over WiFi, what can an agent do — push APKs, modify system settings, change launcher, trigger intents?
+8. Any prior art: blockchain nodes, crypto wallets, or similar heavyweight background services running on Android car headunits?
