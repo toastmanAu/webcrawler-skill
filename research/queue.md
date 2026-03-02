@@ -187,3 +187,47 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 8. ESP32 K-Line implementation: UART + L9637D transceiver — what baud rates, init sequences, and frame formats does Renault use? Any Arduino/ESP-IDF libraries that handle K-Line ISO 14230 (KWP2000)?
 9. What brands/ECU families are most open to diagnostic write access without seed/key security challenges? Best starting points for learning injection before tackling Renault specifics.
 10. Safety: risks of bad write commands — ECU brick, immobiliser lockout, limp mode triggers. What's recoverable vs permanent?
+
+---
+
+## [PENDING] local-repo-mirror-strategy
+**Priority:** MEDIUM
+**Output:** findings/local-repo-mirror.md
+**Goal:** Evaluate whether mirroring key Nervos/CKB repos locally (on Pi5 or Ryzen NVMe) provides meaningful cost/speed benefits for an AI agent workflow. Repos of interest: nervosnetwork/ckb, nervosnetwork/fiber, sporeprotocol/spore-sdk, nervosnetwork/rfcs, ckb-ccc, nervosnetwork/ckb-script-templates. Questions: does local git clone + daily pull beat web_fetch for the crawler? What's the storage cost? How does grep/ripgrep over local source compare to fetching raw files per-query? Best tooling for keeping mirrors fresh (cron + git fetch vs mirror clone).
+**Seeds:**
+- https://raw.githubusercontent.com/nicowillis/git-mirror/main/README.md
+- https://raw.githubusercontent.com/kubernetes/test-infra/master/prow/cmd/peribolos/README.md
+- https://docs.github.com/en/repositories/creating-and-managing-repositories/duplicating-a-repository
+- https://raw.githubusercontent.com/jonhoo/rust-imap/main/README.md
+**Questions to answer:**
+1. What's the actual size of the key Nervos repos (ckb, fiber, rfcs, spore-sdk)? Shallow clone vs full clone — how much disk?
+2. For AI-assisted code search: is local ripgrep over a cloned repo faster/cheaper than web_fetch of specific raw files? When does each win?
+3. Best cron strategy for keeping mirrors fresh — `git fetch --all` nightly, or `git pull` on specific branches?
+4. Does GitHub rate-limit raw.githubusercontent.com fetches at the scale of our crawler (9+ tasks, 6 URLs each)?
+5. Would a local mirror on Ryzen (214GB free, Ethernet) vs Pi5 (828GB free, but this machine) make more sense as the canonical mirror host?
+6. Any tools that auto-index a local git repo for semantic search (beyond grep) — could feed the crawler richer context?
+
+---
+
+## [PENDING] llm-cost-optimisation-strategy
+**Priority:** HIGH
+**Output:** findings/llm-cost-optimisation.md
+**Goal:** Map the full landscape of LLM pricing, quality, and limitations relevant to our workflow. Goal: minimise premium token spend (Claude Sonnet via CKBDev/Anthropic) while maximising quality where it matters. Cover: current provider prices, free tiers and their real limits, local inference options, task routing (what deserves premium vs cheap), context window management, caching strategies, prompt compression, batching. Practical output: a decision framework for which model to use for which task type in our stack.
+**Seeds:**
+- https://artificialanalysis.ai/models (pricing comparison — if fetchable)
+- https://raw.githubusercontent.com/BerriAI/litellm/main/README.md
+- https://openrouter.ai/docs/quick-start
+- https://raw.githubusercontent.com/ollama/ollama/main/README.md
+- https://huggingface.co/docs/api-inference/index
+- https://raw.githubusercontent.com/google-gemini/cookbook/main/README.md
+**Questions to answer:**
+1. Current prices (input/output per million tokens) for: Claude Sonnet 4.5, Claude Haiku 3.5, Gemini 2.5 Flash, Gemini 2.5 Pro, GPT-4o mini, GPT-4o, Llama 3.3 70B (HF free), DeepSeek V3 (API), Qwen3 32B?
+2. HuggingFace free inference tier — actual rate limits, queue times, reliability for sustained use? When does it break down?
+3. Gemini 2.5 Flash free tier — what are the actual RPM/TPD limits? How does it compare to paid at our usage scale?
+4. OpenRouter — does it provide access to cheaper Claude/Gemini routing? Any meaningful cost difference vs direct API?
+5. LiteLLM — can it provide a unified proxy that routes tasks to cheapest capable model automatically? Setup complexity?
+6. Context window management: what are the real cost differences between 8k, 32k, 128k context runs on Sonnet? When is truncation/summarisation worth the quality tradeoff?
+7. Prompt caching (Anthropic): how much does it save for repeated system prompts? Our AGENTS.md + SOUL.md + memory files = significant repeated context.
+8. Local inference (Ryzen qwen2.5:14b): what task types does it handle well enough to fully replace cloud? Coding? Summarisation? Research synthesis? JSON extraction?
+9. Practical routing table: for each task type in our workflow (heartbeat, research crawl, code generation, chat, memory write), what's the optimal model choice and estimated cost per task?
+10. What's a realistic weekly token budget for our current workload, and what does it look like optimised vs unoptimised?
