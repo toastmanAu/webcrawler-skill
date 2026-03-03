@@ -534,3 +534,123 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. How does DID resolution work — given did:ckb:z53x... how do you find the live cell and extract the pubkey?
 5. What's the minimum CKB capacity required for a DID cell?
 6. Can an ESP32 with trezor-crypto generate a compatible keypair and DID string without going on-chain first?
+
+---
+
+## [DONE] ckbfs-wasm-browser-adapter
+**Priority:** HIGH
+**Output:** findings/ckbfs-wasm-browser-adapter.md
+**Goal:** Design and spec a WebAssembly adapter that compiles our CKB-ESP32 CKBFS C implementation to WASM, enabling the same codebase to run in browsers and React apps. This is the foundation for `@wyltek/ckbfs` npm package — one C codebase, two targets (ESP32 + browser).
+
+**Context:**
+- We have a complete CKBFS implementation in C: `CKB-ESP32/src/ckbfs.h` + `ckbfs.cpp`
+- Pure functions (build_witness, build_cell_data, adler32, fetch_witness) compile to WASM today with zero changes
+- Platform-specific layer (HTTP = HTTPClient on ESP32, signing = secp256k1 raw key) needs thin JS shims for browser
+- JoyID/MetaMask signing stays in JS via CCC signer — WASM just builds the tx skeleton + witness bytes
+- End goal: drop-in CKBFS storage provider in the DOB minter (`lib/storage/ckbfs.js`)
+
+**Seeds:**
+- https://raw.githubusercontent.com/code-monad/ckbfs/main/README.md
+- https://raw.githubusercontent.com/code-monad/ckbfs/main/RFC.md
+- https://emscripten.org/docs/porting/connecting_cpp_and_javascript/Interacting-with-code.html
+- https://raw.githubusercontent.com/emscripten-core/emscripten/main/site/source/docs/porting/connecting_cpp_and_javascript/embind.rst
+- https://raw.githubusercontent.com/toastmanAu/CKB-ESP32/main/src/ckbfs.h
+- https://raw.githubusercontent.com/toastmanAu/CKB-ESP32/main/src/ckbfs.cpp
+
+**Questions to answer:**
+1. What is the minimal Emscripten build config to compile ckbfs.h pure functions to WASM — what flags, what stubs needed for Arduino guards?
+2. How should the JS/WASM boundary be designed — embind vs cwrap vs WASM exports directly? What's the cleanest API surface?
+3. For `ckbfs_publish` in browser: the signing step needs to go through a CCC signer (async, returns a signature). How do we bridge async JS signing into synchronous C signing? (Asyncify? Promise + callback?)
+4. For `ckbfs_fetch_witness` in browser: HTTP calls need to use `fetch()` instead of HTTPClient. Best approach — JS fetch shim exported to C via EM_JS, or pure JS implementation calling WASM for decode only?
+5. What does the full npm package structure look like — `@wyltek/ckbfs` with WASM bundle, JS bindings, TypeScript types, React hook `useChainStorage()`?
+6. How does the multi-tx split work for files >480KB — what's the APPEND protocol in CKBFS and how do we expose a progress callback across multiple sequential broadcasts?
+7. What's the CKB capacity cost model for CKBFS vs inline Spore? Our C code has `ckbfs_estimate_cost()` — port this to JS for the DOB minter cost panel.
+8. Are there any existing CKBFS browser implementations (JS/TS) we can reference or diff against?
+
+---
+
+## [PENDING] gameboy-hardware-wallet
+**Priority:** MEDIUM
+**Output:** findings/gameboy-hardware-wallet.md
+**Goal:** Investigate feasibility of a retro handheld console (R36S/similar) that functions as a hardware wallet with CKB light client — disguised as a normal gaming device. Inspired by: "10,000 games and one is a wallet."
+
+**Context:**
+- R36S runs Batocera Linux (ARM, Rockchip RK3326), full Linux userspace available
+- Phill has ESP32 CKB light client + signer already partially built (CKB-ESP32)
+- Private key on removable micro SD (kept in safe separately from device)
+- Wallet loads as a "ROM" in the game list — normal device to anyone watching
+- Specific button combo unlocks wallet mode (like a cheat code)
+- The "alternative mode" triggers a separate process/overlay on Batocera
+
+**Questions to answer:**
+1. What is the Batocera architecture — EmulationStation frontend, retroarch cores, Linux processes? How do custom apps get added as "games" in the UI?
+2. Can a custom binary/script run as a retroarch core? What's the libretro core API — could a CKB light client + signer implement it?
+3. What's the button combo interception pattern in Batocera/EmulationStation? How have others added secret modes or overlays?
+4. Micro SD key storage: what's the right approach — encrypted private key file, hardware-backed keystore, or just raw key? What are the failure modes (corruption, accidental eject)?
+5. What existing projects combine retro gaming hardware with crypto/blockchain (seed phrase entry on gameboy, trezor gameboy case mods, etc)?
+6. RetroAchievements integration: how does it work technically? Can we use the same hooks for CKB events instead of game achievements?
+7. What display/UX would the wallet screen look like in a Batocera ROM slot — full screen app, retroarch overlay, or EmulationStation scraper art?
+8. R36S vs other handhelds (RG35XX, Miyoo Mini) — which has the best Linux access, fastest boot, and most RAM for running a light client alongside games?
+
+**Seeds:**
+- https://raw.githubusercontent.com/batocera-linux/batocera.linux/master/README.md
+- https://wiki.batocera.org/add_games_bios (check raw/text version)
+- https://raw.githubusercontent.com/libretro/RetroArch/master/README.md
+- https://raw.githubusercontent.com/RetroAchievements/RAIntegration/master/README.md
+- https://raw.githubusercontent.com/toastmanAu/CKB-ESP32/main/README.md
+
+---
+
+## [PENDING] retroarch-core-blockchain
+**Priority:** MEDIUM
+**Output:** findings/retroarch-core-blockchain.md
+**Goal:** Deep dive into the libretro/RetroArch core API to understand what's possible for blockchain-native retro games — in-game token earning, Fiber micropayments for lives/continues, on-chain leaderboards, tradeable game items as CKB DOBs.
+
+**Context:**
+- Neon's idea: handheld consoles where traditional points are tokens kids can trade for in-game or platform benefits
+- RetroAchievements already tracks game events and awards badges — same hook could award CKB tokens
+- A retroarch core IS just a shared library (.so/.dll) implementing the libretro API — you could write one from scratch
+- Fiber Network enables sub-second micropayments — perfect for pay-per-life, tournament entry, item trades
+- CKB DOBs as game items: sword found in dungeon = DOB minted to your wallet
+- The "rom" is just data — a custom core could interpret any file format as a game with blockchain hooks
+
+**Questions to answer:**
+1. Full libretro core API surface: retro_run(), retro_serialize(), input polling, audio/video callbacks — what hooks exist for custom logic injection?
+2. RetroAchievements technical implementation: how does rcheevos library detect game events? Same pattern usable for token triggers?
+3. Can a libretro core make network calls (HTTP/WebSocket) from within retro_run()? Threading model?
+4. What's the minimal libretro core that compiles for ARM (R36S/Batocera) — could our CKB light client be the network layer inside a core?
+5. Fiber Network payment flow for games: what does a sub-second micropayment look like in code? Invoice → pay → confirm in <1s?
+6. Existing blockchain game projects on RetroArch or similar — any prior art?
+7. DOB minting from a game event: latency, UX, what does "item found = NFT minted" feel like in practice?
+8. Legal/IP considerations: retro game ROMs + blockchain = two complicated areas. Custom cores with original content sidestep this entirely.
+
+**Seeds:**
+- https://raw.githubusercontent.com/libretro/RetroArch/master/libretro-common/include/libretro.h
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/architecture.md
+
+---
+
+## [PENDING] retro-achievements-ckb-bridge
+**Priority:** LOW
+**Output:** findings/retro-achievements-ckb-bridge.md
+**Goal:** Map RetroAchievements' existing infrastructure and API to understand what's already solved for game event tracking — then design the delta needed to route those events to CKB instead of (or alongside) RA badges.
+
+**Context:**
+- RetroAchievements (RA) is already doing what we want: tracking in-game memory addresses, firing events when conditions are met, awarding badges
+- Their rcheevos C library runs inside retroarch cores and has a public API
+- If we can hook into rcheevos events and route them to a CKB transaction, the game tracking work is already done
+- This is the shortest path to "achievement = on-chain token"
+
+**Questions to answer:**
+1. RetroAchievements API: what endpoints exist for reading achievement definitions and submitting unlocks? Can we POST to a custom endpoint instead?
+2. rcheevos library: what's the callback interface when an achievement fires? How hard is it to add a second callback that signs a CKB tx?
+3. RA achievement format (.json/.cht files): could we define "CKB achievements" in the same format and run them through the same engine?
+4. What CKB transaction type makes sense for an achievement unlock — a simple transfer to a "trophy" address, a DOB mint, or a Fiber micropayment?
+5. RA has a community of 50,000+ users and 500,000+ achievements across thousands of games. Is there a path to propose CKB as an optional "export" destination for existing achievements?
+
+**Seeds:**
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/README.md
+- https://api.retroachievements.org (check their public API docs URL)
+- https://raw.githubusercontent.com/RetroAchievements/RAIntegration/master/README.md
