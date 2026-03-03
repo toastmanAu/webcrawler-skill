@@ -590,7 +590,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 5. What existing projects combine retro gaming hardware with crypto/blockchain (seed phrase entry on gameboy, trezor gameboy case mods, etc)?
 6. RetroAchievements integration: how does it work technically? Can we use the same hooks for CKB events instead of game achievements?
 7. What display/UX would the wallet screen look like in a Batocera ROM slot — full screen app, retroarch overlay, or EmulationStation scraper art?
-8. R36S vs other handhelds (RG35XX, Miyoo Mini) — which has the best Linux access, fastest boot, and most RAM for running a light client alongside games?
+8. R36S vs other budget handhelds (RG35XX, Miyoo Mini, Powkiddy RGB30, Anbernic RG28XX, TrimUI Smart Pro) — which have the best Linux access, fastest boot, most RAM for running a light client alongside games? Focus on devices under $60 AUD. Are there any with hardware secure elements or TPM chips?
 
 **Seeds:**
 - https://raw.githubusercontent.com/batocera-linux/batocera.linux/master/README.md
