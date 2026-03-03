@@ -250,3 +250,57 @@ session_status(model="default")
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+## Research Crawler — Seed URL Rules
+
+When adding tasks to `research/queue.md`, seeds **must** be directly fetchable. Common mistakes:
+
+- ❌ `https://github.com/org/repo/blob/main/file.md` → renders HTML, useless
+- ✅ `https://raw.githubusercontent.com/org/repo/main/file.md` → raw content
+
+- ❌ `https://github.com/org/repo/tree/main/src` → directory listing HTML
+- ✅ `https://raw.githubusercontent.com/org/repo/main/src/specific_file.rs`
+
+- ❌ `https://github.com/org/repo/releases/tag/v1.0` → GitHub HTML page
+- ✅ `https://api.github.com/repos/org/repo/releases/tags/v1.0` → JSON release data
+
+- ❌ `https://some-docs-site.io` → may 404, SSL fail, or return JS-rendered nothing
+- ✅ Test with `curl -sf <url> | head -5` if unsure
+
+Rule: before writing any seed URL, mentally ask "does this return raw text/JSON or rendered HTML?" If HTML → find the raw equivalent.
+
+## 🏗️ CKB Web App Stack — Start Here
+
+When building browser apps on Nervos CKB:
+
+**Always start with full CCC stack:**
+```
+@ckb-ccc/connector-react   — wallet connector UI (JoyID, MetaMask, etc.)
+@ckb-ccc/core              — CKB types, client, transaction builder
+@ckb-ccc/spore             — Spore/DOB minting (createSpore, transferSpore)
+```
+
+**Do NOT start with Lumos + spore-sdk:**
+- Lumos `common-scripts` only resolves secp256k1 locks
+- JoyID and other modern CKB wallets use custom lock types
+- Lumos will fail with "not enough capacity in the info's" for any non-secp256k1 address
+- spore-sdk 0.2.x wraps Lumos — inherits the same limitation
+
+**The CCC way:**
+```js
+// createSpore takes a signer — handles all lock types natively
+const { tx, id } = await spore.createSpore({ signer, data });
+const txHash = await signer.sendTransaction(tx);
+```
+
+**useCcc() API (1.x):**
+```js
+const { signerInfo, open, setClient, disconnect } = useCcc();
+const signer = signerInfo?.signer;   // null until wallet connected
+// Switch network:
+setClient(new ccc.ClientPublicTestnet());
+setClient(new ccc.ClientPublicMainnet());
+```
+
+**Provider must wrap the component that calls useCcc() — not be in the same component.**
+

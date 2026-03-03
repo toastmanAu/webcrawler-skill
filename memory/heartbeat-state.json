@@ -1,13 +1,27 @@
 {
   "lastChecks": {
-    "modelCheck": 1772039281,
-    "dashboard": 1772050087,
-    "ckbNode": 1772050087,
-    "whaleBot": 1772050087,
-    "stratum": 1772050087,
-    "uvTracker": 1772050087,
-    "chatBridge": 1772050087,
-    "antiScam": 1772050087,
-    "backup": 1772001691
+    "modelCheck": 1772485577,
+    "dashboard": 1772526868,
+    "ckbNode": 1772526868,
+    "whaleBot": 1772526868,
+    "stratum": 1772526868,
+    "uvTracker": 1772526868,
+    "chatBridge": 1772526868,
+    "antiScam": 1772487370,
+    "backup": 1772001691,
+    "vaultUpdate": 1772469400,
+    "lastResearchCrawl": 1772526843,
+    "siteStats": 1772516777,
+    "testResults": 1772517101
+  },
+  "telegramSerialPRDone": true,
+  "telegramSerialPR": {
+    "state": "MERGED",
+    "mergedAt": "2026-02-27T06:49:11Z",
+    "noticedAt": "2026-03-03"
+  },
+  "dnsWyltek": {
+    "switched": true,
+    "confirmedAt": "2026-03-03"
   }
 }

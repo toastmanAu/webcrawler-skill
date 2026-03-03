@@ -177,3 +177,84 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - SSH alias: `elitedesk` · IP: 192.168.68.97 · user: phill
 - Role: dedicated build node — ESP-IDF, arm64 cross-compile, Docker, orangepi-build
 - No OpenClaw (build box only)
+
+## Research Crawler System (built 2026-03-03)
+- `scripts/research-crawl.py` — Gemini 2.5 Flash, auto-picks next PENDING task from research/queue.md
+- HEARTBEAT: fires every 15min idle, HIGH→MEDIUM→LOW→SYNTHESIS priority order
+- SYNTHESIS tasks: read all findings + MEMORY.md, produce gap analysis, auto-queue new tasks via [NEW_TASK] blocks
+- ~18 tasks completed 2026-03-03, queue self-extends from synthesis output
+- Seed URL rule: always raw.githubusercontent.com, never github.com/blob/ (in AGENTS.md)
+
+## Research Dashboard
+- http://192.168.68.82:9989 — Python http.server, dark UI, mobile-responsive
+- Shows all research tasks, findings rendered as HTML, progress bar
+- HEARTBEAT monitors + auto-restarts. Port 9977 = Wyltek site (conflict avoided)
+
+## DOB Minter — Collection/Batch Mint (2026-03-03)
+- ClusterPanel: create new cluster OR use existing (paste ID / pick from wallet)
+- FilesPanel: multi-file, batch mint with progress bar
+- Committed: github.com/toastmanAu/ckb-dob-minter commit 55ec5ed
+- Dev server: http://192.168.68.82:5173 (HEARTBEAT auto-restarts)
+
+## Kernel's Web5 / CKB DID Identity (2026-03-03)
+- DID: did:ckb:z53xucm6dnqreuil33e2w5uyg5flzfcp (CKB testnet)
+- Handle: kernel.web5.bbsfans.dev
+- Wallet: ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq0ek0pprdkzl7dj0z3qq7dw8clf0xx3tqsp8phrw
+- Account: ~/.web5-cli/account.json, network: ckb_testnet, PDS: web5.bbsfans.dev
+- web5-cli installed globally (npm)
+- WyDID.h planned: ESP32 component for did:ckb identity in wyltek-embedded-builder
+- PDS use cases: agent memory, ckb-chess records, hardware provenance, devlog, whale feed
+
+## Chat Bridge — Channel Update (2026-03-03)
+- Now bridges: Nervos Nation TG ↔ #nervos-nation-bridge (Discord ID: 1476621586571460700)
+- Was: 👾│general (657799690552606745)
+
+## Tailscale (2026-03-03 — ACTIVE)
+- Installed v1.94.2 on Pi5
+- Auth link sent to Phill — not yet authenticated
+- Goal: remote access to Pi services without port forwarding
+- Pi5 Tailscale IP: 100.115.197.42 (hostname: opi5-oc)
+- iPhone already on same Tailnet (toastmanAu@)
+- Access any Pi service remotely: http://100.115.197.42:<port>
+
+## Tailscale (2026-03-03 — ACTIVE)
+- Installed v1.94.2 on Pi5
+- Auth link sent to Phill — not yet authenticated
+- Goal: remote access to Pi services without port forwarding
+- Pi5 Tailscale IP: 100.115.197.42 (hostname: opi5-oc)
+- iPhone already on same Tailnet (toastmanAu@)
+- Access any Pi service remotely: http://100.115.197.42:<port>
+
+## Wyltek Membership System (2026-03-03)
+- Supabase: yhntwgjzrzyhyxpiqcts.supabase.co
+- Anon key in auth-test.html (public/safe)
+- Service role key: sb_secret_8tdKeoNYfnaSEqrkhwYDqw_B6qJMkEq (PRIVATE)
+- Tables: profiles, comments, likes (RLS enabled)
+- Storage bucket: avatars (public)
+- Auth: JoyID @joyid/ckb@1.1.3 ES module → CKB address → Supabase auth
+- Like button: toastman lobster PNG (kernel-avatar.png, background removed)
+- Test page: wyltekindustries.com/auth-test.html
+- Status: JoyID connect flow being tested
+
+## Founding Member DOB NFT (2026-03-03 — PLANNED)
+- 50 DOBs via Spore Protocol, CKB mainnet
+- Image: RUN CKB Pepe with hardware logos, optimized to ~89KB
+- Cost: ~5,200 CKB total (~$26 AUD)
+- Trigger: first 50 website signups
+- Mint: manual from Pi, minting wallet to be funded
+- Images: /home/phill/.openclaw/workspace/founding-member-dob*.jpg
+- Status: PENDING auth flow confirmation
+
+## 14700K Ubuntu Inference Node (2026-03-03 — PLANNED)
+- Phill's main machine: i7-14700K, 64GB RAM, RTX 3060 Ti (8GB)
+- Plan: dedicated drive, Ubuntu 24.04 Desktop, Ollama + Open WebUI
+- Model: qwen2.5:14b (fits 8GB VRAM, ~45 tok/s)
+- Will be wired as Pi's local inference backend
+- Status: waiting on Phill to install Ubuntu
+
+## DOB Minting Wallet (generated 2026-03-03)
+- Testnet: ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqv5emmruh9u256aaa4l2a4nw3qf3n8fksq60duk9
+- Mainnet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqv5emmruh9u256aaa4l2a4nw3qf3n8fksq5axnua
+- Key file: /home/phill/.openclaw/workspace/secrets/minting-wallet.txt (chmod 600, never commit)
+- Purpose: Wyltek Founding Member DOB minting (50 Spore cells, mainnet)
+- Status: testnet CKB being claimed from faucet; testnet dry run first

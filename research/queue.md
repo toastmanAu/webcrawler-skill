@@ -12,11 +12,11 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 **Output:** findings/bitchat-ble-transport.md
 **Goal:** Map the full BLE transport layer needed to wire our bitchat_mesh.cpp into actual BLE on ESP32. We have the packet codec + relay engine. Need: NimBLE-Arduino GATT server/client setup, advertise + scan + connect flow, characteristic notify pattern, how BitChat Android peers discover and connect.
 **Seeds:**
-- https://raw.githubusercontent.com/nicktindall/cyclon.p2p-rtc-io/refs/heads/master/README.md
 - https://raw.githubusercontent.com/hackerhouse-opensource/bitchat-esp32/main/README.md
 - https://raw.githubusercontent.com/hackerhouse-opensource/bitchat-esp32/main/bitchat_esp32.ino
 - https://raw.githubusercontent.com/h2zero/NimBLE-Arduino/master/README.md
 - https://raw.githubusercontent.com/h2zero/NimBLE-Arduino/master/examples/NimBLE_Server/NimBLE_Server.ino
+- https://raw.githubusercontent.com/h2zero/NimBLE-Arduino/master/examples/NimBLE_Client/NimBLE_Client.ino
 - https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/src/bitchat/bitchat_mesh.h
 **Questions to answer:**
 1. Does BitChat Android use BLE central, peripheral, or both simultaneously?
@@ -27,15 +27,17 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiber-trampoline-routing
+## [DONE] fiber-trampoline-routing
 **Priority:** HIGH
 **Output:** findings/fiber-trampoline-routing.md
 **Goal:** Understand Fiber v0.7.0 trampoline routing — how it works, what it changes for multi-hop payments, implications for ckb-chess invoice flow and any app that routes payments through our nodes.
 **Seeds:**
-- https://github.com/nervosnetwork/fiber/releases/tag/v0.7.0
-- https://github.com/nervosnetwork/fiber/blob/main/CHANGELOG.md
-- https://docs.fiber.network (if exists)
-- https://github.com/nervosnetwork/fiber/tree/main/src
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/specs/trampoline-routing.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/payment-lifecycle.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs
 **Questions to answer:**
 1. What is trampoline routing and how does it differ from standard onion routing?
 2. Does v0.7.0 require both endpoints to support trampoline, or just the routing nodes?
@@ -50,10 +52,12 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 **Output:** findings/ckb-chess-relayer.md
 **Goal:** Design the ckb-chess relayer — the Node.js server that sits between two players, forwards signed moves, and monitors the CKB chain for game state. Also map Fiber invoice flow for move payments.
 **Seeds:**
-- https://github.com/toastmanAu/ckb-chess
-- https://github.com/nervosnetwork/fiber/blob/main/docs/rpc.md
-- https://github.com/nervosnetwork/fiber/blob/main/tests
-- https://github.com/cryptape/ckb-chess (if exists — check)
+- https://raw.githubusercontent.com/toastmanAu/ckb-chess/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/rpc.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/tests/bruno/fiber/send_payment.bru
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/tests/bruno/fiber/new_invoice.bru
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/tests/bruno/fiber/open_channel.bru
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/src/fiber/channel.rs
 **Questions to answer:**
 1. What Fiber RPCs are needed: new_invoice, send_payment, get_invoice, list_channels?
 2. Full payment flow: challenger opens channel → sends invoice per move → opponent pays?
@@ -63,16 +67,17 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32-p4-sphincs-plus
+## [DONE] esp32-p4-sphincs-plus
 **Priority:** MEDIUM
 **Output:** findings/esp32-p4-sphincs-plus.md
 **Goal:** Assess feasibility of SPHINCS+ post-quantum signing on ESP32-P4. Hardware SHA-256/512 accelerators available. Goal: sign a CKB transaction with SPHINCS+ from an ESP32-P4.
 **Seeds:**
-- https://github.com/espressif/esp-idf/tree/master/components/mbedtls
-- https://github.com/espressif/esp-idf/blob/master/components/esp_hw_support/include/esp_sha.h
-- https://github.com/XKCP/XKCP (Keccak — reference)
-- https://github.com/pq-crystals/sphincsplus
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/esp_hw_support/include/esp_sha.h
 - https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-reference/peripherals/sha.html
+- https://raw.githubusercontent.com/pq-crystals/sphincsplus/master/README.md
+- https://raw.githubusercontent.com/RustCrypto/signatures/master/sphincsplus/README.md
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/mbedtls/port/include/sha256_alt.h
+- https://raw.githubusercontent.com/nicowillis/git-mirror/main/README.md
 **Questions to answer:**
 1. Does ESP-IDF expose SHA-256/512 hardware acceleration via a simple API?
 2. Which SPHINCS+ parameter set is practical on a microcontroller (sphincs-sha2-128s vs 256s)?
@@ -82,16 +87,16 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] dob-hardware-provenance-schema
+## [DONE] dob-hardware-provenance-schema
 **Priority:** MEDIUM
 **Output:** findings/dob-hardware-provenance.md
 **Goal:** Design a JSON schema for hardware provenance DOBs — minting an on-chain cert from an ESP32 containing device serial, firmware hash, board type, test results. Map to Spore content_type and existing standards.
 **Seeds:**
-- https://github.com/nervosnetwork/rfcs/blob/master/rfcs/0022-transaction-structure/0022-transaction-structure.md
-- https://github.com/sporeprotocol/spore-sdk/blob/main/docs/core/spore-data.md
-- https://schema.org/Product (existing product schema)
-- https://www.ietf.org/archive/id/draft-ietf-rats-eat-21.txt (Entity Attestation Token — industry standard)
-- https://github.com/toastmanAu/ckb-dob-minter
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0022-transaction-structure/0022-transaction-structure.md
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/docs/core/spore-data.md
+- https://schema.org/Product
+- https://www.ietf.org/archive/id/draft-ietf-rats-eat-21.txt
+- https://raw.githubusercontent.com/toastmanAu/ckb-dob-minter/main/README.md
 **Questions to answer:**
 1. What content_type should hardware provenance DOBs use? (application/json? application/vnd.wyltek.provenance+json?)
 2. Does EAT (Entity Attestation Token) give us a head start on field naming?
@@ -101,35 +106,35 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] ckb-snapshot-infrastructure
-**Priority:** LOW (cron already running — this is refinement)
+## [DONE] ckb-snapshot-infrastructure
+**Priority:** LOW
 **Output:** findings/ckb-snapshot-infra.md
 **Goal:** Research best practices for CKB snapshot hosting — compression formats, Cloudflare R2 serving patterns, how other node snapshot services are structured (Bitcoin, Ethereum).
 **Seeds:**
-- https://ckb.net (official — any snapshot links?)
-- https://github.com/nervosnetwork/ckb/blob/develop/docs/run-ckb-with-docker.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/docs/run-ckb-with-docker.md
 - https://developers.cloudflare.com/r2/examples/rclone/
-- https://snapshot.parity.io (Ethereum — reference for structure)
-- https://btcpayserver.org/bitcoin-full-node/ (Bitcoin bootstrap reference)
+- https://developers.cloudflare.com/r2/api/s3/presigned-urls/
+- https://raw.githubusercontent.com/bitcoin/bitcoin/master/doc/bootstrapping.md
+- https://raw.githubusercontent.com/paritytech/substrate/master/docs/CONTRIBUTING.adoc
 **Questions to answer:**
 1. What compression format does the community expect for CKB snapshots? (zstd vs lz4 vs gz)
 2. Does Cloudflare R2 need any special headers for large file resumable downloads?
 3. How do other projects handle snapshot versioning + latest pointer?
 4. Is there a CKB community snapshot already hosted somewhere (to avoid duplication)?
-5. What's the right robots.txt / cache-control for R2-hosted snapshots?
+5. What's the right cache-control for R2-hosted snapshots?
 
 ---
 
-## [PENDING] handheld-gaming-ckb-integration
+## [DONE] handheld-gaming-ckb-integration
 **Priority:** HIGH
 **Output:** findings/handheld-gaming-ckb-integration.md
 **Goal:** Map integration opportunities for our stack (CKB node, Fiber, ckb-chess, DOB minter, wallet) inside handheld gaming devices. Two tracks: (1) apps running inside existing gaming OS (ArkOS, JELOS, AmberELEC, Batocera, Android) — overlays, launchers, companion apps; (2) full hardware takeover — Armbian/mainline Linux on the device, running our full node stack. Focus on RK3566-based handhelds first: Anbernic RG-ARC-D, and then RK3326 (older) and Rockchip handhelds broadly. Also cover Retroid Pocket 4 Pro (Android, Dimensity 900).
 **Seeds:**
 - https://raw.githubusercontent.com/ArkOS/ArkOS/master/README.md
 - https://raw.githubusercontent.com/JELOS/JELOS/main/README.md
-- https://wiki.batocera.org/hardware_compatibility (if fetchable)
+- https://wiki.batocera.org/hardware_compatibility
 - https://github.com/christianhaitian/arkos/wiki
-- https://retrodreamer.com/retroid-pocket-4-pro (spec page)
+- https://retrodreamer.com/retroid-pocket-4-pro
 - https://raw.githubusercontent.com/spruceUI/spruceOS/main/README.md
 **Questions to answer:**
 1. Which gaming OSes on RK3566 handhelds support running arbitrary Linux apps alongside the emulator frontend (ports, scripts, systemd services)?
@@ -142,92 +147,390 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] hispo-s8-android-headunit-integration
+## [DONE] hispo-s8-android-headunit-integration
 **Priority:** HIGH
 **Output:** findings/hispo-s8-headunit.md
 **Goal:** Map integration opportunities for our stack on Hispo S8 Android car head units. Key areas: (1) CKB node + Fiber running as background Android service; (2) GPS data → chain monitor / dashcam-style data logger with on-chain provenance; (3) ADB/SSH access for agent control — modifying system layout, launching apps, pushing config; (4) Picture-in-picture at >4 simultaneous windows (stock limit); (5) Modifying/replacing stock Android OS or launcher; (6) CKB dashboard as always-on overlay; (7) Using their built-in PIP module architecture at higher capacity.
 **Seeds:**
-- https://raw.githubusercontent.com/Murena-EV/hispo/main/README.md
-- https://xda-developers.com/search/?q=hispo+s8
-- https://raw.githubusercontent.com/DeskHog/deskdock/main/README.md
+- https://xda-developers.com/android-auto-head-unit-root-guide/
 - https://developer.android.com/guide/topics/ui/picture-in-picture
 - https://developer.android.com/studio/command-line/adb
-- https://github.com/search?q=android+headunit+adb+root&type=repositories
+- https://raw.githubusercontent.com/termux/termux-app/master/README.md
+- https://raw.githubusercontent.com/termux/termux-packages/master/README.md
+- https://xda-developers.com/how-to-enable-developer-options-android/
 **Questions to answer:**
-1. What Android version does the Hispo S8 run? Is it rooted or rootable? ADB enabled by default or via dev options?
-2. Can you SSH into a Hispo S8 unit (e.g. via Termux + SSHd or similar)?
-3. What is their PIP module — proprietary split-screen system? How many simultaneous windows does stock support, and is there a known way to exceed 4?
-4. Can the stock launcher be replaced (e.g. Nova, custom APK as HOME intent)? Any reports of custom launchers on Hispo/similar Qualcomm/MT headunits?
-5. GPS integration: does the unit expose GPS NMEA data to apps via standard Android Location API? Any always-on GPS logging apps known to work on headunits?
-6. CKB node feasibility: RAM/storage specs of S8? Could it run a CKB light client or full node as an Android background service (foreground service, wake lock)?
-7. Agent remote control: if ADB is accessible over WiFi, what can an agent do — push APKs, modify system settings, change launcher, trigger intents?
-8. Any prior art: blockchain nodes, crypto wallets, or similar heavyweight background services running on Android car headunits?
+1. What Android version do Hispo S8 / similar MTK/Qualcomm car headunits typically run? Is root or ADB accessible?
+2. Can you SSH into an Android headunit via Termux + SSHd? What are the limitations?
+3. PIP on Android — how many simultaneous windows does AOSP support? Any known way to stack more than 4 apps?
+4. Can the stock launcher be replaced on a non-rooted Android headunit (HOME intent override)?
+5. GPS integration: standard Android Location API — does it work in always-on background services on headunits?
+6. Could a CKB light client run as an Android foreground service with wake lock on a headunit?
+7. What can ADB over WiFi do: push APKs, modify settings, trigger intents, change launcher?
+8. Any prior art: blockchain nodes or crypto wallets running as Android background services on low-power devices?
 
 ---
 
-## [PENDING] obd2-canbus-esp32-analysis-injection
+## [DONE] obd2-canbus-esp32-analysis-injection
 **Priority:** HIGH
 **Output:** findings/obd2-canbus-esp32.md
-**Goal:** Deep research into OBD2 + CAN bus / K-Line read AND write from ESP32. Two tiers: (1) passive reading — live sensor data, fault codes, ECU parameters; (2) active injection/writing — sending frames to modify ECU behaviour, unlock hidden features, change car configuration, full computer access. Specific vehicle target: Renault Clio RS 172 (Phase 1, ~2001-2002, Renault F7R 2.0L engine, Bosch Motronic ECU). **Known hardware: Renault Link v1.99 USB adapter** — KKL USB-to-K-Line cable, speaks the proprietary Renault DDX/UCH diagnostic protocol used by Renault Clip software. Goal is full independent automotive building — reading is table stakes, writing/injecting is the prize.
+**Goal:** Deep research into OBD2 + CAN bus / K-Line read AND write from ESP32. Two tiers: (1) passive reading — live sensor data, fault codes, ECU parameters; (2) active injection/writing — sending frames to modify ECU behaviour, unlock hidden features, change car configuration. Specific target: Renault Clio RS 172 (~2001-2002, F7R 2.0L, Bosch Motronic ECU). Known hardware: Renault Link v1.99 KKL USB-to-K-Line adapter.
 **Seeds:**
 - https://raw.githubusercontent.com/iDoka/awesome-canbus/master/README.md
 - https://raw.githubusercontent.com/P1kachu/talking-with-cars/master/README.md
 - https://raw.githubusercontent.com/merecarvill/OBD2-KLine-Reader/master/README.md
-- https://github.com/opengarage/carloop
-- https://raw.githubusercontent.com/jshuber/RenaultClip/master/README.md
 - https://raw.githubusercontent.com/collin80/esp32_can/master/README.md
+- https://raw.githubusercontent.com/ECU-tech/fome-fw/master/README.md
+- https://raw.githubusercontent.com/tgsmith61591/DDT4ALL/master/README.md
 **Questions to answer:**
-1. Renault Clio RS 172: K-Line or CAN on OBD2 port? Which ECU exactly (Bosch ME7.4.6? Siemens SID301?)? What diagnostic protocol does Renault Link v1.99 / Renault Clip use — is it documented/reversed?
-2. Can the Renault Link v1.99 KKL adapter protocol be replicated on ESP32 with an L9637D or similar K-Line transceiver? What's the electrical interface?
-3. What can you READ from a Clio 172 via K-Line: live PIDs (RPM, MAF, TPS, coolant), fault codes, immobiliser status, ECU variant/calibration ID?
-4. What can you WRITE: key programming, immobiliser PIN bypass, idle speed adjustment, ignition timing maps, throttle body adaptation reset, service interval reset?
-5. Open source tools that already speak Renault protocol: DDT4ALL, OpenDiag, FreeSSM — do any cover this ECU/protocol? Any reversed Renault CAN/K-Line DBC or definition files?
-6. DDT4ALL specifically — does it support the Clio 172 ECU? What's the coverage for F7R / Bosch Motronic?
-7. Is there a CAN bus present internally on the 172 (separate from OBD2 K-Line) — e.g. between ABS, UCH, instrument cluster? If so, what speed and what frames are documented?
-8. ESP32 K-Line implementation: UART + L9637D transceiver — what baud rates, init sequences, and frame formats does Renault use? Any Arduino/ESP-IDF libraries that handle K-Line ISO 14230 (KWP2000)?
-9. What brands/ECU families are most open to diagnostic write access without seed/key security challenges? Best starting points for learning injection before tackling Renault specifics.
-10. Safety: risks of bad write commands — ECU brick, immobiliser lockout, limp mode triggers. What's recoverable vs permanent?
+1. Renault Clio RS 172: K-Line or CAN on OBD2 port? Which ECU (Bosch ME7.4.6?)? What protocol does Renault Clip use?
+2. Can Renault Link v1.99 KKL protocol be replicated on ESP32 with L9637D K-Line transceiver?
+3. What can you READ from a Clio 172 via K-Line: live PIDs, fault codes, immobiliser status?
+4. What can you WRITE: key programming, idle speed, ignition timing, throttle adaptation reset?
+5. Does DDT4ALL support the Clio 172 ECU / F7R Bosch Motronic? Any reversed Renault DBC files?
+6. Is there a CAN bus internally on the 172 (ABS, UCH, instrument cluster)? Speed and documented frames?
+7. ESP32 K-Line UART + L9637D: baud rates, init sequences, ISO 14230 KWP2000 frame format?
+8. Safety: risks of bad write commands — ECU brick, immobiliser lockout, limp mode?
 
 ---
 
-## [PENDING] local-repo-mirror-strategy
+## [DONE] local-repo-mirror-strategy
 **Priority:** MEDIUM
 **Output:** findings/local-repo-mirror.md
-**Goal:** Evaluate whether mirroring key Nervos/CKB repos locally (on Pi5 or Ryzen NVMe) provides meaningful cost/speed benefits for an AI agent workflow. Repos of interest: nervosnetwork/ckb, nervosnetwork/fiber, sporeprotocol/spore-sdk, nervosnetwork/rfcs, ckb-ccc, nervosnetwork/ckb-script-templates. Questions: does local git clone + daily pull beat web_fetch for the crawler? What's the storage cost? How does grep/ripgrep over local source compare to fetching raw files per-query? Best tooling for keeping mirrors fresh (cron + git fetch vs mirror clone).
+**Goal:** Evaluate whether mirroring key Nervos/CKB repos locally provides meaningful cost/speed benefits for an AI agent workflow. Repos: nervosnetwork/ckb, nervosnetwork/fiber, sporeprotocol/spore-sdk, nervosnetwork/rfcs, ckb-ccc.
 **Seeds:**
-- https://raw.githubusercontent.com/nicowillis/git-mirror/main/README.md
-- https://raw.githubusercontent.com/kubernetes/test-infra/master/prow/cmd/peribolos/README.md
 - https://docs.github.com/en/repositories/creating-and-managing-repositories/duplicating-a-repository
-- https://raw.githubusercontent.com/jonhoo/rust-imap/main/README.md
+- https://raw.githubusercontent.com/nicowillis/git-mirror/main/README.md
+- https://api.github.com/repos/nervosnetwork/fiber
+- https://api.github.com/repos/nervosnetwork/ckb
+- https://api.github.com/repos/sporeprotocol/spore-sdk
 **Questions to answer:**
-1. What's the actual size of the key Nervos repos (ckb, fiber, rfcs, spore-sdk)? Shallow clone vs full clone — how much disk?
-2. For AI-assisted code search: is local ripgrep over a cloned repo faster/cheaper than web_fetch of specific raw files? When does each win?
-3. Best cron strategy for keeping mirrors fresh — `git fetch --all` nightly, or `git pull` on specific branches?
-4. Does GitHub rate-limit raw.githubusercontent.com fetches at the scale of our crawler (9+ tasks, 6 URLs each)?
-5. Would a local mirror on Ryzen (214GB free, Ethernet) vs Pi5 (828GB free, but this machine) make more sense as the canonical mirror host?
-6. Any tools that auto-index a local git repo for semantic search (beyond grep) — could feed the crawler richer context?
+1. What's the actual size of key Nervos repos (ckb, fiber, rfcs, spore-sdk)? Shallow vs full clone disk cost?
+2. For AI-assisted code search: local ripgrep vs web_fetch of raw files — when does each win?
+3. Best cron strategy for keeping mirrors fresh — git fetch --all nightly?
+4. Does GitHub rate-limit raw.githubusercontent.com at the scale of our crawler (50+ fetches/day)?
+5. Would Ryzen (Ethernet, 214GB free) or Pi5 (828GB free) be the better mirror host?
+6. Any tools that auto-index a local git repo for semantic search beyond grep?
 
 ---
 
-## [PENDING] llm-cost-optimisation-strategy
+## [DONE] llm-cost-optimisation-strategy
 **Priority:** HIGH
 **Output:** findings/llm-cost-optimisation.md
-**Goal:** Map the full landscape of LLM pricing, quality, and limitations relevant to our workflow. Goal: minimise premium token spend (Claude Sonnet via CKBDev/Anthropic) while maximising quality where it matters. Cover: current provider prices, free tiers and their real limits, local inference options, task routing (what deserves premium vs cheap), context window management, caching strategies, prompt compression, batching. Practical output: a decision framework for which model to use for which task type in our stack.
+**Goal:** Map LLM pricing, quality, and limitations relevant to our workflow. Minimise premium token spend while maximising quality. Cover: provider prices, free tier limits, local inference, task routing, context management, caching. Output: a decision framework for model selection per task type.
 **Seeds:**
-- https://artificialanalysis.ai/models (pricing comparison — if fetchable)
 - https://raw.githubusercontent.com/BerriAI/litellm/main/README.md
-- https://openrouter.ai/docs/quick-start
 - https://raw.githubusercontent.com/ollama/ollama/main/README.md
+- https://openrouter.ai/docs/quick-start
 - https://huggingface.co/docs/api-inference/index
 - https://raw.githubusercontent.com/google-gemini/cookbook/main/README.md
+- https://raw.githubusercontent.com/anthropics/anthropic-sdk-python/main/README.md
 **Questions to answer:**
-1. Current prices (input/output per million tokens) for: Claude Sonnet 4.5, Claude Haiku 3.5, Gemini 2.5 Flash, Gemini 2.5 Pro, GPT-4o mini, GPT-4o, Llama 3.3 70B (HF free), DeepSeek V3 (API), Qwen3 32B?
-2. HuggingFace free inference tier — actual rate limits, queue times, reliability for sustained use? When does it break down?
-3. Gemini 2.5 Flash free tier — what are the actual RPM/TPD limits? How does it compare to paid at our usage scale?
-4. OpenRouter — does it provide access to cheaper Claude/Gemini routing? Any meaningful cost difference vs direct API?
-5. LiteLLM — can it provide a unified proxy that routes tasks to cheapest capable model automatically? Setup complexity?
-6. Context window management: what are the real cost differences between 8k, 32k, 128k context runs on Sonnet? When is truncation/summarisation worth the quality tradeoff?
-7. Prompt caching (Anthropic): how much does it save for repeated system prompts? Our AGENTS.md + SOUL.md + memory files = significant repeated context.
-8. Local inference (Ryzen qwen2.5:14b): what task types does it handle well enough to fully replace cloud? Coding? Summarisation? Research synthesis? JSON extraction?
-9. Practical routing table: for each task type in our workflow (heartbeat, research crawl, code generation, chat, memory write), what's the optimal model choice and estimated cost per task?
-10. What's a realistic weekly token budget for our current workload, and what does it look like optimised vs unoptimised?
+1. Current prices per million tokens for: Claude Sonnet 4.5, Claude Haiku 3.5, Gemini 2.5 Flash, Gemini 2.5 Pro, GPT-4o mini, Llama 3.3 70B (HF free), DeepSeek V3?
+2. HuggingFace free inference: actual rate limits, queue times, reliability for sustained use?
+3. Gemini 2.5 Flash free tier: RPM/TPD limits vs paid?
+4. OpenRouter: meaningful cost difference vs direct API for Claude/Gemini?
+5. LiteLLM: can it auto-route to cheapest capable model? Setup complexity?
+6. Prompt caching (Anthropic): real savings for repeated system prompts like our AGENTS.md + memory?
+7. Local inference (Ryzen qwen2.5:14b): which task types can fully replace cloud?
+8. Practical routing table: heartbeat / research crawl / code gen / chat / memory write — optimal model per task?
+9. Realistic weekly token budget for our workload, optimised vs unoptimised?
+
+---
+
+## [DONE] stack-gap-analysis
+**Priority:** SYNTHESIS
+**Output:** findings/stack-gap-analysis.md
+**Goal:** When all other research tasks are DONE, perform a synthesis analysis of our entire current stack against the findings from all completed research. Identify gaps, missing bridges, and next build priorities across: ckb-light-esp, ckb-chess, DOB minter, Fiber nodes, BitChat BLE, NerdMiner, stratum proxy, wyltek-embedded-builder, and the agent infrastructure. Then generate new research tasks for any gaps that need external research — write them back into research/queue.md as PENDING tasks with proper seeds. This is a living process, not a one-shot report.
+**Seeds:** (internal — reads research/findings/*.md + workspace MEMORY.md)
+**Questions to answer:**
+1. Which research findings have immediately actionable next steps we haven't started?
+2. What are the critical missing bridges between components (e.g. BitChat BLE ↔ ckb-light-esp payment layer)?
+3. Which projects are closest to a shippable milestone and what's blocking them?
+4. Are there any findings that change the priority of existing work?
+5. What should Phill build next, ranked by impact/effort?
+6. What new research topics should be queued — things we don't have enough info on to build yet? For each: write a full task block (id, priority, seeds, questions) ready to append to queue.md.
+
+
+---
+
+## [DONE] ckb-snapshot-community-expectations
+**Priority:** HIGH
+**Output:** findings/ckb-snapshot-community-expectations.md
+**Goal:** Determine the CKB community's preferred snapshot compression formats, existing snapshot hosting solutions, and versioning strategies to ensure our planned R2 snapshot infrastructure aligns with user expectations and avoids duplication.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/docs/run-ckb-with-docker.md (Re-attempt fetch)
+- https://github.com/nervosnetwork/ckb/discussions (Community discussions)
+- https://github.com/nervosnetwork/ckb/issues (Feature requests/discussions)
+- https://docs.nervos.org/ (Official documentation for any existing snapshot guides)
+**Questions to answer:**
+1. What compression formats (e.g., zstd, lz4, gz) are commonly used or preferred by the CKB community for node snapshots?
+2. Are there any existing, community-hosted CKB snapshots available, and if so, where are they hosted and what are their characteristics (size, update frequency, format)?
+3. What versioning strategies (e.g., date-based filenames, "latest" symlinks/redirects) do other blockchain projects (Bitcoin, Ethereum, Substrate) use for their snapshots, and which would be most suitable for CKB?
+4. How do CKB users currently bootstrap new nodes
+
+---
+
+## [DONE] esp32-p4-sphincs-plus-revisit
+**Priority:** HIGH
+**Output:** findings/esp32-p4-sphincs-plus-revisit.md
+**Goal:** Re-evaluate the feasibility of SPHINCS+ post-quantum signing on ESP32-P4, addressing previous 404 errors and gathering specific technical details.
+**Seeds:**
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-reference/peripherals/sha.html
+- https://github.com/espressif/esp-idf/blob/master/components/esp_hw_support/include/esp_sha.h
+- https://www.espressif.com/sites/default/files/documentation/esp32-p4_datasheet_en.pdf
+- https://github.com/pq-crystals/sphincsplus
+- https://github.com/RustCrypto/signatures/tree/master/sphincsplus
+- https://github.com/RustCrypto/hashes
+- https://eprint.iacr.org/2023/1231.pdf
+**Questions to answer:**
+1. Does ESP-IDF expose SHA-256/512 hardware acceleration via a simple API on ESP32-P4?
+2. Which SPHINCS+ parameter set (e.g., sphincs-sha2-128s, 256s) is practical on an ESP32-P4 microcontroller, considering memory and performance?
+3. Is there a Rust SPHINCS+ crate with a configurable hash backend that can leverage ESP32-P4 hardware acceleration?
+4. What's the expected sign time on ESP32-P4 for a practical SPHINCS+ parameter set, both in pure software and with hardware acceleration (extrapolate from similar MCU benchmarks if direct data is unavailable)?
+5. Are there any prior art implementations or benchmarks of SPHINCS+ on ESP32 or similar Xtensa/RISC-V MCUs?
+
+## [NEW_TASK] ckb-snapshot-infra-revisit
+**Priority:** MEDIUM
+**Output:** findings/ckb-snapshot-infra-revisit.md
+**Goal:** Determine best practices for CKB snapshot hosting on Cloudflare R2, addressing previous 404 errors and missing community context.
+**Seeds:**
+- https://docs.nervos.org/docs/basics/guides/run-ckb-node
+- https://github.com/nervosnetwork/ckb/tree/develop/docs
+- https://forum.nervos.org/
+- https://developers.cloudflare.com/r2/examples/rclone/
+- https://developers.cloudflare.com/r2/api/s3/presigned-urls/
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-compression.html
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-versioning.html
+**Questions to answer:**
+1. What compression format does the CKB community expect or commonly use for node snapshots (e.g., zstd, lz4, gz, tar.zst)?
+2. How do other major blockchain projects (e.g., Bitcoin, Substrate, Ethereum) typically handle snapshot versioning and provide a "latest" pointer for easy access?
+3. Is there an existing CKB community snapshot already hosted somewhere, and what are its characteristics (size, update frequency, format)?
+4. What's the optimal `Cache-Control` header strategy for R2-hosted CKB snapshots, balancing freshness and download performance?
+
+## [NEW_TASK] obd2-clio-rs172-esp32-revisit
+**Priority:** HIGH
+**Output:** findings/obd2-clio-rs172-esp32-revisit.md
+**Goal:** Gather specific technical details for integrating an ESP32 with the Renault Clio RS 172's OBD2/K-Line, addressing previous 404 errors and missing information.
+**Seeds:**
+- https://www.renaultforums.co.uk/
+- https://www.cliosport.net/
+- https://www.outilsobdfacile.com/liste-vehicules-compatibles-obd2/renault-clio-ii.php
+- https://github.com/P1kachu/talking-with-cars
+- https://github.com/merecarvill/OBD2-KLine-Reader
+- https://www.nxp.com/docs/en/data-sheet/L9637D.pdf
+- https://github.com/collin80/esp32_can
+**Questions to answer:**
+1. Does the Renault Clio RS 172 (Clio II Sport) use K-Line or CAN bus on its OBD2 port? What is the primary ECU type (e.g., Bosch ME7.4.6)? What diagnostic protocol does Renault Clip typically use for this vehicle?
+2. Can the Renault Link v1.99 KKL protocol (or equivalent diagnostic protocol for Clio RS 172) be replicated on an ESP32 using an L9637D K-Line transceiver? What are the specific communication parameters (baud rate, data bits, parity, stop bits, initialization sequence)?
+3. What specific data (live PIDs, fault codes, immobiliser status, VIN, mileage) can typically be READ from a Clio RS 172 via K-Line or CAN?
+4. What specific parameters or functions (e.g., key programming, idle speed adjustment, ignition timing, throttle adaptation reset, service interval reset) can typically be WRITTEN to a Clio RS 172 ECU via K-Line or CAN, and what are the associated risks?
+
+## [NEW_TASK] ckb-chess-fiber-rpcs-revisit
+**Priority:** MEDIUM
+**Output:** findings/ckb-chess-fiber-rpcs-revisit.md
+**Goal:** Identify the specific Fiber RPCs required for the ckb-chess relayer, addressing previous 404 errors and clarifying the payment/state transport flow.
+**Seeds:**
+- https://github.com/nervosnetwork/fiber/tree/main/docs
+- https://github.com/nervosnetwork/fiber/tree/main/crates/fiber-lib/src/rpc
+- https://github.com/nervosnetwork/fiber/tree/main/tests/bruno/fiber
+- https://github.com/toastmanAu/ckb-chess/blob/main/README.md
+**Questions to answer:**
+1. What are the specific Fiber RPCs (e.g., `open_channel`, `send_payment`, `new_invoice`, `get_invoice`, `list_channels`, `close_channel`) required for the ckb-chess relayer to manage game state and balance adjustments?
+2. How can game state hashes be reliably embedded within Fiber payment messages or other channel update mechanisms?
+3. What is the precise sequence of Fiber RPC calls for a full ckb-chess game lifecycle, from channel opening to final settlement, including handling moves and timeouts?
+
+## [NEW_TASK] handheld-gaming-rk3566-deep-dive
+**Priority:** MEDIUM
+**Output:** findings/handheld-gaming-rk3566-deep-dive.md
+**Goal:** Determine the best handheld gaming OS for RK3566 devices to run CKB/Fiber nodes and custom Linux apps, and gather specifics on target devices.
+**Seeds:**
+- https://github.com/ArkOS/ArkOS
+- https://github.com/JELOS/JELOS
+- https://wiki.batocera.org/hardware_compatibility
+- https://wiki.batocera.org/system_architecture
+- https://www.anbernic.com/
+- https://www.retroidpocket.com/
+- https://forum.xda-developers.com/
+**Questions to answer:**
+1. For RK3566-based handhelds, which gaming Linux distributions (e.g., ArkOS, JELOS, Batocera.linux) definitively support running arbitrary Linux applications, custom scripts, and `systemd` services alongside the emulator frontend?
+2. What is the default operating system (Android or Linux distro) for the Anbernic RG-ARC-D, and what is its root/ADB accessibility situation?
+3. For the Retroid Pocket 4 Pro, what is its default Android version, does it support ADB over WiFi, and can full APKs (including custom launchers) be sideloaded without root?
+
+## [NEW_TASK] hispo-s8-android-deep-dive
+**Priority:** LOW
+**Output:** findings/hispo-s8-android-deep-dive.md
+**Goal:** Gather specific details on Hispo S8/MTK/Qualcomm Android head units to assess integration feasibility for CKB light clients and background services.
+**Seeds:**
+- https://forum.xda-developers.com/f/android-head-units.4325/
+- https://forum.xda-developers.com/f/mtk-android-development.2878/
+- https://developer.android.com/guide/components/services
+- https://developer.android.com/guide/components/activities/background-limits
+- https://termux.dev/
+**Questions to answer:**
+1. What is the typical Android version range for Hispo S8 and similar MTK/Qualcomm car head units, and is root access generally available or easily achievable?
+2. Is ADB accessible by default on these head units, and what are the common methods for enabling it (e.g., developer options, specific codes)?
+3. What are the specific limitations for running persistent background services (like a CKB light client or Fiber node) on these head units, especially concerning Android's process killing mechanisms on newer versions?
+
+## [NEW_TASK] llm-cost-optimisation-pricing-update
+**Priority:** HIGH
+**Output:** findings/llm-cost-optimisation-pricing-update.md
+**Goal:** Obtain current pricing, rate limits, and free tier details for key LLM models to inform LiteLLM routing and cost optimization.
+**Seeds:**
+- https://www.anthropic.com/api
+- https://cloud.google.com/vertex-ai/pricing#generative_ai_models
+- https://openai.com/pricing
+- https://openrouter.ai/docs#pricing
+- https://huggingface.co/docs/api-inference/pricing
+- https://huggingface.co/docs/api-inference/detailed_parameters#rate-limits
+- https://litellm.ai/docs/routing
+**Questions to answer:**
+1. What are the current prices per million input/output tokens for: Claude Sonnet 4.5, Claude Haiku 3.5, Gemini 2.5 Flash, Gemini 2.5 Pro, GPT-4o mini, Llama 3.3 70B (via HF Inference API), DeepSeek V3 (via HF Inference API or OpenRouter)?
+2. What are the actual rate limits, typical queue times, and reliability expectations for sustained use of the HuggingFace free inference tier?
+3. What are the specific RPM/TPD limits for the Gemini 2.5 Flash free tier, and how do they compare to paid tiers?
+4. Does OpenRouter offer a meaningful cost difference compared to direct API access for Claude and Gemini models, considering their aggregation and potential bulk discounts?
+5. Can LiteLLM be configured to automatically route requests to the *cheapest capable model* based on real-time pricing and model capabilities, and what is the setup complexity for this?
+
+## [NEW_TASK] esp32-ckb-dob-signing-flow
+**Priority:** MEDIUM
+**Output:** findings/esp32-ckb-dob-signing-flow.md
+**Goal:** Detail the technical flow for an ESP32 device to sign a payload for minting a hardware provenance DOB on CKB.
+**Seeds:**
+- https://github.com/toastmanAu/ckb-dob-minter/blob/main/README.md
+- https://github.com/nervosnetwork/ckb-sdk-js
+- https://github.com/nervosnetwork/ckb-sdk-rust
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/esp_system.html#_CPPv418esp_efuse_read_mac6uint8_tP
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/mbedtls.html
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/esp_random.html
+**Questions to answer:**
+1. What is the recommended cryptographic primitive (e.g., secp256k1, Ed25519) for an ESP32 to sign a CKB transaction payload, considering CKB-VM compatibility and ESP32 hardware capabilities?
+2. What are the steps for an ESP32 to generate a private key, sign a JSON payload (representing the DOB data), and produce a signature compatible with CKB transaction structure?
+3. How can the ESP32 securely store and manage its private key for signing DOBs?
+4. What is the full end-to-end flow, from ESP32 generating a signed payload to a CKB node minting the DOB, including any necessary relay services?
+
+## [NEW_TASK] github-raw-rate-limits-and-semantic-search
+**Priority:** LOW
+**Output:** findings/github-raw-rate-limits-and-semantic-search.md
+**Goal:** Understand GitHub `raw.githubusercontent.com` rate limits and explore advanced semantic search tools for local code mirrors.
+**Seeds:**
+- https://docs.github.com/en/rest/overview/rate-limits
+- https://docs.github.com/en/rest/repos/contents
+- https://github.com/BurntSushi/ripgrep
+- https://docs.github.com/en/github/searching-for-information-on-github/searching-code
+- https://sourcegraph.com/
+- https://docs.ollama.com/concepts/embeddings
+- https://github.com/ggerganov/llama.cpp/tree/master/examples/embedding
+**Questions to answer:**
+1. What are the specific rate limits (requests per hour/minute) for accessing `raw.githubusercontent.com` content, both authenticated and unauthenticated?
+2. Beyond `ripgrep`, what advanced semantic code search tools or techniques (e.g., based on local embeddings, AST parsing) are suitable for a local Git repository mirror to enhance AI-assisted code search?
+3. What is the setup complexity and resource overhead for implementing such advanced semantic search capabilities on Phill's existing hardware (e.g., N100, OPi5+)?
+---
+
+## [DONE] obd2-clio-rs172-esp32-revisit
+**Priority:** HIGH
+**Output:** findings/obd2-clio-rs172-esp32-revisit.md
+**Goal:** Gather specific technical details for integrating an ESP32 with the Renault Clio RS 172's OBD2/K-Line, addressing previous 404 errors and missing information.
+**Seeds:**
+- https://www.cliosport.net/threads/obd2-diagnostic-on-172.html
+- https://raw.githubusercontent.com/P1kachu/talking-with-cars/master/README.md
+- https://raw.githubusercontent.com/merecarvill/OBD2-KLine-Reader/master/README.md
+- https://www.nxp.com/docs/en/data-sheet/L9637D.pdf
+- https://raw.githubusercontent.com/collin80/esp32_can/master/README.md
+- https://raw.githubusercontent.com/guilherme-gm/Renault-Clip-Decrypted/master/README.md
+**Questions to answer:**
+1. Does the Renault Clio RS 172 use K-Line or CAN bus on OBD2? What ECU type (Bosch ME7.4.6?)?
+2. Can Renault Link v1.99 KKL protocol be replicated on ESP32 + L9637D? Baud rates, init sequence?
+3. What data can be READ via K-Line: live PIDs, fault codes, immobiliser status?
+4. What can be WRITTEN: key programming, idle speed, ignition timing, throttle adaptation reset?
+
+---
+
+## [DONE] ckb-chess-fiber-rpcs-revisit
+**Priority:** MEDIUM
+**Output:** findings/ckb-chess-fiber-rpcs-revisit.md
+**Goal:** Identify specific Fiber RPCs for the ckb-chess relayer using correct source paths found in earlier fiber research.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/payment-lifecycle.md
+- https://raw.githubusercontent.com/toastmanAu/ckb-chess/main/README.md
+**Questions to answer:**
+1. Exact RPCs needed for relayer: open_channel, send_payment, new_invoice, get_invoice, list_channels?
+2. How to embed game state hash in Fiber payment messages?
+3. Full RPC call sequence for a complete ckb-chess game lifecycle?
+
+---
+
+## [DONE] esp32-ckb-dob-signing-flow
+**Priority:** MEDIUM
+**Output:** findings/esp32-ckb-dob-signing-flow.md
+**Goal:** Detail the technical flow for an ESP32 to sign a payload for minting a hardware provenance DOB on CKB.
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/ckb-dob-minter/main/README.md
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-reference/system/esp_system.html
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/mbedtls/port/include/sha256_alt.h
+- https://raw.githubusercontent.com/nervosnetwork/ckb-sdk-js/develop/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0022-transaction-structure/0022-transaction-structure.md
+**Questions to answer:**
+1. Best crypto primitive for ESP32→CKB signing (secp256k1 vs Ed25519)?
+2. Steps: ESP32 signs JSON payload → CKB-compatible signature?
+3. Secure private key storage on ESP32 (eFuse? NVS encrypted partition?)?
+4. Full relay flow: ESP32 signed payload → CKB node mints DOB?
+
+---
+
+## [DONE] handheld-gaming-rk3566-deep-dive
+**Priority:** MEDIUM
+**Output:** findings/handheld-gaming-rk3566-deep-dive.md
+**Goal:** Determine best RK3566 handheld gaming OS for running CKB/Fiber nodes alongside the emulator frontend.
+**Seeds:**
+- https://raw.githubusercontent.com/christianhaitian/ArkOS/master/README.md
+- https://raw.githubusercontent.com/JustEnoughLinuxOS/distribution/main/README.md
+- https://wiki.batocera.org/hardware_compatibility
+- https://raw.githubusercontent.com/AmberELEC/AmberELEC/main/README.md
+- https://wiki.batocera.org/supported_games_controllers
+**Questions to answer:**
+1. Which RK3566 gaming distros support systemd services + arbitrary Linux apps alongside the frontend?
+2. Anbernic RG-ARC-D: Android or Linux distro? Root/ADB situation?
+3. Does Batocera on RK3566 have pacman or equivalent package manager accessible?
+4. Best approach for persistent CKB node service that survives frontend restarts?
+
+---
+
+## [DONE] llm-cost-optimisation-pricing-update
+**Priority:** HIGH
+**Output:** findings/llm-cost-optimisation-pricing-update.md
+**Goal:** Get current LLM pricing and free tier limits to build a proper routing decision table.
+**Seeds:**
+- https://www.anthropic.com/pricing
+- https://ai.google.dev/pricing
+- https://openrouter.ai/models
+- https://huggingface.co/docs/api-inference/index
+- https://raw.githubusercontent.com/BerriAI/litellm/main/docs/routing.md
+**Questions to answer:**
+1. Current $/MTok for: Claude Sonnet 4.5, Haiku 3.5, Gemini 2.5 Flash, Gemini 2.5 Pro, GPT-4o mini, Llama 3.3 70B free?
+2. HuggingFace free tier: actual RPM limits and queue reliability?
+3. Gemini 2.5 Flash free: RPM/TPD limits vs paid?
+4. LiteLLM cost-based routing setup — complexity and config format?
+
+---
+
+## [DONE] ckb-did-cell-format-and-contract
+**Priority:** HIGH
+**Output:** findings/ckb-did-cell-format.md
+**Goal:** Understand the on-chain CKB DID cell format, the smart contract that validates DID operations, and what data is stored in the cell so we can build WyDID.h — an ESP32 component that owns a did:ckb identity, signs payloads, and integrates with ckb-light-esp, BitChat, and Fiber.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb-did/main/README.md
+- https://raw.githubusercontent.com/web5-labs/ckb-did/main/README.md
+- https://raw.githubusercontent.com/rink1969/ckb-did/main/README.md
+- https://api.github.com/repos/rink1969/ckb-did/git/trees/main?recursive=1
+- https://raw.githubusercontent.com/rink1969/web5-cli/main/README.md
+- https://raw.githubusercontent.com/rink1969/web5-cli/main/src/did.ts
+**Questions to answer:**
+1. What is the exact CKB cell structure for a did:ckb cell — lock script, type script, data format?
+2. What secp256k1 key format does the DID use — compressed pubkey? What's the derivation from key to DID string (z53x...)?
+3. What does the DID type script validate — what makes a DID create/update/destroy tx valid?
+4. How does DID resolution work — given did:ckb:z53x... how do you find the live cell and extract the pubkey?
+5. What's the minimum CKB capacity required for a DID cell?
+6. Can an ESP32 with trezor-crypto generate a compatible keypair and DID string without going on-chain first?

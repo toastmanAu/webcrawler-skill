@@ -1,5 +1,24 @@
 # HEARTBEAT.md
 
+## Idle Research Crawler (runs automatically when nothing else needs attention)
+Rule: if there are PENDING tasks in `research/queue.md` AND `lastResearchCrawl` in heartbeat-state.json is >15min ago → run one task.
+Command: `python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py`
+- Script picks the next task automatically: HIGH → MEDIUM → LOW → SYNTHESIS
+- SYNTHESIS tasks run last — they read all completed findings + MEMORY.md and produce a stack gap analysis (no web crawl needed)
+- Script updates `lastResearchCrawl` timestamp itself — no manual step needed
+- On completion: notify Phill: "🔬 Research done: <task-id> → research/findings/<id>.md"
+- Cost: ~$0.03-0.05/task (Gemini 2.5 Flash) — run freely, no approval needed
+- If ALL tasks DONE (including SYNTHESIS): skip silently
+
+## Research Dashboard (port 9989)
+Check `curl -sf http://localhost:9989/ -o /dev/null` — if down, restart:
+`python3 /home/phill/research-dashboard/server.py &`
+- Silent restart, no notification needed
+
+## DOB Minter Dev Server (port 5173)
+Check `systemctl --user is-active ckb-dob-minter` — if inactive, restart: `systemctl --user restart ckb-dob-minter`
+- Silent restart, no notification needed unless it fails to come back up
+
 ## Dashboard Monitor
 Check http://localhost:8080/health (CKB node dashboard proxy — lightweight health endpoint).
 - If unreachable: **restart it** → `bash /home/phill/ckb-dashboard/start.sh`
@@ -31,7 +50,7 @@ Last known: block ~18,674,521, 21 peers, healthy
 Check `systemctl --user is-active ckb-chat-bridge.service` — if inactive, restart: `systemctl --user restart ckb-chat-bridge.service`
 - Also check logs: `journalctl --user -u ckb-chat-bridge.service -n 5 --no-pager`
 - If logs show repeated `SendMessage failed` errors → notify Phill, bridge may need rejoin
-- Service bridges: Nervos Nation TG (-1001623077152) ↔ Nervos Network Discord (👾│general)
+- Service bridges: Nervos Nation TG (-1001623077152) ↔ Nervos Network Discord (#nervos-nation-bridge)
 - Config: /home/phill/ckb-chat-bridge/matterbridge.toml
 
 ## Stratum Proxy (Solo Mode)
@@ -82,3 +101,15 @@ Once group is created and ID is in COLLECTIVE.md:
 - Read other agents' posts, update COLLECTIVE.md with anything worth keeping
 - Format: `[Kernel/Pi5] <3 lines max>`
 - Group ID: -1003828360343
+
+## Wyltek Site Stats (1x/day — ~9am ACST)
+Run `bash /home/phill/.openclaw/workspace/scripts/update-site-stats.sh` — track last run in heartbeat-state.json under key `siteStats`.
+- Counts board targets (boards.h), sensor drivers (sensors/drivers/), public repos (gh CLI)
+- Patches index.html stat cards + feature description, commits + pushes if changed
+- No notification needed unless push fails
+
+## Test Results (1x/day — ~8am ACST)
+Run `python3 /home/phill/.openclaw/workspace/scripts/update-test-results.py` — track last run in heartbeat-state.json under key `testResults`.
+- Runs CKB-ESP32 + ckb-light-esp host test suites
+- Writes JSON to wyltek-industries-site/tests/, commits + pushes if changed
+- If any tests fail: notify Phill immediately with repo name + failure count
