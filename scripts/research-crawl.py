@@ -24,8 +24,26 @@ MEMORY_FILE     = os.path.join(WORKSPACE, "MEMORY.md")
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API   = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
 
+# Telegram notify — uses OpenClaw bot to DM Phill on task completion
+TG_BOT_TOKEN = "8446459270:AAFltgKPOgFc0FX4PjKJNPUxTRoRzayKAlE"
+TG_CHAT_ID   = "1790655432"
+
 MAX_URL_CHARS    = 40000
 MAX_URLS_PER_TASK = 6
+
+
+def send_telegram(text):
+    """Send a Telegram DM to Phill via the whale bot."""
+    try:
+        payload = json.dumps({"chat_id": TG_CHAT_ID, "text": text}).encode()
+        req = urllib.request.Request(
+            f"https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage",
+            data=payload,
+            headers={"Content-Type": "application/json"}
+        )
+        urllib.request.urlopen(req, timeout=10)
+    except Exception as e:
+        print(f"  [warn] Telegram notify failed: {e}")
 
 
 def load_env():
@@ -340,6 +358,11 @@ def main():
 
     completed = [t["id"] for t in tasks]
     print(f"\nDone. {len(tasks)} task(s) completed: {', '.join(completed)}")
+
+    # Notify Phill via Telegram
+    for task_id in completed:
+        findings_path = f"research/findings/{task_id}.md"
+        send_telegram(f"🔬 Research done: {task_id} → {findings_path}")
 
 
 if __name__ == "__main__":

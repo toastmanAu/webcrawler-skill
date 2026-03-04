@@ -569,7 +569,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] gameboy-hardware-wallet
+## [DONE] gameboy-hardware-wallet
 **Priority:** MEDIUM
 **Output:** findings/gameboy-hardware-wallet.md
 **Goal:** Investigate feasibility of a retro handheld console (R36S/similar) that functions as a hardware wallet with CKB light client — disguised as a normal gaming device. Inspired by: "10,000 games and one is a wallet."
@@ -601,7 +601,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] retroarch-core-blockchain
+## [DONE] retroarch-core-blockchain
 **Priority:** MEDIUM
 **Output:** findings/retroarch-core-blockchain.md
 **Goal:** Deep dive into the libretro/RetroArch core API to understand what's possible for blockchain-native retro games — in-game token earning, Fiber micropayments for lives/continues, on-chain leaderboards, tradeable game items as CKB DOBs.
@@ -632,7 +632,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] retro-achievements-ckb-bridge
+## [DONE] retro-achievements-ckb-bridge
 **Priority:** LOW
 **Output:** findings/retro-achievements-ckb-bridge.md
 **Goal:** Map RetroAchievements' existing infrastructure and API to understand what's already solved for game event tracking — then design the delta needed to route those events to CKB instead of (or alongside) RA badges.
@@ -654,3 +654,18 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/README.md
 - https://api.retroachievements.org (check their public API docs URL)
 - https://raw.githubusercontent.com/RetroAchievements/RAIntegration/master/README.md
+
+---
+
+## [DONE] stack-gap-analysis-2
+**Priority:** SYNTHESIS
+**Output:** findings/stack-gap-analysis-2.md
+**Goal:** Fresh synthesis of the entire Wyltek/Kernel stack as of March 2026. Read all completed research findings and MEMORY.md. Identify: (1) what's built and working, (2) what's partially done and what's blocking it, (3) highest-leverage next build priorities, (4) gaps or missing bridges between components. Cover: DOB minter + membership system, Fiber nodes (ckbnode + N100), ckb-light-esp, ckb-chess, NerdMiner CKB, stratum proxy, wyltek-embedded-builder, Web5/DID identity, agent infrastructure (Kernel Pi5 + Wyltek N100), Binance trading bot, and the Wyltek website. Then generate new external research tasks for any knowledge gaps — write them as [NEW_TASK] blocks so they get auto-queued.
+**Seeds:** (internal — reads research/findings/*.md + workspace MEMORY.md)
+**Questions to answer:**
+1. Which projects are closest to a shippable/launchable milestone and what's the last blocker?
+2. What are the critical missing bridges between components that would unlock the most value?
+3. Which completed research findings have immediately actionable next steps not yet started?
+4. What new research topics should be queued — things we don't know enough about yet to build?
+5. Are there any architecture decisions that should be reconsidered based on the accumulated findings?
+6. What's the single highest-impact thing Phill should build next?

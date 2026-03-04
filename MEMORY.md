@@ -252,6 +252,19 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - Will be wired as Pi's local inference backend
 - Status: waiting on Phill to install Ubuntu
 
+## Wyltek Founding Member DOB — Mainnet (2026-03-04 LIVE ✅)
+- Cluster ID: 0x54ba3ee23016ab6e2e20792d8fd69057c62392ca1997b622147a5bd98979f4e8
+- CKBFS TypeID (V2, image published): 0xbdf595ff79548ab67c5d852968ffa0d2491b28ea52687e736d52e661c9cdb76a
+- CKBFS tx: 0xd824b272df0e6ec2cee6eeb353a418174ff52150f4643aa06642d7236b141d0e
+- Cluster tx: 0x38c70187783653b56e117393f9a7c7b4f58eaa18575667824ed5071be8e12c28
+- Member #1 (Phill): Minted ✅ Spore 0x11365ac4d46ff9741fc34250c0159ba6844fa15cd7ded44a4011b4cb6d75e458
+  - Tx: 0x222fc2d3acabe4e28efb2c0d95d95fef6620ad8b9e666b7f8ade4f3e4fb6b0f0
+- Minting wallet: ~10,075 CKB remaining (13,000 - cluster - CKBFS - DOB #1)
+- Queue runner: /home/phill/ckb-dob-minter-script/mint-queue-runner.js (run --mainnet)
+- Members page: wyltekindustries.com/members.html (0/100 public counter, member #1 already minted)
+- Supabase: mint_queue table, member_number from live count
+- JoyID fix: must set joyidAppURL: 'https://app.joy.id' — SDK default is testnet.joyid.dev
+
 ## DOB Minting Wallet (generated 2026-03-03)
 - Testnet: ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqv5emmruh9u256aaa4l2a4nw3qf3n8fksq60duk9
 - Mainnet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqv5emmruh9u256aaa4l2a4nw3qf3n8fksq5axnua
