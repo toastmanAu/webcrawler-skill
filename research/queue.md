@@ -669,3 +669,155 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. What new research topics should be queued — things we don't know enough about yet to build?
 5. Are there any architecture decisions that should be reconsidered based on the accumulated findings?
 6. What's the single highest-impact thing Phill should build next?
+
+---
+
+## [DONE] wyltek-membership-ckb-dob-social-layer
+**Priority:** HIGH
+**Output:** findings/wyltek-membership-ckb-dob-social-layer.md
+**Goal:** Research how other CKB/Spore projects have implemented social features on top of DOB ownership — likes, comments, gated content, reputation. Map what's possible with Spore cells as social identity anchors. Compare against Wyltek's current Supabase approach and identify if/when moving social data fully on-chain makes sense.
+**Seeds:**
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/README.md
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/docs/core-concepts.md
+- https://raw.githubusercontent.com/nervosnetwork/docs.nervos.org/develop/docs/dapp/spore-protocol.md
+- https://raw.githubusercontent.com/ckb-devrel/pausable-udt/main/README.md
+- https://raw.githubusercontent.com/cryptape/kuai/main/README.md
+**Questions to answer:**
+1. Can Spore cell ownership (DOB) be used as a soulbound membership token — what prevents transfers?
+2. Are there existing CKB social dApps storing comments/reactions on-chain? Gas cost estimates?
+3. What's the practical cost of storing a 280-char comment on CKB vs Supabase?
+4. Spore extensions — can we attach metadata to a Spore cell post-mint (e.g. member profile data)?
+5. What does a "token-gated" architecture look like natively on CKB — without a centralised DB?
+
+---
+
+## [DONE] ckbfs-v3-vs-v2-migration-path
+**Priority:** HIGH
+**Output:** findings/ckbfs-v3-vs-v2-migration.md
+**Goal:** CKBFS V3 is now the SDK default. Understand what changed, whether V3 is production-ready, and whether Wyltek should migrate. The @wyltek/ckbfs-browser package currently pins to V2 — understand the full cost/benefit of a V3 upgrade and what would break.
+**Seeds:**
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/README.md
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/CHANGELOG.md
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/packages/api/src/utils/constants.ts
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/packages/api/src/ckbfs.ts
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/packages/api/src/utils/molecule.ts
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/docs/protocol-v3.md
+**Questions to answer:**
+1. What exactly changed in V3 — witness structure, molecule schema, cell layout?
+2. Is V3 more affordable? The synthesis mentions "more affordable" — quantify: cost per 100KB V2 vs V3?
+3. Are V2 and V3 cells readable by the same resolver, or completely separate contracts?
+4. V3 code_hash `0xb5d13f...` — is it deployed and stable on mainnet?
+5. What would breaking changes look like in @wyltek/ckbfs-browser if we upgraded to V3?
+
+---
+
+## [DONE] fiber-channel-funding-ux
+**Priority:** HIGH
+**Output:** findings/fiber-channel-funding-ux.md
+**Goal:** The N100 Fiber node needs 99+ CKB to auto-accept channels. Research the full UX of Fiber channel lifecycle — funding, capacity, liquidity rebalancing, and closing — specifically as it applies to our ckbnode↔N100 setup. Also research what CKB amount makes sense for a "healthy" routing node vs a payment endpoint.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/specs/channel-announcement.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/payment-lifecycle.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/quick-start.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/tests/bruno/fiber/open_channel.bru
+- https://api.github.com/repos/nervosnetwork/fiber/releases/latest
+**Questions to answer:**
+1. Minimum CKB to auto-accept channels — is 99 CKB correct or is it configurable?
+2. What's the recommended channel capacity for a routing node vs an app endpoint?
+3. How do you rebalance a channel that's become one-sided (all capacity on one end)?
+4. Channel close flow: cooperative vs unilateral — time locks, on-chain fees?
+5. For ckb-chess: what capacity is needed per game session (typical move payment size × expected moves)?
+
+---
+
+## [DONE] ccc-transaction-building-patterns
+**Priority:** HIGH  
+**Output:** findings/ccc-transaction-building-patterns.md
+**Goal:** Deep dive into CCC (CKB Component Composer) transaction building patterns — specifically for browser dApps using JoyID. We've been debugging CCC API quirks (getAddresses vs getAddressObjs, bytesFrom vs hexFrom, depType casing, hashTypeId argument order). Document the definitive correct patterns to avoid future regressions in @wyltek/ckbfs-browser and any future CKB browser tooling.
+**Seeds:**
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/README.md
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/core/src/signer/signer.ts
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/core/src/transaction/transaction.ts
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/core/src/ckb/transaction.ts
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/connector-react/README.md
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/examples/ckb-transfer/src/App.tsx
+**Questions to answer:**
+1. `getAddresses()` vs `getAddressObjs()` vs `getRecommendedAddressObj()` — when to use each?
+2. `bytesFrom()` vs `hexFrom()` — when does CCC auto-convert, when does it break JoyID serialisation?
+3. `depType` casing — 'depGroup' vs 'dep_group' vs 'code' — what are the valid values and their byte encodings?
+4. `hashTypeId(cellInput, outputIndex)` — does it take CellInput or OutPoint? What about the index type (BigInt vs number)?
+5. `completeInputsByCapacity` vs `completeInputs` vs `completeFeeBy` — correct call order and what each does?
+6. How does CCC serialise a transaction for JoyID popup — what types are safe (hex string vs Uint8Array vs BigInt)?
+
+---
+
+## [DONE] spore-dob-rendering-standards
+**Priority:** MEDIUM
+**Output:** findings/spore-dob-rendering-standards.md
+**Goal:** Research how DOBs/Spores with ckbfs:// URI content are rendered in wallets and explorers. When someone receives a Founding Member DOB, how does JoyID, Neuron, or the CKB explorer display it? Are there metadata standards (like ERC-721 tokenURI) that determine how the image/name/description shows up?
+**Seeds:**
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/docs/core-concepts.md
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/packages/core/src/codec/spore.ts
+- https://raw.githubusercontent.com/nervosnetwork/docs.nervos.org/develop/docs/dapp/spore-protocol.md
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0046-spore-protocol/0046-spore-protocol.md
+**Questions to answer:**
+1. Does JoyID wallet render ckbfs:// images natively, or does it need IPFS/HTTP?
+2. Is there a Spore metadata standard for name, description, attributes (like ERC-721)?
+3. How does the CKB explorer (explorer.nervos.org) render Spore/DOB content?
+4. What content-types are well-supported across wallets — image/jpeg, image/png, image/svg+xml?
+5. For the Founding Member DOB: what's the best content strategy to maximise wallet display compatibility?
+
+---
+
+## [DONE] ckb-light-esp-ckbfs-integration
+**Priority:** MEDIUM
+**Output:** findings/ckb-light-esp-ckbfs-integration.md
+**Goal:** Research how CKBFS could be integrated into ckb-light-esp — specifically using an ESP32 to publish small sensor readings, firmware hashes, or hardware provenance records to CKBFS. Understand the constraints: no browser, no JoyID, needs raw CKB transaction building on a microcontroller or lightweight proxy.
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/README.md
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/src/ckb/transaction.h
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/README.md
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/packages/api/src/ckbfs.ts
+- https://raw.githubusercontent.com/nervosnetwork/ckb-sdk-rust/main/README.md
+**Questions to answer:**
+1. What's the minimum viable CKBFS publish flow for a constrained device (no Node.js, no browser)?
+2. Can an ESP32 build and sign a CKBFS transaction directly, or does it need a proxy?
+3. What's the witness size limit per CKB transaction — can a sensor reading + firmware hash fit in one tx?
+4. Is there a lightweight Rust or C CKBFS implementation that could target ESP-IDF?
+5. Hardware provenance pattern: ESP32 signs its own firmware hash → publishes to CKBFS → DOB references it. Feasible?
+
+---
+
+## [DONE] wyltek-site-seo-and-discoverability
+**Priority:** MEDIUM
+**Output:** findings/wyltek-site-seo.md
+**Goal:** Research SEO and discoverability strategies specifically for a niche blockchain/hardware developer community site. What meta tags, structured data, and content strategies make sense for wyltekindustries.com? Also research how other Nervos ecosystem projects handle discoverability — are there community directories, awesome-lists, or aggregators worth submitting to?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/awesome-nervos/main/README.md
+- https://raw.githubusercontent.com/ckb-community/ckb-explorer-frontend/main/README.md
+- https://raw.githubusercontent.com/ckb-devrel/ckbfs/main/README.md
+- https://raw.githubusercontent.com/sporeprotocol/awesome-spore/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/docs.nervos.org/develop/docs/ecosystem/projects.md
+**Questions to answer:**
+1. What Open Graph / Twitter Card meta tags should wyltekindustries.com have?
+2. Is there an official Nervos ecosystem directory or dApp registry to submit Wyltek to?
+3. What structured data (JSON-LD) schema makes sense for a blockchain tools/hardware project?
+4. How do successful niche crypto projects drive organic traffic — content, GitHub stars, forum presence?
+5. Are there CKB-specific communities (Discord, Telegram, forums) with project showcase channels?
+
+---
+
+## [DONE] stack-gap-analysis-3
+**Priority:** LOW
+**Output:** findings/stack-gap-analysis-3.md
+**Goal:** SYNTHESIS — read all completed findings since stack-gap-analysis-2 plus current MEMORY.md. Produce updated gap analysis focused on: (1) what shipped since last synthesis (membership system, DOB minter, CKBFS browser SDK, profile system), (2) new gaps revealed by shipping, (3) revised priority order for remaining work, (4) any new opportunities spotted in research findings.
+**Seeds:** local
+**Questions to answer:**
+1. What shipped since the last synthesis and what new gaps did shipping reveal?
+2. Are the Fiber channel issues still the biggest blocker for ckb-chess?
+3. With @wyltek/ckbfs-browser published, what's the ecosystem opportunity — who else would use this?
+4. What's the most valuable next project to start after the membership system stabilises?
+5. What risks exist in the current stack that need addressing before public launch?
+
