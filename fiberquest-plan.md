@@ -8,20 +8,20 @@
 
 **FiberQuest** — Play retro games, pay real money per game event via the Fiber Network.
 
-> "Imagine Street Fighter 2 where every hit costs Shannon. No wallets, no confirmations — just gameplay mapped to Fiber micropayments in real time."
+> "Your farm account is a Fiber payment channel. Sell crops — receive CKB. Buy seeds — spend CKB. The channel balance IS your gold."
 
-One-liner: **Retro gaming meets Fiber micropayment triggers — pay per hit, per life, per boss.**
+One-liner: **Harvest Moon with a real economy — your in-game gold IS a Fiber payment channel.**
 
 ---
 
 ## Scope Decision (commit to this before day 1)
 
 ### MVP (must ship by day 9)
-- [ ] Target game: **Street Fighter 2 Turbo (SNES)** — best RAM map coverage, clear payment events
+- [ ] Target game: **Harvest Moon (SNES)** — bidirectional economy, gold address confirmed at 7F1F04-06
 - [ ] RetroArch running on Mac/PC, SNES core (Snes9x or bsnes)
 - [ ] Node.js sidecar: polls RetroArch UDP RAM → detects events → triggers Fiber payments
 - [ ] Fiber: two local nodes (ckbnode + N100), channel pre-funded, testnet
-- [ ] Payment events: **player takes damage** (most reliable RAM address), optionally round win/loss
+- [ ] Payment events: **morning shipping payout** (gold addr jumps → Fiber payment IN), **shop purchase** (gold addr drops → Fiber payment OUT)
 - [ ] Web UI: simple status panel — shows last payment, channel balance, event log
 - [ ] Demo video: 60–90 seconds, shows live gameplay + payment firing in real time
 
@@ -196,13 +196,14 @@ If MVP is solid, pick ONE stretch goal:
 **Goal: Record the submission video**
 
 Script (60–90 seconds):
-1. Open game (SF2 Turbo, character select)
-2. Show web UI panel — channel balance, empty event log
-3. Start a round — first hit lands
-4. Zoom to web UI — event fires, payment hash appears, balance drops
-5. Ko — show final event log
-6. One-liner to camera: "Every hit costs real money. No wallet pop-ups, no confirmations — just Fiber."
-7. Show txHash in a block explorer (optional)
+1. Open Harvest Moon, new day starting — shipping truck arrives
+2. Show web UI panel — channel balance, event log
+3. Overnight shipping pays out — gold address jumps → Fiber payment IN fires
+4. Zoom to web UI — "CROP SALE: +50 Shannon" payment hash appears, balance rises
+5. Enter store, buy seeds — gold drops → Fiber payment OUT fires
+6. Zoom: "PURCHASE: -20 Shannon" hash appears, balance drops
+7. One-liner to camera: "The channel balance IS your gold. Real money, real blockchain — just Fiber."
+8. Show txHash in explorer (optional)
 
 Record multiple takes. Keep it under 90 seconds. The payment firing in real time IS the demo.
 
@@ -244,8 +245,10 @@ Record multiple takes. Keep it under 90 seconds. The payment firing in real time
 
 ## Pre-Hackathon Checklist (do before March 11)
 
-- [ ] Find SF2 Turbo SNES P1 health RAM address (browse RA wiki, no auth needed)
-- [ ] Find SF2 Turbo SNES P2 health RAM address
+- [x] Gold address confirmed: 7F1F04-06 (3-byte value) ✅
+- [x] Shipped crop counters: 7F1F4A/4C/4E/50 (corn/tomato/turnip/potato) ✅
+- [ ] Confirm exact money address via emulator debug session (7E0010 or 7F1F04 — need to verify which is live game value)
+- [ ] Map shop purchase moment — does gold drop on confirm button or on menu close?
 - [ ] Confirm RetroArch Network Commands exact format (READ_CORE_MEMORY + UDP port 55355)
 - [ ] Fund N100 Fiber wallet (99+ CKB) — channel auto-accept
 - [ ] Verify both Fiber nodes reachable and synced

@@ -1338,7 +1338,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] cloudflare-workers-kv-rate-limiting
+## [DONE] cloudflare-workers-kv-rate-limiting
 **Priority:** HIGH
 **Output:** findings/cloudflare-workers-kv-rate-limiting.md
 **Goal:** Map the Cloudflare Workers KV API for rate limiting. We're building a Workers-based bug reporter that receives POST requests from wyltekindustries.com. Need: KV namespace setup, storing request counts per key with TTL, atomic increment patterns, wrangler CLI commands to create and bind KV namespaces. Also: what are the free tier limits for KV reads/writes, and is there a better rate-limiting primitive (Durable Objects)?
@@ -1355,7 +1355,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32-wifi-ota-partition-safety
+## [DONE] esp32-wifi-ota-partition-safety
 **Priority:** HIGH
 **Output:** findings/esp32-wifi-ota-partition-safety.md
 **Goal:** Deep dive into ESP32 OTA update safety guarantees. We're implementing Telegram-triggered OTA on NerdMiner CKB (ESP32-2432S028R). Need to understand: partition table OTA slots (app0/app1/factory), rollback on failed boot, bootloader anti-rollback fuses, what happens if power is cut mid-flash, and whether huge_app.csv (our current partition scheme) supports proper OTA with rollback.
@@ -1373,7 +1373,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] supabase-rls-member-security-audit
+## [DONE] supabase-rls-member-security-audit
 **Priority:** HIGH
 **Output:** findings/supabase-rls-member-security-audit.md
 **Goal:** Audit the security model of our Wyltek membership system. We use Supabase with RLS, JoyID CKB address as the user identifier (no traditional auth), anon key in client-side JS. Need to understand: what an attacker can actually do with the anon key, whether our RLS policies prevent impersonation (someone submitting a bug report or like with another member's CKB address), and best practices for CKB-address-based identity in Supabase without a traditional JWT auth flow.
@@ -1531,7 +1531,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] ckb-ccc-external-signing-node-js-flow
+## [DONE] ckb-ccc-external-signing-node-js-flow
 **Priority:** MEDIUM
 **Output:** findings/ckb-ccc-external-signing-node-js-flow.md
 **Goal:** Clarify the exact data flow and API calls for a Node.js backend using `@ckb-ccc/core` to facilitate external signing of CKB transactions (specifically for Fiber channel open/close) by a browser-based wallet like JoyID. This is crucial for secure key management in the Node.js sidecar.
@@ -1548,7 +1548,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiber-testnet-reliability-assessment
+## [DONE] fiber-testnet-reliability-assessment
 **Priority:** MEDIUM
 **Output:** findings/fiber-testnet-reliability-assessment.md
 **Goal:** Conduct a practical assessment of Fiber testnet reliability, focusing on channel opening/closing success rates, payment routing stability, and common failure modes. This is critical for ensuring a smooth hackathon demo.
@@ -1581,18 +1581,51 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. What is the remaining CPU headroom for other tasks, and are there any observed performance degradation or stuttering when all components run concurrently?
 ---
 
-## [PENDING] esp32p4-lightclient-emulator-coexistence
+## [DONE] esp32p4-lightclient-emulator-coexistence
 **Priority:** HIGH
 **Output:** findings/esp32p4-lightclient-emulator-coexistence.md
 **Goal:** Validate CPU/memory headroom for running ckb-light-esp (our existing CKB light client, 214KB binary, confirmed working on ESP32-P4) CONCURRENTLY with a NES/SNES emulator. We already know the light client works. The question is: can both run together without emulator frame drops? Map FreeRTOS task allocation across both cores — emulator on core 0, light client + WiFi + secp256k1 signing on core 1 — and identify any contention points (shared peripherals, WiFi interrupt load, heap fragmentation).
 **Seeds:**
-- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/src/main.cpp
-- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/src/ckb_light_client.h
-- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-guides/freertos-smp.html
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/master/src/LightClient.cpp
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/master/src/LightClient.h
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/master/src/core/header_chain.cpp
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/master/src/core/block_filter.cpp
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/master/src/core/header_chain.h
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/master/platformio.ini
 - https://raw.githubusercontent.com/espressif/esp-idf/master/examples/system/freertos/real_time_stats/main/real_time_stats_example_main.c
+- https://docs.espressif.com/projects/esp-idf/en/stable/esp32p4/api-guides/performance/speed.html
 **Questions to answer:**
 1. What is the interrupt load of the WiFi stack on core 1 and does it interfere with emulator timing on core 0?
 2. How much heap does ckb-light-esp consume at peak (header chain + filter state)?
 3. Can secp256k1 signing (a one-shot ~1ms operation) be safely triggered from core 1 during emulator gameplay without causing frame drops?
 4. What FreeRTOS priority levels should each task use to guarantee emulator gets consistent CPU time?
 5. Is there a known pattern for "emulator on core 0, network stack on core 1" in ESP32 projects we can reference?
+
+---
+
+## [DONE] harvest-moon-snes-ram-map
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Find Harvest Moon SNES RAM addresses for: gold/money balance, crop sale events, shop purchase events, shipping bin contents. Need addresses that change discretely on transaction events (not just continuously polling balance).
+**Tags:** fiberquest, snes, retroarch, harvest-moon
+**Seeds:**
+- https://datacrystal.tcrf.net/wiki/Harvest_Moon_(SNES)/RAM_map
+- https://www.retroachievements.org/game/1582
+- https://raw.githubusercontent.com/RetroAchievements/RAScripts/master/SNES/HarvestMoon.lua
+- https://datacrystal.tcrf.net/wiki/Harvest_Moon_(SNES)
+- https://www.romhacking.net/games/306/
+
+---
+
+## [DONE] harvest-moon-snes-economy-mechanics
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Map the complete economy loop of Harvest Moon SNES — what triggers money in (shipping bin overnight, selling to shops), what triggers money out (buying seeds, tools, animal feed, upgrades). Find the exact in-game transaction moments that would map to Fiber payment events. Is the money delta detectable as a single-frame RAM change?
+**Tags:** fiberquest, snes, harvest-moon
+**Seeds:**
+- https://gamefaqs.gamespot.com/snes/564596-harvest-moon/faqs/9640
+- https://gamefaqs.gamespot.com/snes/564596-harvest-moon/faqs/2883
+- https://gamehacking.org/game/43127
+- https://www.zophar.net/cheats/snes/harvest-moon.html
+- https://tcrf.net/Harvest_Moon_(SNES)
+**Context:** Gold address is 7F1F04-06 (3-byte value). 7E0010 also reported. Game Genie infinite gold code: FF8E-0F0A. Need to find: shipping bin overnight event address, shop buy event address, discrete transaction moment.
