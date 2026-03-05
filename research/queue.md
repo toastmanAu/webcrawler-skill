@@ -821,3 +821,654 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. What's the most valuable next project to start after the membership system stabilises?
 5. What risks exist in the current stack that need addressing before public launch?
 
+
+---
+
+## [DONE] fiber-network-deep-dive
+**Priority:** HIGH
+**Output:** findings/fiber-network-deep-dive.md
+**Goal:** Map Fiber Network's full capability set — what can an AI agent actually DO with it? Cover: channel open/close/update RPC API, invoice creation + payment flow, HTLC mechanics, multi-hop routing, asset support (CKB + UDT), cross-chain (BTC Lightning interop), peer discovery, fee structures, watchtower support. Focus on what's practical TODAY vs roadmap. What are the latency/throughput characteristics? What's the minimum viable agent use case?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/en/get-started.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/en/architecture.md
+
+---
+
+## [DONE] fiber-rpc-api-reference
+**Priority:** HIGH
+**Output:** findings/fiber-rpc-api-reference.md
+**Goal:** Extract the complete Fiber RPC API — every method, params, return types, examples. Focus on: channel management (open_channel, accept_channel, list_channels), payments (send_payment, get_invoice, list_payments), peer management (connect_peer, list_peers), node info. Build a mental model of what a JS/TS agent client would look like against this API.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/en/rpc.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/src/rpc/mod.rs
+
+---
+
+## [DONE] fiber-agent-ideas-brainstorm
+**Priority:** MEDIUM
+**Output:** findings/fiber-agent-ideas-brainstorm.md
+**Goal:** Brainstorm novel AI agent ideas that use Fiber Network as a core primitive. Think beyond "pay for AI prompts" — what unique things does Fiber enable that no other chain does? Consider: streaming micropayments per-token/per-byte, agent escrow/dispute, multi-agent coordination via payment channels, pay-per-proof oracles, metered API access, content monetisation, autonomous market making, Lightning interop use cases. Score each idea on: novelty, technical feasibility in 2 weeks, judge appeal, real-world utility. Pick the top 3.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/en/architecture.md
+
+---
+
+## [DONE] fiber-hackathon-prior-art
+**Priority:** MEDIUM
+**Output:** findings/fiber-hackathon-prior-art.md
+**Goal:** Survey what's already been built on Fiber Network — any demos, repos, blog posts, hackathon entries, or community projects. What ground is already covered? What gaps exist? This helps us find whitespace for a novel entry. Also survey what "agentic" CKB projects exist generally.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://api.github.com/search/repositories?q=fiber+nervos+CKB&sort=updated&per_page=10
+- https://api.github.com/search/repositories?q=ckb+agent&sort=updated&per_page=10
+
+---
+
+## [DONE] fiber-hackathon-synthesis
+**Priority:** LOW
+**Output:** findings/fiber-hackathon-synthesis.md
+**Goal:** SYNTHESIS — read all fiber-* findings + MEMORY.md + our existing stack (Wyltek site, DOB minter, CKBFS SDK, Fiber nodes already running on ckbnode + N100). Produce: (1) recommended hackathon project concept with clear scope, (2) technical architecture — what we build, what APIs we use, what's the agent loop, (3) 2-week build plan broken into days, (4) what differentiates our entry from others, (5) risks and mitigations.
+**Seeds:**
+
+---
+
+## [DONE] retroarch-memory-interface
+**Priority:** HIGH
+**Output:** findings/retroarch-memory-interface.md
+**Goal:** Deep dive on RetroArch's network control interface for memory access. Cover: READ_CORE_MEMORY / WRITE_CORE_MEMORY UDP protocol (exact byte format, response format, error handling), GET_STATUS response format, how to identify which game/core is running, polling frequency limits, latency characteristics. Also cover the libretro achievement/cheevos system — how RAM address maps work, where they're stored, format of .rAchievement files. Find 3-5 popular 2-player competitive games (Street Fighter II, Bomberman, Mario Kart, Pong variants) and their known RAM addresses for: score, health/lives, player positions, game-over state. This data drives the payment trigger logic.
+**Seeds:**
+- https://raw.githubusercontent.com/libretro/RetroArch/master/command.h
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/netplay/netplay.h
+- https://docs.libretro.com/development/retroarch/network-control-interface/
+- https://raw.githubusercontent.com/RetroAchievements/RAIntegration/master/README.md
+- https://api.github.com/repos/RetroAchievements/rcheevos/contents/
+
+---
+
+## [DONE] retroachievements-ram-maps
+**Priority:** HIGH
+**Output:** findings/retroachievements-ram-maps.md
+**Goal:** Map out the RetroAchievements data format and find concrete RAM address maps for competitive 2-player games. Need: the .json or achievement condition format that specifies memory addresses + conditions, where to fetch game RAM maps via the RA public API (no auth needed), specific addresses for Street Fighter II (health bars, round win, game over), Bomberman (lives, kills), any Pong variant (scores). Also: does RA have a "rich presence" feature that tracks game state? Can we query it? Goal is a lookup table: game → RAM addresses → payment trigger conditions.
+**Seeds:**
+- https://retroachievements.org/devoops.php
+- https://api.retroachievements.org/v1/game/228/achievements
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/README.md
+- https://retroachievements.org/game/228
+
+---
+
+## [DONE] fiber-retroarch-architecture
+**Priority:** HIGH  
+**Output:** findings/fiber-retroarch-architecture.md
+**Goal:** Design the technical architecture for a Fiber-powered RetroArch payment sidecar. Answer: (1) What does the agent process look like — polling loop, event detection, debouncing? (2) How does player A's agent communicate with player B's agent — direct Fiber channel, hub-and-spoke, or P2P? (3) Channel lifecycle — when does it open (game start), when does it settle (game over), what happens if a player disconnects mid-game? (4) What's the minimum CKB stake per game session? (5) How do we handle the 20ms Fiber latency vs game frame timing? (6) What's the UI — overlay on RetroArch, separate terminal, web dashboard? (7) Can this work over RetroArch Netplay (2 players on different machines) or only local? Map out the full data flow from game event → RAM read → payment trigger → Fiber send_payment → opponent receives.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+- https://raw.githubusercontent.com/libretro/RetroArch/master/command.h
+
+---
+
+## [DONE] fiber-retroarch-synthesis
+**Priority:** LOW
+**Output:** findings/fiber-retroarch-synthesis.md
+**Goal:** SYNTHESIS — read ALL fiber-* and retroarch-* findings + MEMORY.md. Produce the definitive build plan: (1) Project name + one-line pitch, (2) exact feature set for a 2-week hackathon build (MVP vs stretch), (3) day-by-day build schedule for March 11-25, (4) repo structure, (5) judging criteria mapping — score our concept against each criterion (completeness, soundness, autonomy, UX abstraction, viability, novelty), (6) demo script for the video submission, (7) what makes this entry impossible to ignore.
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-target-games
+**Priority:** HIGH
+**Output:** findings/fiberquest-target-games.md
+**Goal:** Build a catalog of the best target games for FiberQuest — retro games that naturally lend themselves to real-money micropayment mechanics. Cross-reference: (1) highly rated/beloved games on MobyGames, GameFAQs, RA game database, (2) games with clean 2-player competitive mechanics where money-per-event makes intuitive sense, (3) games with well-documented RAM maps in RetroAchievements. Categories to cover: fighting games (SF2, MK, KI), sports (NBA Jam, Tecmo Bowl, Sensible Soccer), racing (Mario Kart, F-Zero, RC Pro-Am), puzzle/versus (Tetris, Dr Mario, Columns, Puyo Puyo), arcade (Pong, Arkanoid variants, Bubble Bobble co-op), brawlers (Streets of Rage, Double Dragon co-op — "pay to revive" mechanic). For each game include: console, core (Snes9x/Genesis Plus GX/mGBA/FBNeo), payment trigger concept (what event = what payment), why it's fun with money on the line, RA game ID if known. Aim for 20+ games across 5+ categories. Prioritise games that are universally recognised even by non-gamers (judges may not be hardcore gamers).
+**Seeds:**
+- https://retroachievements.org/gameList.php?c=2&s=5
+- https://api.retroachievements.org/API/API_GetTopTenUsers.php
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/README.md
+- https://www.mobygames.com/game/snes/street-fighter-ii-turbo-hyper-fighting/
+- https://api.github.com/repos/RetroAchievements/RALibretro/contents/
+
+---
+
+## [DONE] fiberquest-ram-addresses
+**Priority:** HIGH
+**Output:** findings/fiberquest-ram-addresses.md
+**Goal:** Find concrete RAM addresses for the top 10 FiberQuest target games. For each game: Player 1 HP/lives address, Player 2 HP/lives address, score addresses, round/match state address, game-over flag address. Focus on: Street Fighter II Turbo (SNES), Super Street Fighter II (SNES), Mortal Kombat (SNES + Genesis), Super Bomberman (SNES), NBA Jam (SNES + Genesis), Pong variants (Atari 2600), Dr. Mario (NES), Tetris (Game Boy), F-Zero (SNES). Sources: RetroAchievements achievement condition strings encode exact addresses — parse them. GameHacking.org RAM maps. TCRF.net game internals. Any GitHub repos with documented memory maps. Format output as a JSON-ready lookup table: { gameName, console, core, addresses: { p1hp: "0xXXXX", p2hp: "0xXXXX", ... }, paymentTriggers: [...] }
+**Seeds:**
+- https://gamehacking.org/system/snes
+- https://raw.githubusercontent.com/RetroAchievements/RALibretro/master/README.md
+- https://tcrf.net/Street_Fighter_II_Turbo:_Hyper_Fighting_(SNES)
+- https://tcrf.net/Super_Bomberman_(SNES)
+- https://datacrystal.romhacking.net/wiki/Street_Fighter_II_Turbo:_Hyper_Fighting:RAM_map
+- https://datacrystal.romhacking.net/wiki/Super_Bomberman:RAM_map
+
+---
+
+## [DONE] fiberquest-payment-mechanics
+**Priority:** MEDIUM
+**Output:** findings/fiberquest-payment-mechanics.md
+**Goal:** Design the payment mechanic models for FiberQuest — how should money map to game events in each genre? Answer: (1) Fighting games — per-damage (proportional shannons to HP lost), per-round, per-match, per-special-move? (2) Sports — per-score, per-quarter, winner-takes-all? (3) Racing — per-position-change, finish-order payout, lap splits? (4) Puzzle/versus — per-garbage-sent, per-line-clear, survival bonus? (5) Co-op brawlers — "pay to revive" model, boss-kill bounty, shared pool? Also: what's the ideal wager size? Too small = meaningless, too large = scary. Recommend default amounts in CKB shannons that feel like arcade quarters — enough to feel real, not enough to hurt. Consider: variable wager (set per session), bracket wager (tournament pot). Also research: have any other projects done game+Lightning payments? What can we learn/differentiate from?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nicholasgasior/gsfmt/master/README.md
+- https://stacker.news/items/1
+- https://github.com/lightningnetwork/lnd/blob/master/docs/payments.md
+
+---
+
+## [DONE] fiberquest-catalog-synthesis
+**Priority:** LOW
+**Output:** findings/fiberquest-catalog-synthesis.md
+**Goal:** SYNTHESIS — read fiberquest-target-games + fiberquest-ram-addresses + fiberquest-payment-mechanics findings. Produce: (1) Final ranked catalog of 15 launch games for FiberQuest with complete details (game, console, core, RAM addresses, payment trigger model, default wager), (2) recommended launch lineup of 5 games that cover different genres and are universally recognisable, (3) the ram-maps/ JSON files content ready to paste into the repo for top 5 games, (4) suggested UI copy for each game profile ("You lost 32 HP — that'll cost you 320 shannons"), (5) which games to feature in the demo video and why.
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-sf2-ram-map
+**Priority:** HIGH
+**Output:** findings/fiberquest-sf2-ram-map.md
+**Goal:** Find exact SNES Street Fighter II Turbo RAM addresses via web search. Need: P1 health address, P2 health address, P1 wins counter, P2 wins counter, game state (character select / fighting / round over / game over). Also find same for Super Bomberman SNES (P1 lives, P2 lives, bomb counts if possible). These are the two launch games. Cross-reference: TCRF, DataCrystal, GameHacking.org, speedrunning resources, any GitHub repos with SNES RAM maps. Also check: does the RetroAchievements public API (no auth needed) expose achievement conditions at https://retroachievements.org/API/API_GetGameInfoAndUserProgress.php or similar?
+**Seeds:**
+- https://datacrystal.tcrf.net/wiki/Street_Fighter_II_Turbo:_Hyper_Fighting_(SNES)/RAM_map
+- https://www.romhacking.net/games/149/
+- https://gamehacking.org/game/6694
+- https://gamehacking.org/game/1
+- https://www.retroachievements.org/game/1273
+
+---
+
+## [DONE] fiberquest-poker-games
+**Priority:** HIGH
+**Output:** findings/fiberquest-poker-games.md
+**Goal:** Find retro poker and card games compatible with RetroAchievements and suitable for Fiber payment integration. Cover: (1) Which poker/card games exist on SNES, Genesis, NES, GBA with RA achievement sets — Texas Hold'em, Video Poker, Casino games, Blackjack, any multiplayer card games. (2) Specifically look for any with 2-player vs mode or link cable multiplayer. (3) RAM map compatibility — do poker games have clean money/chip count addresses that map naturally to Fiber channel balances? (4) The ideal case: a poker game where chip stack in RAM = Fiber channel balance in shannons — completely natural 1:1 mapping. (5) Any arcade poker/gambling games on FinalBurn Neo with RA support. (6) Consider: could we make a game where the GAME ITSELF is the channel UI? Player's chip stack IS their channel balance, updated in real time via WRITE_CORE_MEMORY as payments flow. This would be unprecedented. Rate each game: RA coverage, RAM map cleanliness, multiplayer potential, Fiber integration elegance.
+**Seeds:**
+- https://retroachievements.org/gameList.php?c=2&s=5&f=poker
+- https://www.mobygames.com/game/snes/super-caesars-palace/
+- https://gamehacking.org/system/snes
+- https://www.romhacking.net/games/?name=poker&system=&region=&combo=&category=&perpage=20&page=1&submit=Go
+
+---
+
+## [DONE] fiberquest-online-multiplayer
+**Priority:** HIGH
+**Output:** findings/fiberquest-online-multiplayer.md
+**Goal:** Map the landscape of online multiplayer for retro games via RetroArch Netplay and other protocols. Cover: (1) RetroArch Netplay — how it works technically (rollback vs delay-based netcode, relay servers, P2P), latency requirements per game genre, which cores support it best. (2) Which games work well over Netplay — fighters, sports, puzzle — what's the competitive scene? (3) RetroAchievements + Netplay interaction — do achievements fire for both players? Does RAM state sync between clients? (4) Kaillera, GGPO, FightCade — are any of these accessible via RetroArch cores? FightCave runs FBNeo which is a libretro core — can we hook into it? (5) Latency question: Fiber send_payment is ~20ms. Netplay adds 50-150ms. Is the combined latency acceptable for real-time per-hit payments? Or do we need to batch payments per round instead? (6) Can two players on opposite sides of the world play SF2 over Netplay with Fiber payments? What's the practical distance limit?
+**Seeds:**
+- https://docs.libretro.com/guides/netplay/
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/netplay/netplay.h
+- https://fightcade.com/
+- https://www.retroachievements.org/viewtopic.php?t=1234
+
+---
+
+## [DONE] fiberquest-custom-protocol
+**Priority:** HIGH
+**Output:** findings/fiberquest-custom-protocol.md
+**Goal:** Research feasibility of a custom protocol layer that connects retro console emulators with Fiber payment channels reliably. Answer: (1) What existing protocols handle real-time game state sync between emulators — GGPO rollback netcode, delay-based, what are the tradeoffs? (2) Could FiberQuest implement a lightweight custom sync protocol ON TOP of RetroArch Netplay — i.e. a sidecar that augments the existing netplay connection with payment events? (3) Alternatively: could we build a standalone game-agnostic payment event bus — two machines run RetroArch independently, our sidecar syncs game state hashes and payment triggers via a separate WebSocket channel? (4) Console-level integration: is there any way to run a Fiber-aware sidecar ON the console hardware itself (e.g., Raspberry Pi running RetroArch, Pi also runs Fiber node, all local)? (5) What would a "FiberQuest Protocol" look like — a lightweight spec for: session handshake, event message format, payment acknowledgement, dispute resolution if one client disagrees on game state? (6) Robustness: what happens if the network drops mid-game? Can we use Fiber's existing channel state as a source of truth for dispute resolution? Design the protocol as if it could become an open standard other game developers adopt.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+- https://gafferongames.com/post/what_every_programmer_needs_to_know_about_game_networking/
+- https://raw.githubusercontent.com/pond3r/ggpo/master/README.md
+- https://docs.libretro.com/guides/netplay/
+- https://gafferongames.com/post/introduction_to_networked_physics/
+
+---
+
+## [DONE] fiberquest-multiplayer-synthesis
+**Priority:** LOW
+**Output:** findings/fiberquest-multiplayer-synthesis.md
+**Goal:** SYNTHESIS — read fiberquest-poker-games + fiberquest-online-multiplayer + fiberquest-custom-protocol findings. Produce: (1) Best poker/card game recommendations with full integration details, (2) recommended online multiplayer approach for FiberQuest — Netplay hook vs custom protocol vs hybrid, (3) the FiberQuest Protocol v0.1 spec — a concrete lightweight spec we could implement in week 2 of the hackathon, (4) updated game catalog additions from poker research, (5) honest assessment: can two players across the internet reliably play SF2 with per-hit Fiber payments? What's the architecture that makes this work? (6) What's the most impressive demo we can build in 2 weeks that showcases online multiplayer + Fiber payments?
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-embedded-node
+**Priority:** HIGH
+**Output:** findings/fiberquest-embedded-node.md
+**Goal:** Research running CKB/Fiber nodes persistently on retro gaming hardware. Cover: (1) Can a Fiber Network Node (FNN) run on ARM SBCs that also run RetroArch? Specifically: Raspberry Pi 4/5, Orange Pi 5, Odroid, Batocera/Lakka/RetroPie distros — do they have enough RAM/CPU headroom to run FNN alongside RetroArch? What are the resource requirements of FNN (RAM, CPU, storage for chain data)? (2) CKB light client vs full node — which is feasible on these devices? Light client (ckb-light-client) is ~50MB RAM — is that viable alongside RetroArch? What's the sync time? (3) Batocera/Lakka/RetroPie — can we install arbitrary binaries/services? Batocera uses a read-only squashfs overlay, Lakka similar. How do we persist a Fiber node service across reboots on these locked-down distros? Is there a user-data partition we can write to? (4) RetroArch on RetroPie (Raspberry Pi OS based) — full OS access, systemd available — this is the most viable path. How hard is it to add a systemd service to RetroPie? (5) Alternatively: dedicated companion device — a small SBC (Pi Zero 2W, ESP32-S3) that runs only the Fiber node and communicates with the gaming machine over LAN/USB. What's the minimum viable hardware for a Fiber node? (6) What does the user setup flow look like — plug in device, scan QR code, channel funded, ready to play?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/en/get-started.md
+- https://batocera.org/os.php
+- https://raw.githubusercontent.com/libretro/Lakka-LibreELEC/master/README.md
+- https://retropie.org.uk/docs/Transferring-Roms/
+
+---
+
+## [DONE] fiberquest-esp32s3-node
+**Priority:** HIGH
+**Output:** findings/fiberquest-esp32s3-node.md
+**Goal:** Investigate using an ESP32-S3 (or similar) as a standalone FiberQuest companion device. Cover: (1) Can the ESP32-S3 run a CKB light client or Fiber node? It has 512KB SRAM + up to 8MB PSRAM + 16MB flash — is that enough for a light client? Probably not for a full node. What's the minimum viable embedded CKB implementation? (2) Alternative: ESP32-S3 as a HARDWARE WALLET / SIGNER only — it holds the private key and signs Fiber channel transactions, but the actual node runs on the gaming machine or cloud. This is more realistic. What would this look like? (3) USB HID / USB Serial approach: ESP32-S3 connected via USB to a gaming machine — acts as a hardware wallet dongle. User plugs it in, it identifies as a USB serial device, FiberQuest sidecar communicates with it to sign transactions. (4) BLE approach: ESP32-S3 with BLE — acts as a wireless hardware wallet. FiberQuest sidecar on gaming machine connects via BLE to request signatures. (5) What existing CKB/crypto signing implementations exist for ESP32? Can we use the existing ESP32 CKB key management from the NerdMiner CKB project or ckb-light-esp? (6) Physical form factor ideas: small PCB that clips onto a controller, or fits in a cartridge slot, or acts as a "FiberQuest cartridge". Rate feasibility for hackathon timeline.
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/NerdMiner_CKB/main/README.md
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/README.md
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/peripherals/usb/device/tusb_serial_device/README.md
+- https://raw.githubusercontent.com/espressif/arduino-esp32/master/libraries/BLE/README.md
+
+---
+
+## [DONE] fiberquest-web-client
+**Priority:** HIGH
+**Output:** findings/fiberquest-web-client.md
+**Goal:** Research building a web-based FiberQuest client — playing FiberQuest games directly in a browser with Fiber payments. Cover: (1) WebAssembly RetroArch — RetroArch has a web player (https://web.libretro.com/), does it expose the network control interface (UDP port 55355) to JavaScript? Or can we access emulator memory via WASM exports? (2) CKB/Fiber in the browser — CCC (CKBer's Codebase) already runs in browser. Does Fiber have a browser-compatible JS SDK? Can we connect to a Fiber node via WebSocket from a browser? (3) The ideal web flow: open browser → connect JoyID wallet → game loads in browser tab → Fiber channel opens → play with per-event payments → channel settles → done. No installation required. (4) Fallback: web DASHBOARD only (no in-browser game) — browser shows live channel balance, payment feed, game state while RetroArch runs natively. This is simpler and more achievable. (5) WebRTC for P2P game state sync between two browser tabs or two machines — could replace RetroArch Netplay for certain simple games. (6) What's the lightest possible web experience — a single HTML page that connects to a local Fiber node RPC and shows live payment activity while the user plays RetroArch natively?
+**Seeds:**
+- https://web.libretro.com/
+- https://raw.githubusercontent.com/libretro/RetroArch/master/pkg/emscripten/README.md
+- https://raw.githubusercontent.com/ckb-ecell/ckb-ccc/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+
+---
+
+## [DONE] fiberquest-hardware-synthesis
+**Priority:** LOW
+**Output:** findings/fiberquest-hardware-synthesis.md
+**Goal:** SYNTHESIS — read fiberquest-embedded-node + fiberquest-esp32s3-node + fiberquest-web-client findings + MEMORY.md (we have Pi5, NucBox, N100 with Fiber nodes, ESP32 CKB experience via NerdMiner_CKB and ckb-light-esp). Produce: (1) Recommended hardware architecture for FiberQuest — what runs where, what's the minimum setup a player needs, (2) The "FiberQuest device" concept — what would a dedicated plug-and-play FiberQuest hardware dongle look like, is it feasible in 2 weeks as a stretch goal, (3) Web client recommendation — full browser game vs dashboard-only vs hybrid, what's achievable in 2 weeks, (4) The most impressive hardware demo possible — e.g. two handhelds playing over WiFi with Fiber payments on a visible HUD, (5) Updated hackathon scope: does hardware integration strengthen or complicate the entry? What's the right level of hardware ambition for 2 weeks?
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-console-hub-protocols
+**Priority:** HIGH
+**Output:** findings/fiberquest-console-hub-protocols.md
+**Goal:** Research existing console multiplayer connectivity protocols that could be emulated by an ESP32-S3 or ESP32-P4 acting as a central hub. Cover each major console's link/multiplayer protocol in detail: (1) SNES Multi-tap / serial link — protocol, baud rate, signal levels, timing, what does the SNES expect to see on the serial pins? Is this SPI, UART, proprietary? (2) Game Boy Link Cable — Serial Clock, Serial Data, clock speed, master/slave arbitration, how does the GB handle 2/4 player via Game Boy Printer adapter or 4-player adapter? (3) NES Four Score / Satellite — how does the NES 4-player adapter work at the electrical/protocol level? (4) Sega Genesis 6-button controller port / Team Player — EA 4-player adapter protocol, Genesis multitap, electrical spec (DE-9 connector pinout, voltage levels). (5) N64 Joybus protocol — used for controllers, memory paks, Rumble Pak, Transfer Pak. Could an ESP32 emulate a Joybus device? (6) GBA Link Cable — what protocol? What chips? 115200 baud serial? (7) For each: what GPIO/peripheral on ESP32-S3 or ESP32-P4 could implement it? SPI, I2S, UART, RMT, bit-banging? What voltage level shifting is needed (3.3V vs 5V)? (8) Are there existing Arduino/ESP32 projects that have already done any of this? GitHub repos? (9) The prize insight: if our hub can speak native console protocols, games don't need to know about Fiber AT ALL — multiplayer just works as designed, and our hub invisibly handles the payment layer. This is extraordinary.
+**Seeds:**
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/driver/spi/README.md
+- https://gbdev.io/pandocs/Serial_Data_Transfer_(Link_Cable).html
+- https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/README.md
+- https://problemkaputt.de/fullsnes.htm
+- https://wiki.nesdev.org/w/index.php/Four_Score
+
+---
+
+## [DONE] fiberquest-esp32p4-capabilities
+**Priority:** HIGH
+**Output:** findings/fiberquest-esp32p4-capabilities.md
+**Goal:** Deep dive on ESP32-P4 capabilities for a console connectivity hub. The ESP32-P4 is Espressif's latest high-performance SoC. Cover: (1) CPU: dual-core RISC-V P4 at 400MHz — how does this compare to ESP32-S3 for real-time protocol emulation? Is 400MHz enough for bit-banging SNES link at the right timing? (2) Memory: 768KB SRAM + external PSRAM support up to 32MB — enough to buffer game states from multiple consoles simultaneously? (3) Peripherals: USB 2.0 HS OTG (480Mbps), MIPI CSI/DSI, SDIO, I2S, SPI x3, UART x3 — which of these map to console protocols? USB HS could connect directly to modern USB controllers/adapters. (4) GPIO: how many available for parallel console port emulation? (5) Real-time: does ESP32-P4 support real-time priority tasks suitable for microsecond-level protocol timing? (6) ESP32-P4 vs ESP32-S3 for this use case — is P4 significantly better, or is S3 sufficient? (7) Any existing console emulation projects on ESP32-P4? (8) Power: can the P4 run off USB power while also powering 4 console ports?
+**Seeds:**
+- https://www.espressif.com/en/news/ESP32-P4
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/esp_hw_support/README.md
+- https://github.com/espressif/esp-idf/tree/master/examples/peripherals/usb/host
+- https://www.espressif.com/sites/default/files/documentation/esp32-p4_datasheet_en.pdf
+
+---
+
+## [DONE] fiberquest-hub-architecture
+**Priority:** HIGH
+**Output:** findings/fiberquest-hub-architecture.md
+**Goal:** Design the FiberQuest Hub — a physical device based on ESP32-P4 (or S3) that acts as a central multiplayer hub for retro consoles, invisibly integrating Fiber payments. Answer: (1) Physical design: what does it look like? A box with N console controller ports + WiFi + small display? Or a dongle that plugs into one console and connects others via wireless? (2) Protocol bridge: how does it translate between console A's native protocol and console B's native protocol in real time? Does it need to re-implement the game's multiplayer logic, or just relay signals? (3) The key insight — if RetroArch is involved, we don't need to emulate hardware protocols at all! We can use RetroArch Netplay (software) + our sidecar for payments. The hardware hub becomes relevant only for REAL hardware consoles. Which approach is better for the hackathon? (4) Hybrid approach: hub supports BOTH — real hardware consoles via native protocols AND RetroArch via Netplay/UDP — same payment layer underneath. (5) What does the Fiber payment integration look like at the hub level? Hub has its own Fiber node? Or connects to a Pi? Hub holds the escrow? (6) Minimum viable hub for hackathon demo: what's the simplest hardware that proves the concept? One SNES with two controllers? Two Game Boys linked wirelessly? Two RetroArch instances + sidecar? (7) What would make this commercially viable after the hackathon? Build-to-order? Open hardware? License the protocol?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://gbdev.io/pandocs/Serial_Data_Transfer_(Link_Cable).html
+- https://raw.githubusercontent.com/libretro/RetroArch/master/command.h
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/driver/spi/README.md
+
+---
+
+## [DONE] fiberquest-existing-console-bridges
+**Priority:** MEDIUM
+**Output:** findings/fiberquest-existing-console-bridges.md
+**Goal:** Survey existing open-source projects that bridge console protocols, emulate link cables, or connect retro hardware over IP. Find: (1) Any ESP32/Arduino projects that emulate SNES controller/link protocols. (2) GBLink-WiFi, GBLink-BLE, or similar Game Boy link cable wireless adapters — these are exactly analogous to what we want. What protocol do they use? How do they handle timing? (3) "Online NES/SNES multiplayer" projects that bridge original hardware over the internet. (4) Krikzz's products (EverDrive, etc.) — any network capabilities? (5) MiSTer FPGA — how does it handle link cable emulation? Could FiberQuest integrate with MiSTer? (6) Any patents or prior art on "console multiplayer over IP" that we should be aware of? (7) Community interest: is there a market for a wireless FiberQuest hub for real retro hardware? Check Reddit (r/retrogaming, r/SNES, r/gameboy), Discord communities. (8) What's the closest existing product to what we're describing, and how does FiberQuest differentiate?
+**Seeds:**
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/peripherals/spi_slave/README.md
+- https://github.com/djpohly/gblinkwifi
+- https://raw.githubusercontent.com/makhowastaken/GWIZ/master/README.md
+- https://api.github.com/search/repositories?q=game+boy+link+cable+wifi+esp32&sort=stars&per_page=10
+- https://api.github.com/search/repositories?q=snes+link+cable+esp32&sort=stars&per_page=10
+- https://api.github.com/search/repositories?q=retro+console+wifi+multiplayer&sort=stars&per_page=10
+
+---
+
+## [DONE] fiberquest-hub-synthesis
+**Priority:** LOW
+**Output:** findings/fiberquest-hub-synthesis.md
+**Goal:** SYNTHESIS — read fiberquest-console-hub-protocols + fiberquest-esp32p4-capabilities + fiberquest-hub-architecture + fiberquest-existing-console-bridges findings + MEMORY.md (we have ESP32 experience via NerdMiner_CKB, ckb-light-esp, ESP32 CYD hardware). Produce: (1) Is a real hardware console protocol hub feasible in 2 weeks for the hackathon? Honest assessment. (2) What's the minimum viable hardware hub demo — the simplest thing that proves "real console + invisible Fiber payment"? (3) Recommended approach: real hardware vs RetroArch software vs hybrid — which gives best judge impact per hour of development? (4) The commercial vision post-hackathon: what is the FiberQuest Hub as a product? Who buys it, how much does it cost, what's the TAM? (5) Updated day-by-day schedule incorporating hardware hub as stretch goal — what gets cut from MVP to make room if we pursue hardware? (6) The pitch: how do you explain the hub concept to hackathon judges who may not be hardware people? One paragraph that makes it land.
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-hackathon-gap-analysis
+**Priority:** SYNTHESIS
+**Output:** findings/fiberquest-hackathon-gap-analysis.md
+**Goal:** SYNTHESIS — Full gap analysis of all FiberQuest hackathon research completed so far. Read every findings file and MEMORY.md. Produce: (1) What we know solidly (confirmed facts, confirmed RAM addresses, confirmed Fiber RPC methods, confirmed ESP32 capabilities). (2) What is still unknown or unverified — specific gaps that could block hackathon build. Rank by risk: HIGH (blocks MVP), MEDIUM (blocks stretch goal), LOW (nice to have). (3) Critical path for the 2-week build (March 11-25): exact sequence of tasks, what depends on what, what can be parallelised. (4) Specific technical questions that still need answering before we can write code — e.g. "does RetroArch UDP work on Windows?", "what is the Fiber RPC endpoint format exactly?", "does meltSpore work for testnet NFTs?". For each: suggest exactly how to answer it (test command, specific doc URL, etc). (5) Recommended day-1 tasks for March 11 — the first things to do when hackathon opens. (6) Risks that could kill the project — what could go wrong and what's the mitigation. (7) Generate new PENDING research tasks for any HIGH or MEDIUM gaps that need external research to resolve. Use exact queue format.
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-gap-analysis-risks
+**Priority:** SYNTHESIS
+**Output:** findings/fiberquest-gap-analysis-risks.md
+**Goal:** SYNTHESIS — Focused gap analysis for FiberQuest hackathon MVP. Read MEMORY.md and all fiberquest-* findings only (not the wider CKB research). Answer ONLY these questions: (1) What specific technical facts are still UNVERIFIED for the MVP? List each as: [RISK LEVEL] "What we assume" vs "What we actually know". Focus on: RetroArch UDP RAM reading working on the actual target OS, Fiber RPC JSON format for send_payment and open_channel, Node.js Fiber client library availability, private key management for the sidecar (how does the sidecar sign channel txs without exposing keys), whether testnet Fiber channels work reliably enough for a demo. (2) What are the 3 biggest things that could kill the project in the first 48 hours of building? For each: what's the mitigation / fallback plan? (3) Exact day-1 checklist for March 11: the first 5 things to do when hackathon opens, in order, with expected time per task. (4) Generate new PENDING research tasks for any unresolved HIGH risks. Use exact queue format with ## [NEW_TASK] ... ## [/NEW_TASK] wrappers.
+**Seeds:**
+
+---
+
+## [DONE] fiberquest-gap-analysis-architecture
+**Priority:** SYNTHESIS
+**Output:** findings/fiberquest-gap-analysis-architecture.md
+**Goal:** SYNTHESIS — Architecture gap analysis for FiberQuest. Read MEMORY.md and fiberquest-* + fiber-* findings. Answer: (1) Draw the exact data flow for the MVP: RetroArch → sidecar → Fiber → settlement. What calls what, in what order, with what data format? Identify every interface that needs to be implemented. (2) What does the sidecar Node.js daemon look like exactly? What npm packages? What's the main loop? Pseudo-code the core loop (poll RAM → detect event → trigger payment). (3) Key integration questions: how does the sidecar authenticate with the local Fiber node RPC? Is there auth? What port? What format (JSON-RPC? REST? gRPC?)? (4) How does channel lifecycle work for a game session: open at game start, multiple micropayments during, settle at game end — what are the exact RPC calls in sequence? (5) What's the fallback if Fiber channel opening fails at game start? Does the game just not start? Or does it run without payments and settle at end? (6) For the ESP32-P4 hub stretch goal: what's the simplest possible wiring diagram for reading one SNES controller and triggering a WiFi HTTP call to the sidecar? (7) Generate new PENDING research tasks for architecture gaps. Use exact queue format with ## [NEW_TASK] ... ## [/NEW_TASK] wrappers.
+**Seeds:**
+
+
+---
+
+## [PENDING] fiber-rpc-json-format-details
+**Priority:** HIGH
+**Output:** findings/fiber-rpc-json-format-details.md
+**Goal:** Obtain concrete JSON-RPC request and response examples for `open_channel` and `send_payment` from the `nervosnetwork/fiber` repository's tests or documentation. This is crucial for building a Node.js client.
+**Seeds:**
+- https://github.com/nervosnetwork/fiber/tree/main/crates/fiber-lib/src/rpc
+- https://github.com/nervosnetwork/fiber/tree/main/docs
+- https://github.com/nervosnetwork/fiber/tree/main/tests/bruno/fiber
+**Questions to answer:**
+1. What are the exact JSON field names (e.g., `funding_amount` vs `fundingAmount`) and data types (e.g., `u128` as string or number) for `open_channel` parameters?
+2. What are the exact JSON field names and data types for `send_payment` parameters, especially `custom_records`?
+3. Are there any specific HTTP headers or JSON-RPC version requirements for these calls?
+
+---
+
+## [PENDING] fiber-nodejs-client-feasibility
+**Priority:** HIGH
+**Output:** findings/fiber-nodejs-client-feasibility.md
+**Goal:** Assess the effort and best approach to implement a minimal Node.js client for the Fiber RPC, given the JSON format (once known). Determine if existing generic JSON-RPC libraries are suitable.
+**Seeds:**
+- https://github.com/nervosnetwork/fiber
+- https://www.npmjs.com/search?q=json-rpc+client
+- https://github.com/ckb-ccc/ccc
+**Questions to answer:**
+1. What are the most suitable generic Node.js JSON-RPC client libraries for interacting with a custom RPC endpoint?
+2. What are the specific challenges in adapting such a library to Fiber's RPC (e.g., transport layer: HTTP POST vs WebSocket, authentication)?
+3. Estimate the development time for a minimal client supporting `open_channel` and `send_payment`.
+
+---
+
+## [PENDING] sidecar-secure-key-management
+**Priority:** HIGH
+**Output:** findings/sidecar-secure-key-management.md
+**Goal:** Investigate secure and practical methods for the Node.js sidecar to sign CKB transactions (specifically for Fiber channel open/close) without directly exposing private keys in the application code or environment.
+**Seeds:**
+- https://docs.nervos.org/
+- https://github.com/ckb-ccc/ccc
+- https://github.com/toastmanAu/ckb-dob-minter
+- https://github.com/nervosnetwork/fiber
+- https://docs.joy.id/
+**Questions to answer:**
+1. Can `ckb-ccc` facilitate external signing requests (e.g., to a browser-based JoyID instance or an ESP32 hardware signer) from a Node.js backend?
+2. What are the best practices for securely managing a *temporary* private key for a Node.js hackathon demo (e.g., environment variables, encrypted file, in-memory only)?
+3. What is the recommended flow for the Node.js sidecar to initiate an on-chain Fiber channel transaction and get it signed by an external entity (e.g., a user's JoyID wallet)?
+
+---
+
+## [DONE] fiber-rpc-api-verification
+**Priority:** HIGH
+**Output:** findings/fiber-rpc-api-verification.md
+**Goal:** To obtain concrete, verifiable documentation or examples of the Fiber Network Node's RPC API, specifically for channel management (`open_channel`, `close_channel`) and payments (`send_payment`, `new_invoice`). This is critical because previous attempts to access `fiber-lib/src/rpc/README.md` and `docs/en/rpc.md` resulted in 404 errors, leaving the exact JSON-RPC structure, parameters, and return types unverified.
+**Seeds:**
+- https://github.com/nervosnetwork/fiber/tree/main/crates/fiber-lib/src/rpc (examine source code directly)
+- https://github.com/nervosnetwork/fiber/tree/main/tests/bruno/fiber (examine Bruno test files for RPC call examples)
+- https://github.com/nervosnetwork/fiber/issues (search for RPC documentation requests or examples)
+**Questions to answer:**
+1. What is the exact JSON-RPC request and response structure for `open_channel`? What parameters are mandatory/optional?
+2. What is the exact JSON-RPC request and response structure for `send_payment`? Can it take a `recipient_node_id` directly, or is an invoice always required?
+3. What is the exact JSON-RPC request and response structure for `close_channel`? What parameters are needed to initiate settlement?
+4. Is there any form of authentication (e.g., API key, token) required for local RPC access (127.0.0.1)?
+5. Are there any WebSocket RPC endpoints available, or is it purely HTTP POST?
+
+---
+
+## [DONE] fiber-node-js-client-library-search
+**Priority:** MEDIUM
+**Output:** findings/fiber-node-js-client-library-search.md
+**Goal:** To determine if an existing or in-progress Node.js/TypeScript client library for the Fiber Network Node RPC exists. If not, identify best practices for building a custom client, including error handling and state management. This would significantly reduce development effort for the sidecar.
+**Seeds:**
+- https://github.com/nervosnetwork/fiber/issues?q=nodejs+client+sdk
+- https://github.com/nervosnetwork/fiber/issues?q=typescript+client+sdk
+- https://github.com/search?q=nervos+fiber+javascript&type=repositories
+- https://github.com/search?q=nervos+fiber+typescript&type=repositories
+**Questions to answer:**
+1. Is there an official or community-maintained Node.js/TypeScript client library for Fiber RPC?
+2. If not, what are the recommended patterns for interacting with the Fiber RPC from Node.js (e.g., raw `axios`, a wrapper class)?
+3. Are there any existing examples of Fiber RPC interaction in JavaScript/TypeScript within the Nervos ecosystem?
+
+---
+
+## [DONE] snes-controller-protocol-deep-dive
+**Priority:** MEDIUM
+**Output:** findings/snes-controller-protocol-deep-dive.md
+**Goal:** To acquire precise technical specifications for the SNES controller's serial communication protocol, including exact timing diagrams, bit order, and expected signal levels. This is crucial for reliably implementing the ESP32-P4 console hub stretch goal, as current findings indicate these details are missing.
+**Seeds:**
+- https://www.raphnet.net/electronique/snes_usb/snes_usb_en.php (often has good protocol details)
+- https://www.retroleum.com/snes-controller-pinout (pinouts often come with protocol hints)
+- https://www.gamefaqs.com/snes/916396-super-nintendo/faqs/10000 (search for hardware/technical FAQs)
+- Datasheets for SNES controller ICs (if identifiable)
+**Questions to answer:**
+1. What are the precise timing requirements (in microseconds) for the Latch and Clock pulses?
+2. What is the exact bit order for the 16 data bits sent by the controller (e.g., MSB first, which button corresponds to which bit)?
+3. Are there any known quirks or variations in the protocol across different SNES controller revisions or third-party controllers?
+4. What are the exact voltage levels for HIGH and LOW signals on the DAT, LAT, CLK lines?
+---
+
+## [PENDING] fiber-rpc-raw-source
+**Priority:** HIGH
+**Output:** findings/fiber-rpc-raw-source.md
+**Goal:** Read the actual Rust source code for Fiber RPC definitions. We need exact JSON field names, types, and serialisation for open_channel, send_payment, new_invoice, list_channels. Previous crawls only got GitHub HTML directory listings — we need the raw file contents.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/mod.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/types.rs
+
+---
+
+## [PENDING] snes-controller-protocol-raw
+**Priority:** MEDIUM
+**Output:** findings/snes-controller-protocol-raw.md
+**Goal:** Get precise SNES controller serial protocol timing specs for ESP32-P4 implementation. Need: latch pulse width, clock frequency, bit order, voltage levels, button bit map.
+**Seeds:**
+- https://raw.githubusercontent.com/nicowillis/snes-controller/master/README.md
+- https://raw.githubusercontent.com/marcin-osowski/snes_gamepad/master/README.md
+- https://www.cs.columbia.edu/~sedwards/classes/2013/4840/reports/SNES.pdf
+- https://raw.githubusercontent.com/MickGyver/DaemonBite-Retro-Controllers-USB/master/SNEStoUSB/SNEStoUSB.ino
+
+---
+
+## [PENDING] esp32p4-snes-emulator-viability
+**Priority:** HIGH
+**Output:** findings/esp32p4-snes-emulator-viability.md
+**Goal:** Research viability of running a SNES or NES emulator directly on ESP32-P4. Key questions: (1) ESP32-P4 specs vs SNES/NES requirements — CPU clock (400MHz RISC-V), RAM (768KB SRAM + PSRAM), are these sufficient? SNES CPU is 3.58MHz 65816, RAM 128KB — but emulation overhead is typically 10-50x. NES is 1.79MHz 6502, 2KB RAM — much lighter. (2) Are there existing ESP32 SNES or NES emulator projects? nofrendo (NES) runs on ESP32 original. Any SNES emulator on ESP32? SNES9x or PocketSNES has been ported to small hardware before. (3) What display would be needed? ESP32-P4 has MIPI DSI — can drive ILI9341/ST7789 or a small LCD directly. What resolution is needed for SNES (256x224)? (4) Audio: SNES has SPC700 audio chip — is software emulation of this feasible on P4 with I2S output? (5) If SNES is not viable, what about NES? nofrendo on ESP32-S3 is confirmed — P4 at 400MHz should be significantly better. (6) Critical: if the ESP32-P4 is running an emulator, what CPU headroom remains for: WiFi stack, Fiber signing (secp256k1 or blake2b hashing), CKB light client operations? Can these coexist or does emulation consume 100% of CPU? (7) Recommended architecture: emulator on one core, WiFi/payment on second core? FreeRTOS task priorities?
+**Seeds:**
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/peripherals/lcd/mipi_dsi/README.md
+- https://github.com/esp-arduino-libs/esp32-display-support
+- https://raw.githubusercontent.com/nofrendo-esp32/nofrendo-esp32/master/README.md
+- https://api.github.com/search/repositories?q=esp32+snes+emulator&sort=stars&per_page=10
+- https://api.github.com/search/repositories?q=esp32+nes+emulator&sort=stars&per_page=10
+- https://api.github.com/search/repositories?q=esp32-p4+emulator&sort=stars&per_page=5
+
+---
+
+## [PENDING] esp32p4-fiber-signer-vs-lightclient
+**Priority:** HIGH
+**Output:** findings/esp32p4-fiber-signer-vs-lightclient.md
+**Goal:** Compare two architectures for ESP32-P4 in FiberQuest: (A) Fiber Signer Only — ESP32-P4 holds private key, signs CKB L1 transactions via USB/BLE, a Pi or server runs the actual Fiber node. (B) Light Client + Signer — ESP32-P4 runs a CKB light client AND signs transactions, becoming a more autonomous node. For each: (1) What software exists? CKB light client is Rust — can it compile for RISC-V ESP32-P4? What are the binary size and RAM requirements? (2) Fiber Network Node (FNN) is also Rust — same question. FNN is heavier than just a light client. (3) Signing only: secp256k1 library for ESP32 exists (Bitcoin hardware wallets use this). Memory footprint? (4) Our existing ckb-light-esp project — what CKB operations does it already do on ESP32? Can it sign secp256k1 transactions? (5) For Fiber specifically: channel open/close = CKB L1 tx (needs signing). send_payment = off-chain message (needs signing of payment hash only, much lighter). Which operations actually need to run on-device vs can be delegated? (6) Verdict: is "signer only" sufficient for a self-contained FiberQuest device, or do you need a light client to verify channel state independently?
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/bitcoin/secp256k1/master/README.md
+- https://api.github.com/search/repositories?q=esp32+secp256k1&sort=stars&per_page=10
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/mbedtls/README.md
+
+---
+
+## [PENDING] retroachievements-live-api-payment-triggers
+**Priority:** HIGH
+**Output:** findings/retroachievements-live-api-payment-triggers.md
+**Goal:** Research using RetroAchievements (RA) data as live payment triggers for FiberQuest. Two angles: (1) RA Rich Presence protocol — RA games include Rich Presence scripts that read RAM addresses and format live game state strings (e.g. "Playing as Mario, World 1-2, Lives: 3"). These scripts are essentially pre-written RAM maps maintained by the RA community. Can we parse RA Rich Presence scripts to get RAM addresses and game state logic for free, without writing our own RAM maps? URL: https://docs.retroachievements.org/developer-docs/rich-presence.html (2) RA Achievement definitions — each achievement has conditions tied to specific RAM addresses and values. These are machine-readable. Can we parse achievement conditions to detect game events? E.g. "Player dealt damage" = perfect payment trigger. URL: https://docs.retroachievements.org/developer-docs/achievement-development-overview.html (3) RA API — is there a live/websocket API, or only a REST polling API? Can we query current game state, active achievements, rich presence string in real-time? Rate limits? Auth requirements? (4) RetroArch + RA integration — RetroArch already talks to RA servers. Can we hook into RetroArch's existing RA client to get achievement unlock events locally, without hitting the RA API at all? Is there a local event/callback system? (5) Practical: for SF2 Turbo SNES, does RA have a rich presence script that reads health values? If yes, those RAM addresses are already verified and community-maintained — we can use them directly.
+**Seeds:**
+- https://docs.retroachievements.org/developer-docs/rich-presence.html
+- https://docs.retroachievements.org/developer-docs/achievement-development-overview.html
+- https://docs.retroachievements.org/developer-docs/condition-syntax.html
+- https://api.retroachievements.org/API/API_GetGameInfoAndUserProgress.php
+- https://raw.githubusercontent.com/RetroAchievements/RAInterface/master/README.md
+
+---
+
+## [PENDING] esp32p4-emulator-payment-synthesis
+**Priority:** SYNTHESIS
+**Output:** findings/esp32p4-emulator-payment-synthesis.md
+**Goal:** SYNTHESIS — Read esp32p4-snes-emulator-viability + esp32p4-fiber-signer-vs-lightclient + retroachievements-live-api-payment-triggers + fiberquest-esp32p4-capabilities findings + MEMORY.md. Produce: (1) Is a self-contained FiberQuest device on ESP32-P4 (emulator + signer + WiFi payment) technically feasible? Give a concrete yes/no with reasoning. (2) Best architecture for a standalone device: which tasks run on which core, what's the memory budget, what gets cut if RAM is tight. (3) If RetroAchievements rich presence / achievement data gives us pre-verified RAM maps, how does this change our development speed? Quantify: instead of manually finding RAM addresses for 5 games, we get community-verified maps for 1000s of games instantly. (4) The boldest possible demo: a single ESP32-P4 device running NES/SNES, connected to a TV via HDMI/composite, two controllers plugged in, WiFi connected to Fiber, payments triggered by in-game events — is this achievable in the 2-week hackathon? What's the minimum hardware BOM? (5) Generate new research tasks for any remaining gaps.
+**Seeds:**
+
+---
+
+## [PENDING] fiberquest-game-catalog-followup-test-question
+**Priority:** HIGH
+**Output:** findings/fiberquest-game-catalog-followup-test-question.md
+**Goal:** Follow-up research from FiberQuest Intel feedback on 'fiberquest-game-catalog'. Question: test question. Context: This is an elaboration point raised during research review. Provide detailed, technical, actionable findings. Focus on what's practically implementable within the hackathon timeframe (March 11-25 2026).
+**Tags:** general, followup, fiberquest-game-catalog
+**Seeds:**
+
+---
+
+## [PENDING] fiberquest-multiplayer-synthesis-followup-follow-texas-holdem-angle-single-table-t
+**Priority:** HIGH
+**Output:** findings/fiberquest-multiplayer-synthesis-followup-follow-texas-holdem-angle-single-table-t.md
+**Goal:** Follow-up research from FiberQuest Intel feedback on 'fiberquest-multiplayer-synthesis'. Question: Follow Texas Holdem angle. Single table tournament buy in possible? Ring games Can 9 players simultaneously interact with the same channel to facilitate poker?. Context: This is an elaboration point raised during research review. Provide detailed, technical, actionable findings. Focus on what's practically implementable within the hackathon timeframe (March 11-25 2026).
+**Tags:** general, followup, fiberquest-multiplayer-synthesis
+**Seeds:**
+
+---
+
+## [PENDING] cloudflare-workers-kv-rate-limiting
+**Priority:** HIGH
+**Output:** findings/cloudflare-workers-kv-rate-limiting.md
+**Goal:** Map the Cloudflare Workers KV API for rate limiting. We're building a Workers-based bug reporter that receives POST requests from wyltekindustries.com. Need: KV namespace setup, storing request counts per key with TTL, atomic increment patterns, wrangler CLI commands to create and bind KV namespaces. Also: what are the free tier limits for KV reads/writes, and is there a better rate-limiting primitive (Durable Objects)?
+**Seeds:**
+- https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/README.md
+- https://developers.cloudflare.com/workers/runtime-apis/kv/
+- https://developers.cloudflare.com/durable-objects/best-practices/create-durable-object-stubs-and-send-requests/
+**Questions to answer:**
+1. How do you create and bind a KV namespace via wrangler.toml?
+2. Pattern for "max N requests per key per hour" using KV TTL?
+3. Is Durable Objects a better fit for atomic counters than KV?
+4. Free tier limits: KV reads/writes per day?
+5. Can we deploy the entire rate-limited worker without a paid plan?
+
+---
+
+## [PENDING] esp32-wifi-ota-partition-safety
+**Priority:** HIGH
+**Output:** findings/esp32-wifi-ota-partition-safety.md
+**Goal:** Deep dive into ESP32 OTA update safety guarantees. We're implementing Telegram-triggered OTA on NerdMiner CKB (ESP32-2432S028R). Need to understand: partition table OTA slots (app0/app1/factory), rollback on failed boot, bootloader anti-rollback fuses, what happens if power is cut mid-flash, and whether huge_app.csv (our current partition scheme) supports proper OTA with rollback.
+**Seeds:**
+- https://raw.githubusercontent.com/espressif/esp-idf/master/docs/en/api-reference/system/ota.rst
+- https://raw.githubusercontent.com/espressif/arduino-esp32/master/tools/partitions/huge_app.csv
+- https://raw.githubusercontent.com/GyverLibs/FastBot/main/README_EN.md
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/bootloader_support/include/esp_ota_ops.h
+**Questions to answer:**
+1. Does huge_app.csv include two OTA slots? If not, what partition scheme should we use?
+2. How does esp_ota_mark_app_valid_cancel_rollback() work and when must we call it?
+3. What happens on power cut mid-flash — will the device brick or fall back to previous?
+4. Is there a FastBot-specific approach to triggering OTA with rollback support?
+5. Minimum safe partition scheme for OTA + rollback on a 4MB flash ESP32?
+
+---
+
+## [PENDING] supabase-rls-member-security-audit
+**Priority:** HIGH
+**Output:** findings/supabase-rls-member-security-audit.md
+**Goal:** Audit the security model of our Wyltek membership system. We use Supabase with RLS, JoyID CKB address as the user identifier (no traditional auth), anon key in client-side JS. Need to understand: what an attacker can actually do with the anon key, whether our RLS policies prevent impersonation (someone submitting a bug report or like with another member's CKB address), and best practices for CKB-address-based identity in Supabase without a traditional JWT auth flow.
+**Seeds:**
+- https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/content/guides/auth/row-level-security.mdx
+- https://raw.githubusercontent.com/supabase/supabase-js/master/README.md
+- https://supabase.com/docs/guides/api/api-keys
+**Questions to answer:**
+1. What can an attacker do with just the anon key and knowledge of table names?
+2. How can we use Supabase RLS to enforce "only the owner CKB address can write their own row"?
+3. Is there a JoyID / CKB address → Supabase JWT flow we should implement?
+4. Can we use Supabase edge functions to verify a CKB signed message before writing?
+5. What's the simplest security upgrade that prevents impersonation without full auth?
+
+---
+
+## [PENDING] ckb-light-client-esp32-sync-performance
+**Priority:** MEDIUM
+**Output:** findings/ckb-light-client-esp32-sync-performance.md
+**Goal:** Research the performance characteristics of the CKB light client protocol from an embedded device perspective. We have ckb-light-esp running on ESP32-P4. Need to understand: how many peers does the light client need to sync reliably, typical initial sync time for a fresh device, bandwidth usage per transaction verification, memory requirements for the filter/proof data, and whether the ESP32-P4's 32MB PSRAM is sufficient for real-world use.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/light-client/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-light-client/main/README.md
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0031-variable-length-header-field/0031-variable-length-header-field.md
+**Questions to answer:**
+1. How does the light client determine which blocks to download (bloom filter size, false positive rate)?
+2. Minimum peers needed for reliable sync — what happens below that threshold?
+3. Estimated bandwidth per verified transaction on mainnet?
+4. Memory footprint: how large is the header chain + filter chain state?
+5. Is there a keep-alive / reconnection strategy needed for WiFi-prone ESP32 environments?
+
+---
+
+## [PENDING] telegram-bot-esp32-security-hardening
+**Priority:** MEDIUM
+**Output:** findings/telegram-bot-esp32-security-hardening.md
+**Goal:** Security hardening for our Telegram OTA bot on NerdMiner CKB. We currently whitelist by chat ID (compile-time). Research: what additional attack surface exists (replay attacks on Telegram updates, token exposure if device is physically inspected, bot token rotation procedure, rate limiting OTA triggers), and whether FastBot's update mechanism is safe from MITM on untrusted WiFi networks.
+**Seeds:**
+- https://raw.githubusercontent.com/GyverLibs/FastBot/main/src/FastBot.h
+- https://raw.githubusercontent.com/GyverLibs/FastBot/main/src/FastBot.cpp
+- https://core.telegram.org/bots/api#getupdates
+- https://core.telegram.org/bots/faq#how-do-i-get-updates
+**Questions to answer:**
+1. Does FastBot use HTTPS for Telegram API calls on ESP32, and how is the cert validated?
+2. Can an attacker replay a previously sent .bin file to trigger re-flash?
+3. What's the procedure to rotate a compromised bot token on a deployed device?
+4. Are there additional authentication layers beyond chat ID whitelisting worth implementing?
+5. Does Telegram's API guarantee message ordering / can updates be injected?
+
+---
+
+## [PENDING] wyltek-seo-current-audit
+**Priority:** LOW
+**Output:** findings/wyltek-seo-current-audit.md
+**Goal:** Audit the current SEO status of wyltekindustries.com. We've recently migrated to Cloudflare, added structured pages (hardware, research, members, blog). Need: current indexing status check approach, meta tag audit across key pages, sitemap.xml completeness, structured data opportunities (JSON-LD for hardware products), and quick wins to improve discoverability for searches like "CKB ESP32", "Nervos CKB embedded", "CKB light client ESP32".
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/wyltek-industries/master/sitemap.xml
+- https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap
+- https://schema.org/Product
+- https://raw.githubusercontent.com/toastmanAu/wyltek-industries/master/index.html
+**Questions to answer:**
+1. What JSON-LD structured data makes sense for a hardware/embedded product site?
+2. Are there technical SEO issues (missing canonical, duplicate titles, missing OG tags) on key pages?
+3. What's the optimal sitemap.xml structure for a site like ours?
+4. What are the most valuable search terms to target given our niche?
+5. Quick wins that take <1 hour to implement each?
+
+---
+
+## [PENDING] nerdminer-ckb-pool-stats-display
+**Priority:** MEDIUM
+**Output:** findings/nerdminer-ckb-pool-stats-display.md
+**Goal:** Research how to pull live miner stats from ViaBTC pool API and display them on the NerdMiner CKB screen. Currently we show local hashrate but not pool-side accepted shares, pool difficulty, or estimated earnings. Need: ViaBTC pool API endpoints for miner stats (if public), alternative: parse stratum responses for share accepted/rejected counts, and how existing NerdMiner v2 forks display pool stats.
+**Seeds:**
+- https://raw.githubusercontent.com/BitMaker-hub/NerdMiner_v2/main/src/stratum.cpp
+- https://raw.githubusercontent.com/BitMaker-hub/NerdMiner_v2/main/src/stratum.h
+- https://raw.githubusercontent.com/BitMaker-hub/NerdMiner_v2/main/src/monitor.cpp
+- https://raw.githubusercontent.com/toastmanAu/NerdMiner_CKB/master/src/stratum.cpp
+- https://viabtc.com/tools/mining_api
+**Questions to answer:**
+1. Does ViaBTC expose a public REST API for per-worker stats (hashrate, shares, earnings)?
+2. What stratum protocol messages carry accepted/rejected share counts?
+3. How does NerdMiner v2 currently track shares accepted/rejected locally?
+4. What screen real estate changes are needed to show pool stats on the CYD display?
+5. Is there a better pool with a more accessible API we should consider for CKB?
+
+---
+
+## [PENDING] synthesis-stack-gap-4
+**Priority:** SYNTHESIS
+**Output:** findings/stack-gap-analysis-4.md
+**Goal:** SYNTHESIS — Full gap analysis across all completed research (excluding FiberQuest tasks). Read MEMORY.md and all non-fiberquest findings files. Identify: (1) What parts of the Wyltek stack are well-researched and ready to build. (2) What gaps remain — things we know we need but haven't researched. (3) What new research tasks should be queued based on recent work (bug reporter, NerdMiner OTA, research page improvements, Telegram OTA, DOB minting system). (4) Any dependencies between planned features that could cause build order issues. Generate new PENDING tasks using ## [NEW_TASK] ... ## [/NEW_TASK] format for any HIGH or MEDIUM gaps.
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/README.md
+- https://raw.githubusercontent.com/toastmanAu/NerdMiner_CKB/master/README.md
+- https://raw.githubusercontent.com/toastmanAu/wyltek-industries/master/index.html
+
