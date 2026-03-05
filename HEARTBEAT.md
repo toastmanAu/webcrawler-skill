@@ -14,12 +14,19 @@ Command: `python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py --fi
 - On completion: notify Phill: "🔬 Research done: <task-id> → research/findings/<id>.md"
 - Cost: ~$0.03-0.05/task (Gemini 2.5 Flash) — run freely, no approval needed
 
-## Research Dashboard (port 9989)
+## Research Dashboard (port 9989) — LOCAL TESTBED ONLY
+⚠️ Local only — not public facing. Accessible via Tailscale at http://100.115.197.42:9989
 Check `curl -sf http://localhost:9989/ -o /dev/null` — if down, restart:
 `python3 /home/phill/research-dashboard/server.py &`
 - Silent restart, no notification needed
 
-## DOB Minter Dev Server (port 5173)
+## Kernel Dashboard (port 9999) — PRIVATE, Tailscale only
+Unified local dashboard at http://100.115.197.42:9999
+Check `systemctl --user is-active kernel-dash` — if inactive, restart: `systemctl --user restart kernel-dash`
+- Silent restart, no notification needed unless it fails to come back up
+
+## DOB Minter Dev Server (port 5173) — LOCAL TESTBED ONLY
+⚠️ This is a local dev/test server — NOT public facing. Public minter is at wyltekindustries.com/mint/ (GitHub Pages/Cloudflare CDN).
 Check `systemctl --user is-active ckb-dob-minter` — if inactive, restart: `systemctl --user restart ckb-dob-minter`
 - Silent restart, no notification needed unless it fails to come back up
 
