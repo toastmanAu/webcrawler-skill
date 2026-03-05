@@ -1755,3 +1755,71 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://fonts.google.com/?category=Monospace
 - https://animate.style/
 - https://raw.githubusercontent.com/nicedoc/nicedoc/master/README.md
+
+---
+
+## [DONE] pi5-retropie-setup-on-pios
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Complete setup guide for Pi 5 running RetroPie on Pi OS Bookworm 64-bit. Key questions: (1) Does the official RetroPie installer script support Pi 5 yet, or is there a fork/workaround? (2) What are the exact install steps — which packages, which script version? (3) Does RetroArch run well on Pi 5 with VideoCore VII / v3d driver? (4) Any known issues with Pi OS Bookworm + RetroPie? (5) Best SNES core for Pi 5 (snes9x vs bsnes vs mesen-s)?
+**Tags:** fiberquest, pi5, retropie, retroarch, setup
+**Seeds:**
+- https://retropie.org.uk/docs/Raspberry-Pi-5/
+- https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/README.md
+- https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/retropie_setup.sh
+- https://www.raspberrypi.com/documentation/computers/os.html
+- https://retropie.org.uk/docs/First-Installation/
+
+---
+
+## [DONE] pi5-hdmi-touch-1024x600-config
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Pi 5 config.txt settings for a 1024x600 HDMI touchscreen display. Key questions: (1) Exact hdmi_group, hdmi_mode or hdmi_cvt settings for 1024x600; (2) Touch driver setup — common ICs used on 1024x600 HDMI touchscreens (FT5406, GT911, USB HID); (3) Touch calibration on Pi OS Bookworm (Wayland vs X11 differences); (4) Display rotation if needed; (5) Any known Pi 5 config.txt syntax changes from Pi 4 (Pi 5 uses different dtparam/dtoverlay syntax).
+**Tags:** fiberquest, pi5, display, touch, config
+**Seeds:**
+- https://www.raspberrypi.com/documentation/computers/config_txt.html
+- https://raw.githubusercontent.com/raspberrypi/firmware/master/boot/overlays/README
+- https://www.raspberrypi.com/documentation/computers/raspberry-pi.html
+- https://forums.raspberrypi.com/viewtopic.php?t=364817
+
+---
+
+## [DONE] pi5-gpio-fan-mosfet-control
+**Priority:** MEDIUM
+**Added:** 2026-03-05
+**Goal:** GPIO fan control on Pi 5 via MOSFET. Key questions: (1) Which dtoverlay controls GPIO fan on Pi 5 — is it still gpio-fan or has it changed? (2) What config.txt lines control the temperature thresholds and GPIO pin? (3) PWM fan control vs simple on/off — which is better for a MOSFET-switched fan? (4) Does Pi 5's RP1 IO controller change any GPIO fan setup vs Pi 4? (5) Software PWM via pigpio vs hardware PWM for smooth fan speed control.
+**Tags:** fiberquest, pi5, gpio, fan, cooling
+**Seeds:**
+- https://raw.githubusercontent.com/raspberrypi/firmware/master/boot/overlays/README
+- https://www.raspberrypi.com/documentation/computers/config_txt.html
+- https://www.raspberrypi.com/documentation/computers/raspberry-pi.html
+- https://gpiozero.readthedocs.io/en/latest/api_output.html
+
+---
+
+## [PENDING] pi5-electron-app-autolaunch
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Auto-launch setup for Pi 5 demo machine — RetroArch + FiberQuest Electron app on boot, no desktop interaction needed. Key questions: (1) Best autostart method on Pi OS Bookworm with Wayland (autostart file vs systemd user service vs labwc autostart); (2) How to launch Electron AppImage on Pi OS — ARM64 AppImage support, dependencies; (3) Launch order: RetroArch first, then FiberQuest after N seconds delay; (4) Display compositor for side-by-side windows at 1024x600 — can both apps share screen cleanly? (5) Kiosk mode options — hide taskbar, disable screen blanking, keep both windows always on top.
+**Tags:** fiberquest, pi5, electron, autostart, kiosk
+**Seeds:**
+- https://www.raspberrypi.com/documentation/computers/configuration.html
+- https://www.electronjs.org/docs/latest/tutorial/linux-desktop-actions
+- https://raw.githubusercontent.com/electron/electron/main/docs/api/app.md
+- https://specifications.freedesktop.org/autostart-spec/latest/
+
+---
+
+## [DONE] retroarch-network-commands-exact-protocol
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Exact UDP protocol for RetroArch READ_CORE_MEMORY network command — needed to implement the FiberQuest sidecar correctly. Key questions: (1) Exact UDP packet format for READ_CORE_MEMORY request — is it plaintext or binary? (2) Exact response format — how is data returned, encoding? (3) How to enable network commands in RetroArch config (retroarch.cfg settings); (4) Is there a keepalive or connection concept, or is each read stateless? (5) WRITE_CORE_MEMORY format — useful for resetting state or injecting values for demo purposes; (6) Any rate limit or timing constraints on polling frequency?
+**Tags:** fiberquest, retroarch, network, protocol, sidecar
+**Seeds:**
+- https://raw.githubusercontent.com/libretro/RetroArch/master/command.c
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/net_http.c
+- https://raw.githubusercontent.com/libretro/RetroArch/master/command.h
+- https://retropie.org.uk/docs/RetroArch-Network-Commands/
+- https://raw.githubusercontent.com/libretro/RetroArch/master/retroarch.cfg
+
