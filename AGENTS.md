@@ -269,6 +269,30 @@ When adding tasks to `research/queue.md`, seeds **must** be directly fetchable. 
 
 Rule: before writing any seed URL, mentally ask "does this return raw text/JSON or rendered HTML?" If HTML → find the raw equivalent.
 
+## Wyltek Site — Page Style Rule
+
+**All new pages must use the shared site header pattern** — no bespoke nav CSS:
+
+```html
+<header>
+  <div class="header-inner">
+    <a href="/index.html" class="logo">
+      <img src="/wyltek-mark.png" alt="Wyltek" style="width:28px;height:28px;border-radius:7px;object-fit:cover;">
+      Wyltek Industries
+    </a>
+    <nav id="mainNav">
+      <!-- nav links here -->
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
+  </div>
+</header>
+```
+
+- Copy `:root`, `header`, `.header-inner`, `.logo`, `nav`, `.nav-toggle`, `.member-only`, `.nav-join` CSS from `index.html`
+- Include `/js/member-nav.js` and the nav-toggle inline script near `</body>`
+- Include `/js/bug-reporter.js` near `</body>` on all member-accessible pages
+- Reference: use `index.html` as the canonical template
+
 ## 🏗️ CKB Web App Stack — Start Here
 
 When building browser apps on Nervos CKB:
@@ -304,3 +328,15 @@ setClient(new ccc.ClientPublicMainnet());
 
 **Provider must wrap the component that calls useCcc() — not be in the same component.**
 
+
+## Browser App Debugging Rules
+
+When debugging browser-side issues (React, Vite apps, wallet integrations):
+
+1. **Always add `console.log` first** — don't guess. Add logging at each step of the data flow before trying fixes.
+2. **Log at boundaries** — component receives props, async function starts/completes, data flows between modules.
+3. **Use `[ComponentName]` prefixes** — e.g. `console.log('[MintResultViewer] result:', {...})` so logs are filterable.
+4. **Log the shape, not just existence** — `console.log('result:', { ckbfsTypeId: r.ckbfsTypeId, storageMode: r.storageMode })` not just `console.log('result:', r)` (large objects collapse in DevTools).
+5. **Leave debug logs until the bug is confirmed fixed** — strip them in the same commit that fixes the issue.
+6. **For mobile debugging** — remind Phill to use `chrome://inspect` on desktop Chrome to attach to mobile browser DevTools, or add a visible on-screen log panel if that's not practical.
+7. **For wallet/JoyID issues specifically** — log the full tx structure (inputs count, outputs capacities, witnesses lengths, cellDeps depType) right before `signer.sendTransaction()`.
