@@ -45,6 +45,22 @@
 - **NerdMiner CKB** → https://github.com/toastmanAu/NerdMiner_CKB — ESP32 Eaglesong miner. Core implementation DONE 2026-02-22. PlatformIO installed at /home/phill/.platformio-venv/, `pio` on PATH. Target: ESP32-2432S028R (CYD). Added Worker Name field + fixed password field. Default pool: ckb.viabtc.com:3333. Push needs `gh auth refresh -s workflow` (workflow scope) then `git push`. Flash: `pio run -e ESP32-2432S028R -t upload` (from terminal with dialout group).
 - **Fan controller** → /home/phill/fan-control/ — systemd service, GPIO1_C4 (gpio52), software PWM 25Hz
 
+## NucBox K8 Plus (Ryzen 7 8845HS — Primary Inference Node)
+- IP: 192.168.68.79 · hostname: phill-NucBox-K8-Plus · user: phill · NOPASSWD sudo
+- Always-on local inference machine
+- AMD Ryzen 7 8845HS · Radeon 780M iGPU · 32GB RAM
+- Ollama: http://192.168.68.79:11434 (LAN accessible)
+- Models: minicpm-v (vision), qwen2.5:14b, deepseek-r1:14b, gemma3:12b, qwen2.5-coder:14b, llama3.1:8b + more
+- OpenClaw provider: "ryzen" → imageModel = ryzen/minicpm-v:latest
+- Auto-suspend permanently masked (sleep.target → /dev/null)
+
+## driveThree (i7-14700K — Secondary Inference Node, on-demand)
+- IP: 192.168.68.88 · user: phill · NOPASSWD sudo
+- On when Phill is using it, not always on
+- RTX 3060 Ti (8GB VRAM) — faster GPU inference than NucBox when available
+- Ollama: http://192.168.68.88:11434 · model: qwen2.5:14b (confirmed working)
+- Auto-suspend set to 2hr idle timeout (not masked — intentional)
+
 ## OPi5+ Ollama Status (confirmed working 2026-02-25)
 - **qwen2.5:3b WORKING** — inference confirmed, ~2.5s load, ~39s cold start for 10 tokens
 - **qwen2.5:7b causes power-related crashes** — PSU claims 5A but browns out under heavy CPU load

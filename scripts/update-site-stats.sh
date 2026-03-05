@@ -68,9 +68,17 @@ PYEOF
 
 # Commit and push if anything changed
 cd "$SITE"
-if ! git diff --quiet index.html; then
-    git add index.html
-    git commit -m "stats: boards=$BOARDS sensors=$SENSORS repos=$REPOS [auto]"
+
+# Sync research findings
+FINDINGS_SRC="/home/phill/.openclaw/workspace/research/findings"
+FINDINGS_DEST="$SITE/research"
+mkdir -p "$FINDINGS_DEST"
+rsync -a --delete "$FINDINGS_SRC"/ "$FINDINGS_DEST"/
+echo "[stats] Research findings synced"
+
+if ! git diff --quiet || git status --short | grep -q "research/"; then
+    git add index.html research/
+    git commit -m "stats: boards=$BOARDS sensors=$SENSORS repos=$REPOS + findings sync [auto]"
     git push
     echo "[stats] Pushed update to GitHub"
 else

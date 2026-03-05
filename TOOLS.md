@@ -42,3 +42,27 @@ Skills are shared. Your setup is yours. Keeping them apart means you can update 
 ---
 
 Add whatever helps you do your job. This is your cheat sheet.
+
+## driveThree (192.168.68.88)
+- Hostname: driveThree · user: phill · SSH alias: needs adding
+- i7-14700K, 64GB RAM, RTX 3060 Ti (8GB VRAM), Ubuntu 22.04 x86_64
+- Ollama installed: qwen2.5:14b loaded and working (~GPU inference)
+- API: http://192.168.68.88:11434
+- Auto-suspend disabled (GNOME + logind)
+- No OpenClaw installed (inference node only for now)
+
+## CKB Testnet Light Client (N100)
+- Running at: http://192.168.68.91:9001
+- Chain: testnet (genesis 0x10639e...)
+- Binary: ~/ckb-light-testnet/ckb-light-client
+- Start: bash ~/ckb-light-testnet/start.sh
+- Stop: bash ~/ckb-light-testnet/stop.sh
+
+## NucBox K8 Plus (Ryzen — Primary Inference Node)
+- Hostname: phill-NucBox-K8-Plus · IP: 192.168.68.79 · user: phill
+- SSH: ssh phill@192.168.68.79 (NOPASSWD sudo)
+- Ryzen 7 8845HS · Radeon 780M iGPU · 32GB RAM · always on
+- Ollama: http://192.168.68.79:11434 (LAN accessible)
+- Key models: minicpm-v (vision), qwen2.5:14b, deepseek-r1:14b, gemma3:12b, qwen2.5-coder:14b, llama3.1:8b
+- OpenClaw provider: "ryzen" → imageModel = ryzen/minicpm-v:latest
+- Auto-suspend permanently masked

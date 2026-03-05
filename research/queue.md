@@ -1151,7 +1151,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiber-rpc-json-format-details
+## [DONE] fiber-rpc-json-format-details
 **Priority:** HIGH
 **Output:** findings/fiber-rpc-json-format-details.md
 **Goal:** Obtain concrete JSON-RPC request and response examples for `open_channel` and `send_payment` from the `nervosnetwork/fiber` repository's tests or documentation. This is crucial for building a Node.js client.
@@ -1166,7 +1166,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiber-nodejs-client-feasibility
+## [DONE] fiber-nodejs-client-feasibility
 **Priority:** HIGH
 **Output:** findings/fiber-nodejs-client-feasibility.md
 **Goal:** Assess the effort and best approach to implement a minimal Node.js client for the Fiber RPC, given the JSON format (once known). Determine if existing generic JSON-RPC libraries are suitable.
@@ -1181,7 +1181,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] sidecar-secure-key-management
+## [DONE] sidecar-secure-key-management
 **Priority:** HIGH
 **Output:** findings/sidecar-secure-key-management.md
 **Goal:** Investigate secure and practical methods for the Node.js sidecar to sign CKB transactions (specifically for Fiber channel open/close) without directly exposing private keys in the application code or environment.
@@ -1247,7 +1247,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. What are the exact voltage levels for HIGH and LOW signals on the DAT, LAT, CLK lines?
 ---
 
-## [PENDING] fiber-rpc-raw-source
+## [DONE] fiber-rpc-raw-source
 **Priority:** HIGH
 **Output:** findings/fiber-rpc-raw-source.md
 **Goal:** Read the actual Rust source code for Fiber RPC definitions. We need exact JSON field names, types, and serialisation for open_channel, send_payment, new_invoice, list_channels. Previous crawls only got GitHub HTML directory listings — we need the raw file contents.
@@ -1260,7 +1260,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] snes-controller-protocol-raw
+## [DONE] snes-controller-protocol-raw
 **Priority:** MEDIUM
 **Output:** findings/snes-controller-protocol-raw.md
 **Goal:** Get precise SNES controller serial protocol timing specs for ESP32-P4 implementation. Need: latch pulse width, clock frequency, bit order, voltage levels, button bit map.
@@ -1272,7 +1272,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32p4-snes-emulator-viability
+## [DONE] esp32p4-snes-emulator-viability
 **Priority:** HIGH
 **Output:** findings/esp32p4-snes-emulator-viability.md
 **Goal:** Research viability of running a SNES or NES emulator directly on ESP32-P4. Key questions: (1) ESP32-P4 specs vs SNES/NES requirements — CPU clock (400MHz RISC-V), RAM (768KB SRAM + PSRAM), are these sufficient? SNES CPU is 3.58MHz 65816, RAM 128KB — but emulation overhead is typically 10-50x. NES is 1.79MHz 6502, 2KB RAM — much lighter. (2) Are there existing ESP32 SNES or NES emulator projects? nofrendo (NES) runs on ESP32 original. Any SNES emulator on ESP32? SNES9x or PocketSNES has been ported to small hardware before. (3) What display would be needed? ESP32-P4 has MIPI DSI — can drive ILI9341/ST7789 or a small LCD directly. What resolution is needed for SNES (256x224)? (4) Audio: SNES has SPC700 audio chip — is software emulation of this feasible on P4 with I2S output? (5) If SNES is not viable, what about NES? nofrendo on ESP32-S3 is confirmed — P4 at 400MHz should be significantly better. (6) Critical: if the ESP32-P4 is running an emulator, what CPU headroom remains for: WiFi stack, Fiber signing (secp256k1 or blake2b hashing), CKB light client operations? Can these coexist or does emulation consume 100% of CPU? (7) Recommended architecture: emulator on one core, WiFi/payment on second core? FreeRTOS task priorities?
@@ -1286,7 +1286,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32p4-fiber-signer-vs-lightclient
+## [DONE] esp32p4-fiber-signer-vs-lightclient
 **Priority:** HIGH
 **Output:** findings/esp32p4-fiber-signer-vs-lightclient.md
 **Goal:** Compare two architectures for ESP32-P4 in FiberQuest: (A) Fiber Signer Only — ESP32-P4 holds private key, signs CKB L1 transactions via USB/BLE, a Pi or server runs the actual Fiber node. (B) Light Client + Signer — ESP32-P4 runs a CKB light client AND signs transactions, becoming a more autonomous node. For each: (1) What software exists? CKB light client is Rust — can it compile for RISC-V ESP32-P4? What are the binary size and RAM requirements? (2) Fiber Network Node (FNN) is also Rust — same question. FNN is heavier than just a light client. (3) Signing only: secp256k1 library for ESP32 exists (Bitcoin hardware wallets use this). Memory footprint? (4) Our existing ckb-light-esp project — what CKB operations does it already do on ESP32? Can it sign secp256k1 transactions? (5) For Fiber specifically: channel open/close = CKB L1 tx (needs signing). send_payment = off-chain message (needs signing of payment hash only, much lighter). Which operations actually need to run on-device vs can be delegated? (6) Verdict: is "signer only" sufficient for a self-contained FiberQuest device, or do you need a light client to verify channel state independently?
@@ -1299,7 +1299,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] retroachievements-live-api-payment-triggers
+## [DONE] retroachievements-live-api-payment-triggers
 **Priority:** HIGH
 **Output:** findings/retroachievements-live-api-payment-triggers.md
 **Goal:** Research using RetroAchievements (RA) data as live payment triggers for FiberQuest. Two angles: (1) RA Rich Presence protocol — RA games include Rich Presence scripts that read RAM addresses and format live game state strings (e.g. "Playing as Mario, World 1-2, Lives: 3"). These scripts are essentially pre-written RAM maps maintained by the RA community. Can we parse RA Rich Presence scripts to get RAM addresses and game state logic for free, without writing our own RAM maps? URL: https://docs.retroachievements.org/developer-docs/rich-presence.html (2) RA Achievement definitions — each achievement has conditions tied to specific RAM addresses and values. These are machine-readable. Can we parse achievement conditions to detect game events? E.g. "Player dealt damage" = perfect payment trigger. URL: https://docs.retroachievements.org/developer-docs/achievement-development-overview.html (3) RA API — is there a live/websocket API, or only a REST polling API? Can we query current game state, active achievements, rich presence string in real-time? Rate limits? Auth requirements? (4) RetroArch + RA integration — RetroArch already talks to RA servers. Can we hook into RetroArch's existing RA client to get achievement unlock events locally, without hitting the RA API at all? Is there a local event/callback system? (5) Practical: for SF2 Turbo SNES, does RA have a rich presence script that reads health values? If yes, those RAM addresses are already verified and community-maintained — we can use them directly.
@@ -1312,7 +1312,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32p4-emulator-payment-synthesis
+## [DONE] esp32p4-emulator-payment-synthesis
 **Priority:** SYNTHESIS
 **Output:** findings/esp32p4-emulator-payment-synthesis.md
 **Goal:** SYNTHESIS — Read esp32p4-snes-emulator-viability + esp32p4-fiber-signer-vs-lightclient + retroachievements-live-api-payment-triggers + fiberquest-esp32p4-capabilities findings + MEMORY.md. Produce: (1) Is a self-contained FiberQuest device on ESP32-P4 (emulator + signer + WiFi payment) technically feasible? Give a concrete yes/no with reasoning. (2) Best architecture for a standalone device: which tasks run on which core, what's the memory budget, what gets cut if RAM is tight. (3) If RetroAchievements rich presence / achievement data gives us pre-verified RAM maps, how does this change our development speed? Quantify: instead of manually finding RAM addresses for 5 games, we get community-verified maps for 1000s of games instantly. (4) The boldest possible demo: a single ESP32-P4 device running NES/SNES, connected to a TV via HDMI/composite, two controllers plugged in, WiFi connected to Fiber, payments triggered by in-game events — is this achievable in the 2-week hackathon? What's the minimum hardware BOM? (5) Generate new research tasks for any remaining gaps.
@@ -1320,7 +1320,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiberquest-game-catalog-followup-test-question
+## [DONE] fiberquest-game-catalog-followup-test-question
 **Priority:** HIGH
 **Output:** findings/fiberquest-game-catalog-followup-test-question.md
 **Goal:** Follow-up research from FiberQuest Intel feedback on 'fiberquest-game-catalog'. Question: test question. Context: This is an elaboration point raised during research review. Provide detailed, technical, actionable findings. Focus on what's practically implementable within the hackathon timeframe (March 11-25 2026).
@@ -1329,7 +1329,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiberquest-multiplayer-synthesis-followup-follow-texas-holdem-angle-single-table-t
+## [DONE] fiberquest-multiplayer-synthesis-followup-follow-texas-holdem-angle-single-table-t
 **Priority:** HIGH
 **Output:** findings/fiberquest-multiplayer-synthesis-followup-follow-texas-holdem-angle-single-table-t.md
 **Goal:** Follow-up research from FiberQuest Intel feedback on 'fiberquest-multiplayer-synthesis'. Question: Follow Texas Holdem angle. Single table tournament buy in possible? Ring games Can 9 players simultaneously interact with the same channel to facilitate poker?. Context: This is an elaboration point raised during research review. Provide detailed, technical, actionable findings. Focus on what's practically implementable within the hackathon timeframe (March 11-25 2026).
@@ -1472,3 +1472,110 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://raw.githubusercontent.com/toastmanAu/NerdMiner_CKB/master/README.md
 - https://raw.githubusercontent.com/toastmanAu/wyltek-industries/master/index.html
 
+
+
+---
+
+## [DONE] fiber-nodejs-client-library-development
+**Priority:** HIGH
+**Output:** findings/fiber-nodejs-client-library-development.md
+**Goal:** Investigate the best approach to develop a robust Node.js/TypeScript client library for the Fiber Network RPC, given the absence of an official one. This is critical for the Node.js sidecar to interact with Fiber nodes.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/mod.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/types.rs
+- https://www.npmjs.com/search?q=json-rpc+client
+**Questions to answer:**
+1. What are the full JSON-RPC method signatures (method name, parameters, return types) for `open_channel`, `send_payment`, `new_invoice`, `list_channels`, and `get_invoice`?
+2. What HTTP client (e.g., `axios`, `node-fetch`) and JSON-RPC library (if any) are best suited for building this client?
+3. What authentication mechanisms (if any) are required for Fiber RPC calls?
+4. Should the client library be generated from the Rust source (e.g., using `ts-rs` or similar) or manually written?
+
+---
+
+## [PENDING] retroachievements-ram-map-access-strategy
+**Priority:** HIGH
+**Output:** findings/retroachievements-ram-map-access-strategy.md
+**Goal:** Determine a viable strategy to programmatically access RetroAchievements' community-verified RAM maps and achievement conditions for a large number of games, bypassing current API authentication/rate limit issues for live triggers. This is crucial for scaling FiberQuest beyond manually mapped games.
+**Seeds:**
+- https://retroachievements.org/devoops.php
+- https://api.retroachievements.org/API/API_GetGameInfoAndUserProgress.php
+- https://docs.retroachievements.org/developer-docs/achievement-development-overview.html
+- https://docs.retroachievements.org/developer-docs/condition-syntax.html
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/README.md
+**Questions to answer:**
+1. Is there an unauthenticated or developer-level API endpoint that exposes achievement conditions (including RAM addresses and logic) for a given game ID?
+2. Can we scrape or parse the achievement definition pages (if accessible) to extract RAM map data? What are the legal/ethical implications?
+3. Are there any community-maintained databases or tools that aggregate RA RAM map data that we could leverage?
+4. What is the exact format of achievement conditions (e.g., `0xH0000=0xV`) and how can it be parsed into a usable structure for event detection?
+
+---
+
+## [PENDING] snes-controller-protocol-implementation-details
+**Priority:** MEDIUM
+**Output:** findings/snes-controller-protocol-implementation-details.md
+**Goal:** Obtain precise technical specifications for the SNES controller serial protocol (timing, bit order, voltage levels, button mapping) to enable direct connection and reading of physical SNES controllers via ESP32-P4 GPIO. This is critical for the "boldest demo" if USB controllers are not used.
+**Seeds:**
+- https://www.raphnet.net/electronique/snes_usb/snes_usb_en.php (try to find an archived version or alternative)
+- https://www.retroleum.com/snes-controller-pinout (try to find an archived version or alternative)
+- https://www.cs.columbia.edu/~sedwards/classes/2013/4840/reports/SNES.pdf (try to find an archived version or alternative)
+- https://raw.githubusercontent.com/MickGyver/DaemonBite-Retro-Controllers-USB/master/SNEStoUSB/SNEStoUSB.ino (if accessible)
+- Search for "SNES controller protocol timing" on reputable electronics/retro gaming forums.
+**Questions to answer:**
+1. What are the precise timing requirements (in microseconds) for the Latch and Clock pulses?
+2. What is the exact bit order for the 16 data bits sent by the controller (e.g., MSB first, which button corresponds to which bit)?
+3. What are the signal voltage levels (e.g., 5V, 3.3V) and are logic level shifters required for ESP32-P4 (3.3V)?
+4. What is the full button-to-bit mapping for a standard SNES controller?
+
+---
+
+## [PENDING] ckb-ccc-external-signing-node-js-flow
+**Priority:** MEDIUM
+**Output:** findings/ckb-ccc-external-signing-node-js-flow.md
+**Goal:** Clarify the exact data flow and API calls for a Node.js backend using `@ckb-ccc/core` to facilitate external signing of CKB transactions (specifically for Fiber channel open/close) by a browser-based wallet like JoyID. This is crucial for secure key management in the Node.js sidecar.
+**Seeds:**
+- https://github.com/ckb-ccc/ccc (re-attempt access)
+- https://docs.joy.id/
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/core/src/signer/signer.ts (re-attempt access)
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/core/src/transaction/transaction.ts (re-attempt access)
+**Questions to answer:**
+1. What `ckb-ccc` methods are used by a Node.js backend to prepare a transaction for external signing?
+2. What is the exact payload format sent to an external signer (e.g., JoyID) for signature?
+3. How does the Node.js backend receive and integrate the signature back into the transaction for broadcasting?
+4. Are there any specific `ckb-ccc` helpers or examples for this Node.js-to-browser signing flow?
+
+---
+
+## [PENDING] fiber-testnet-reliability-assessment
+**Priority:** MEDIUM
+**Output:** findings/fiber-testnet-reliability-assessment.md
+**Goal:** Conduct a practical assessment of Fiber testnet reliability, focusing on channel opening/closing success rates, payment routing stability, and common failure modes. This is critical for ensuring a smooth hackathon demo.
+**Seeds:**
+- Existing Fiber nodes on `ckbnode` and `N100` (local testing)
+- `nervosnetwork/fiber` GitHub issues and discussions
+- `fiber-channel-funding-ux.md` (revisit for any clues on common issues)
+**Questions to answer:**
+1. What is the observed success rate for `open_channel` and `send_payment` on the Fiber testnet over a sustained period (e.g., 1 hour of continuous operations)?
+2. What are the most common error messages or failure modes encountered during channel operations or payments?
+3. How quickly do channels settle on-chain when closed?
+4. Are there any known issues with the current Fiber testnet (e.g., network instability, peer discovery problems)?
+
+---
+
+## [PENDING] esp32-p4-emulator-fiber-cpu-headroom-benchmarking
+**Priority:** LOW
+**Output:** findings/esp32-p4-emulator-fiber-cpu-headroom-benchmarking.md
+**Goal:** Benchmark the ESP32-P4's CPU and memory usage when running a NES/SNES emulator, WiFi stack, and `secp256k1` signing operations concurrently. This will validate the architectural assumptions and identify potential performance bottlenecks.
+**Seeds:**
+- ESP32-P4 development board (physical testing)
+- ESP-IDF documentation on FreeRTOS task monitoring and profiling
+- Existing NES/SNES emulator projects for ESP32 (e.g., `nofrendo-esp32`)
+- `esp32p4-snes-emulator-viability.md`
+- `esp32p4-fiber-signer-vs-lightclient.md`
+**Questions to answer:**
+1. What is the average CPU utilization of the emulator core(s) when running NES/SNES at target frame rates?
+2. What is the CPU overhead of the WiFi stack during active network communication (e.g., UDP polling, sending signed messages)?
+3. What is the execution time and CPU impact of a `secp256k1` signing operation on the ESP32-P4?
+4. What is the remaining CPU headroom for other tasks, and are there any observed performance degradation or stuttering when all components run concurrently?
