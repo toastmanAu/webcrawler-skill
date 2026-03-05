@@ -24,6 +24,59 @@ MEMORY_FILE     = os.path.join(WORKSPACE, "MEMORY.md")
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API   = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
 
+# ─── Ground truth context injected into every prompt ───────────────────────
+# Prevents hallucination about Fiber/CKB/CKBFS relationships.
+# Update this block if the stack changes.
+GROUND_TRUTH = """
+## ⚠️ Project Ground Truth — Read Before Answering
+
+This research is for a hackathon project called **FiberQuest** built on the Nervos CKB blockchain.
+The following facts are FIXED. Do NOT contradict them, infer around them, or confuse them with each other.
+
+### Fiber Network (nervosnetwork/fiber)
+- Fiber is a **payment channel network** — conceptually similar to Bitcoin's Lightning Network
+- It is built on top of CKB Layer 1 (not a separate chain)
+- Fiber channels open/close via CKB on-chain transactions; everything in between is **off-chain message passing**
+- Fiber **CANNOT store arbitrary data or files** — it only routes payments (CKB, UDTs)
+- The only data Fiber persists: channel state, balances, HTLCs/PTLCs — all tiny, all payment-related
+- `nervosnetwork/fiber-archive` is an OLD ABANDONED repo (2021, GitHub archived flag) — it is NOT a storage protocol
+- Fiber nodes run the FNN binary; RPC methods: open_channel, send_payment, list_channels, new_invoice, etc.
+- Fiber latency: ~20ms. Fees: ~0.00000001 cent. Supports PTLCs (not HTLCs), BTC Lightning interop.
+
+### CKBFS (CKB File System)
+- CKBFS is an **on-chain file storage system** — stores arbitrary files chunked across CKB cells
+- COMPLETELY SEPARATE from Fiber. CKBFS has nothing to do with payment channels.
+- CKBFS V3 code_hash: `0xb5d13ffe0547c78021c01fe24dce2e959a1ed8edbca3cb93dd2e9f57fb56d695`
+- We have a working browser SDK: `@wyltek/ckbfs-browser` (github.com/toastmanAu/ckbfs-browser)
+- Mainnet CKBFS V3 type_id: `0xcc5411e8b70e551d7a3dd806256533cff6bc12118b48dd7b2d5d2292c3651add`
+
+### Spore Protocol / DOB NFTs
+- Spore is CKB's NFT standard — cells that hold content + ownership
+- DOBs (Digital Objects) are Spore NFTs. We have minted them on CKB mainnet.
+- Cluster ID (mainnet): `0x54ba3ee23016ab6e2e20792d8fd69057c62392ca1997b622147a5bd98979f4e8`
+- DOB minter app: github.com/toastmanAu/ckb-dob-minter (deployed at wyltekindustries.com/mint/)
+
+### CKB Layer 1
+- Nervos CKB is the base layer — a UTXO-like chain (cells, not accounts)
+- Cell model: every cell has capacity (CKByte), lock script (owner), optional type script, data field
+- JoyID is the primary wallet (uses passkeys, no seed phrase)
+- CCC (`@ckb-ccc/core`) is the JS SDK for building CKB transactions
+
+### FiberQuest Architecture (what we are building)
+- RetroArch (emulator) polls game RAM via UDP on port 55355 (READ_CORE_MEMORY protocol)
+- A Node.js sidecar reads RAM, detects game events (health damage, score), and triggers Fiber micropayments
+- Fiber channels open at game start, settle at game end
+- CKBFS stores game content/assets (separate from payments)
+- ESP32-S3/P4 (optional stretch goal): reads real console controllers, triggers payments via hub
+
+### Our Infrastructure
+- Pi5 (192.168.68.82): main machine, OpenClaw, Tailscale IP 100.115.197.42
+- NucBox K8 Plus (192.168.68.79): always-on inference, Ryzen 7 8845HS, Ollama
+- N100 (192.168.68.91): CKB mainnet + testnet light clients
+- ckbnode (192.168.68.87): CKB mainnet full node + Fiber node (mainnet)
+- Fiber node RPC (ckbnode): 127.0.0.1:8227 (localhost only, SSH tunnel to N100:8237)
+""".strip()
+
 # Telegram notify — uses OpenClaw bot to DM Phill on task completion
 TG_BOT_TOKEN = "8446459270:AAFltgKPOgFc0FX4PjKJNPUxTRoRzayKAlE"
 TG_CHAT_ID   = "1790655432"
@@ -76,10 +129,10 @@ def gemini_query(api_key, prompt):
     url = GEMINI_API.format(model=GEMINI_MODEL, key=api_key)
     payload = json.dumps({
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 8192},
+        "generationConfig": {"temperature": 0.3, "maxOutputTokens": 16384},
     }).encode()
     req = urllib.request.Request(url, data=payload, headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as resp:
+    with urllib.request.urlopen(req, timeout=120) as resp:
         data = json.load(resp)
         return data["candidates"][0]["content"]["parts"][0]["text"]
 
@@ -120,19 +173,31 @@ def mark_done(task_id):
     open(QUEUE_FILE, "w").write(content.replace(f"[IN_PROGRESS] {task_id}", f"[DONE] {task_id}", 1))
 
 
-def load_synthesis_context():
-    """Load all completed findings + MEMORY.md for synthesis tasks."""
+def load_synthesis_context(task_id=None):
+    """Load completed findings + MEMORY.md for synthesis tasks.
+    For fiberquest-* tasks: only loads fiberquest-* / fiber-* / retro-* findings
+    to avoid Gemini token/timeout limits. General tasks load everything.
+    """
     parts = []
 
     # MEMORY.md
     if os.path.exists(MEMORY_FILE):
-        mem = open(MEMORY_FILE).read()[:15000]
+        mem = open(MEMORY_FILE).read()[:12000]
         parts.append(f"=== MEMORY.md (stack context) ===\n{mem}")
 
-    # All findings
-    for path in sorted(glob.glob(os.path.join(FINDINGS_DIR, "*.md"))):
+    # Decide which findings to include
+    all_findings = sorted(glob.glob(os.path.join(FINDINGS_DIR, "*.md")))
+    is_fiberquest = task_id and any(x in task_id for x in ('fiberquest', 'fiber', 'retroarch', 'retro'))
+    if is_fiberquest:
+        findings = [p for p in all_findings
+                    if any(os.path.basename(p).startswith(x)
+                           for x in ('fiberquest', 'fiber', 'retro'))]
+    else:
+        findings = all_findings
+
+    for path in findings:
         name = os.path.basename(path)
-        content = open(path).read()[:6000]  # cap each finding
+        content = open(path).read()[:1500]  # cap each finding tight for synthesis
         parts.append(f"=== Research Finding: {name} ===\n{content}")
 
     return "\n\n".join(parts)
@@ -151,12 +216,14 @@ def run_task(task, api_key, dry_run=False):
         if dry_run:
             source_text = "[DRY RUN - local files not read]"
         else:
-            source_text = load_synthesis_context()
+            source_text = load_synthesis_context(task_id=task["id"])
 
         questions_text = "\n".join(f"{i+1}. {q}" for i, q in enumerate(task["questions"]))
         prompt = f"""You are a technical architect and project advisor. You have access to a developer's research findings and project memory. Your job is to synthesise across all findings and produce a gap analysis, prioritised action plan, and new research tasks.
 
 Be concrete and specific. Reference actual projects, findings, and decisions. Do not be generic.
+
+{GROUND_TRUTH}
 
 ## Task
 {task['goal']}
@@ -209,6 +276,8 @@ Only generate tasks for things genuinely unknown — not things already covered 
         fetched_text   = "\n\n".join(f"=== {url} ===\n{content[:8000]}" for url, content in fetched.items())
 
         prompt = f"""You are a technical research assistant. Analyse the following web content and answer the research questions. Be precise and cite specific code, APIs, or docs where relevant. Do not hallucinate — if you can't find the answer in the provided content, say so explicitly.
+
+{GROUND_TRUTH}
 
 ## Research Topic: {task['id']}
 
@@ -308,6 +377,8 @@ def main():
     parser.add_argument("--all",     action="store_true", help="Run all PENDING tasks")
     parser.add_argument("--dry-run", action="store_true", help="Don't fetch or call API")
     parser.add_argument("--list",    action="store_true", help="List all tasks and status")
+    parser.add_argument("--filter",  help="Comma-separated prefixes to include (e.g. fiberquest,fiber). Excludes all others.")
+    parser.add_argument("--exclude", help="Comma-separated prefixes to exclude (e.g. fiberquest,fiber).")
     args = parser.parse_args()
 
     env = load_env()
@@ -318,6 +389,16 @@ def main():
 
     queue_text = open(QUEUE_FILE).read()
     tasks = parse_tasks(queue_text)
+
+    # Apply include filter (--filter)
+    if args.filter:
+        prefixes = [p.strip().lower() for p in args.filter.split(",") if p.strip()]
+        tasks = [t for t in tasks if any(t["id"].lower().startswith(p) or p in t["id"].lower() for p in prefixes)]
+
+    # Apply exclude filter (--exclude)
+    if args.exclude:
+        prefixes = [p.strip().lower() for p in args.exclude.split(",") if p.strip()]
+        tasks = [t for t in tasks if not any(t["id"].lower().startswith(p) or p in t["id"].lower() for p in prefixes)]
 
     if args.list:
         print(f"\n{'ID':<40} {'STATUS':<15} {'PRIORITY'}")

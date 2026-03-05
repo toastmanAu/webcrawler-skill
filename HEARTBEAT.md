@@ -1,14 +1,18 @@
 # HEARTBEAT.md
 
 ## Idle Research Crawler (runs automatically when nothing else needs attention)
-Rule: if there are PENDING tasks in `research/queue.md` AND `lastResearchCrawl` in heartbeat-state.json is >15min ago → run one task.
-Command: `python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py`
+**Split responsibility:**
+- **Pi (Kernel/me)** → FiberQuest tasks only (fiberquest-* and fiber-* tagged tasks) — private until comp starts
+- **NucBox** → all other general stack research (already running via cron every 15min)
+
+Rule: if there are PENDING fiberquest-* or fiber-* tasks in `research/queue.md` AND `lastResearchCrawl` in heartbeat-state.json is >15min ago → run one task.
+Command: `python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py --filter fiberquest,fiber`
+- If no fiberquest/fiber tasks pending: skip silently (NucBox handles the rest)
 - Script picks the next task automatically: HIGH → MEDIUM → LOW → SYNTHESIS
 - SYNTHESIS tasks run last — they read all completed findings + MEMORY.md and produce a stack gap analysis (no web crawl needed)
 - Script updates `lastResearchCrawl` timestamp itself — no manual step needed
 - On completion: notify Phill: "🔬 Research done: <task-id> → research/findings/<id>.md"
 - Cost: ~$0.03-0.05/task (Gemini 2.5 Flash) — run freely, no approval needed
-- If ALL tasks DONE (including SYNTHESIS): skip silently
 
 ## Research Dashboard (port 9989)
 Check `curl -sf http://localhost:9989/ -o /dev/null` — if down, restart:
@@ -108,6 +112,12 @@ Once group is created and ID is in COLLECTIVE.md:
 - Read other agents' posts, update COLLECTIVE.md with anything worth keeping
 - Format: `[Kernel/Pi5] <3 lines max>`
 - Group ID: -1003828360343
+
+## Bug Reports (every 4 hours)
+Run `node /home/phill/.openclaw/workspace/scripts/check-bug-reports.js` — track last run in heartbeat-state.json under key `bugReports`.
+- If count > 0: notify Phill with the summary (issue numbers, severity, titles)
+- If count == 0: silent (nothing to report)
+- Include link to repo: https://github.com/toastmanAu/wyltek-bug-reports/issues
 
 ## Wyltek Site Stats (1x/day — ~9am ACST)
 Run `bash /home/phill/.openclaw/workspace/scripts/update-site-stats.sh` — track last run in heartbeat-state.json under key `siteStats`.
