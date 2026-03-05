@@ -37,6 +37,7 @@ Do NOT suggest building something we have already built. Do NOT suggest a librar
 ---
 
 ### ✅ Software We Have Already Shipped — Do NOT treat these as missing or unbuilt
+**Full list in STACK.md (workspace root). Key ones:**
 
 **ckb-light-esp** (github.com/toastmanAu/ckb-light-esp)
 - Full CKB light client protocol stack running on ESP32 (C/ESP-IDF)
@@ -242,15 +243,21 @@ def mark_done(task_id):
 
 
 def load_synthesis_context(task_id=None):
-    """Load completed findings + MEMORY.md for synthesis tasks.
+    """Load completed findings + MEMORY.md + STACK.md for synthesis tasks.
     For fiberquest-* tasks: only loads fiberquest-* / fiber-* / retro-* findings
     to avoid Gemini token/timeout limits. General tasks load everything.
     """
     parts = []
 
+    # STACK.md — canonical list of everything built (load first, highest priority)
+    stack_file = os.path.join(WORKSPACE, "STACK.md")
+    if os.path.exists(stack_file):
+        stack = open(stack_file).read()
+        parts.append(f"=== STACK.md (everything we have built — do not suggest rebuilding these) ===\n{stack}")
+
     # MEMORY.md
     if os.path.exists(MEMORY_FILE):
-        mem = open(MEMORY_FILE).read()[:12000]
+        mem = open(MEMORY_FILE).read()[:10000]
         parts.append(f"=== MEMORY.md (stack context) ===\n{mem}")
 
     # Decide which findings to include
