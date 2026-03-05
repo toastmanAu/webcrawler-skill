@@ -22,8 +22,8 @@ One-liner: **Harvest Moon with a real economy — your in-game gold IS a Fiber p
 - [ ] Node.js sidecar: polls RetroArch UDP RAM → detects events → triggers Fiber payments
 - [ ] Fiber: two local nodes (ckbnode + N100), channel pre-funded, testnet
 - [ ] Payment events: **morning shipping payout** (gold addr jumps → Fiber payment IN), **shop purchase** (gold addr drops → Fiber payment OUT)
-- [ ] Web UI: simple status panel — shows last payment, channel balance, event log
-- [ ] Demo video: 60–90 seconds, shows live gameplay + payment firing in real time
+- [ ] Electron app: native desktop app (Mac/Windows/Linux) — game selector, Fiber config, live payment HUD
+- [ ] Demo video: 60–90 seconds, FiberQuest.app open beside RetroArch, payment notifications firing live
 
 ### Stretch (days 9–11 if MVP solid)
 - [ ] Multiple payment event types (health, KO, round win, perfect)
@@ -83,10 +83,13 @@ fiberquest/
 │   └── ram-maps/
 │       ├── sf2-turbo-snes.json  # RAM addresses: health, round, timer, char select
 │       └── README.md
-├── ui/
-│   ├── index.html               # Status panel — no build step
-│   ├── style.css
-│   └── app.js                   # WebSocket client, renders event log + balances
+├── app/
+│   ├── main.js                  # Electron main process — UDP poller, Fiber RPC, IPC bridge
+│   ├── preload.js               # contextBridge — safe API exposure to renderer
+│   └── renderer/
+│       ├── index.html           # Main HUD window
+│       ├── style.css            # Dark retro-meets-crypto aesthetic
+│       └── app.js               # Renderer — receives IPC events, animates UI
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── FIBER-RPC.md             # Our API surface + auth notes
@@ -151,14 +154,18 @@ End of day 2 milestone: **Hit detected in game → payment fires → txHash logg
 
 ---
 
-### Day 4 (March 14) — Web UI
-**Goal: Something to show in the demo video**
+### Day 4 (March 14) — Electron App UI
+**Goal: A proper native app that blows the demo out of the water**
 
-- [ ] `web-server.js` — Express + ws, broadcasts events to browser
-- [ ] `ui/index.html` — dark theme, event log (event type, amount, txHash truncated), channel balance
-- [ ] Auto-refresh channel balance every 10s via Fiber `list_channels`
-- [ ] QR code for channel funding (nice touch for demo)
-- [ ] Mobile-friendly — looks good on phone too
+- [ ] Electron scaffold via electron-forge (`npm init @electron-forge/app`)
+- [ ] `main.js` — wire UDP poller + Fiber RPC client into Electron main process, push events via `ipcMain`
+- [ ] `preload.js` — contextBridge exposes `onPayment`, `getBalance`, `getConfig` safely to renderer
+- [ ] `renderer/index.html` — dark theme, pixel/mono font, neon accent colours
+- [ ] Game selector screen — pick from installed RAM maps (Harvest Moon highlighted)
+- [ ] Fiber config screen — enter node RPC URL, one-time setup, persisted to disk
+- [ ] Live HUD: channel balance (animated ticker), scrolling payment feed (type + amount + txHash truncated)
+- [ ] Payment toast notification — slides in on every event, auto-fades after 3s
+- [ ] Package test: `npm run make` → confirm .app / .exe builds cleanly
 
 ---
 
@@ -181,6 +188,7 @@ End of day 2 milestone: **Hit detected in game → payment fires → txHash logg
 - [ ] `FIBER-RPC.md` — document exactly which Fiber RPCs we use + param shapes
 - [ ] `RAM-MAPS.md` — explain the RAM polling approach, how to add a new game
 - [ ] Clean up logs, remove debug noise, add comments
+- [ ] Final packaging pass — electron-builder config, icons, About screen with version
 
 ---
 
@@ -196,8 +204,9 @@ If MVP is solid, pick ONE stretch goal:
 **Goal: Record the submission video**
 
 Script (60–90 seconds):
-1. Open Harvest Moon, new day starting — shipping truck arrives
-2. Show web UI panel — channel balance, event log
+1. Launch FiberQuest.app — game selector appears, pick Harvest Moon
+2. RetroArch launches / is already open — new day starting, shipping truck arrives
+3. FiberQuest HUD visible beside game — channel balance, empty event log
 3. Overnight shipping pays out — gold address jumps → Fiber payment IN fires
 4. Zoom to web UI — "CROP SALE: +50 Shannon" payment hash appears, balance rises
 5. Enter store, buy seeds — gold drops → Fiber payment OUT fires

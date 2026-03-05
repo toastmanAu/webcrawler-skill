@@ -1629,3 +1629,129 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://www.zophar.net/cheats/snes/harvest-moon.html
 - https://tcrf.net/Harvest_Moon_(SNES)
 **Context:** Gold address is 7F1F04-06 (3-byte value). 7E0010 also reported. Game Genie infinite gold code: FF8E-0F0A. Need to find: shipping bin overnight event address, shop buy event address, discrete transaction moment.
+
+---
+
+## [DONE] esp32p4-emulator-pause-resume-safety
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Research safe pause/resume of SNES emulation on ESP32-P4 (FreeRTOS context). Can the emulator task be suspended cleanly mid-frame without corrupting CPU state, audio buffer, or video output? What is the minimum safe pause point (end of frame, mid-scanline, etc.)? How do existing ESP32 emulator projects handle pause? Can emulation be suspended from an external FreeRTOS task (e.g., sidecar triggering a UI overlay)?
+**Tags:** fiberquest, esp32p4, emulator, freertos
+**Seeds:**
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/freertos/FreeRTOS-Kernel/include/freertos/task.h
+- https://github.com/snes9xgit/snes9x/blob/master/docs/control.html
+- https://raw.githubusercontent.com/NoRescue/SNES9x-ESP32/master/main/main.cpp
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-reference/system/freertos_idf.html
+- https://raw.githubusercontent.com/mattkj/esp32-snes9x/master/main/app_main.cpp
+
+---
+
+## [DONE] esp32p4-persistent-overlay-framebuffer
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Research persistent on-screen overlays on ESP32-P4 during emulation. Can a second layer/surface be composited over the emulator framebuffer in real time? Options: direct framebuffer write, hardware alpha blending (P4 has a 2D GPU / PPA), LVGL overlay on top of emulator output, or DMA-driven second layer. What is the CPU cost? Can the overlay update independently of the emulator frame rate? Can it contain touch-interactive buttons?
+**Tags:** fiberquest, esp32p4, overlay, framebuffer, display, lvgl
+**Seeds:**
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-reference/peripherals/ppa.html
+- https://docs.espressif.com/projects/esp-lvgl-port/en/latest/esp32p4/index.html
+- https://docs.lvgl.io/master/details/integration/chip/espressif.html
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/peripherals/ppa/ppa_blend/main/ppa_blend_example_main.c
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-reference/peripherals/lcd/index.html
+
+---
+
+## [DONE] esp32p4-touch-overlay-input-routing
+**Priority:** MEDIUM
+**Added:** 2026-03-05
+**Goal:** When an overlay UI is active on ESP32-P4 (e.g., a Fiber wallet panel or buy/sell menu), how do touch input events get routed — to the overlay UI vs. the emulator controller input? Can touch be intercepted cleanly when overlay is visible, then returned to emulator when dismissed? What touch controller ICs are common on P4 dev boards and what drivers are available?
+**Tags:** fiberquest, esp32p4, touch, input, overlay
+**Seeds:**
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-reference/peripherals/lcd/index.html
+- https://docs.espressif.com/projects/esp-lvgl-port/en/latest/esp32p4/index.html
+- https://raw.githubusercontent.com/espressif/esp-bsp/master/components/esp_lvgl_port/src/lvgl9/esp_lvgl_port_touch.c
+- https://docs.lvgl.io/master/details/main-components/indev.html
+
+---
+
+## [DONE] retrofit-economy-design-patterns
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Research design patterns and prior art for adding an economy layer to existing games that never had one. Specifically: (1) can RAM watching + event detection be generalised to any SNES game (not just Harvest Moon)? (2) What game state variables make good "economic primitives" — health as collateral, score as earnings, lives as stake? (3) Is there prior art of blockchain/crypto economies overlaid on retro games? (4) What makes a compelling "retrofitted economy" — what game mechanics translate naturally to earn/spend models? (5) Could this concept be packaged as a reusable framework (FiberQuest SDK) that lets anyone add a Fiber economy to any ROM?
+**Tags:** fiberquest, economy, design, framework, retro
+**Seeds:**
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/net_retropad/net_retropad_core.c
+- https://raw.githubusercontent.com/libretro/RetroArch/master/cores/README.md
+- https://docs.libretro.com/development/cores/developing-cores/
+- https://docs.libretro.com/guides/retroachievements/
+- https://arxiv.org/abs/2301.00000
+
+---
+
+## [DONE] snes9x-fork-architecture-extensibility
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Assess Snes9x (or equivalent BSD/MIT licensed SNES emulator) as a fork base for FiberQuest. Key questions: (1) What is the license? (2) Where does the main emulation loop live — what callback/hook points exist for frame-complete, memory-write events, save-state? (3) Is there an existing plugin or extension API? (4) How is display output handled — can we inject a compositing layer? (5) How is input handled — can we intercept/redirect? (6) What is the build system (cmake, autoconf)? (7) Is there an ESP32 port already (Snes9x-ESP32)?
+**Tags:** fiberquest, snes9x, emulator, fork, architecture
+**Seeds:**
+- https://raw.githubusercontent.com/snes9xgit/snes9x/master/LICENSE
+- https://raw.githubusercontent.com/snes9xgit/snes9x/master/README.md
+- https://raw.githubusercontent.com/snes9xgit/snes9x/master/snes9x.cpp
+- https://raw.githubusercontent.com/snes9xgit/snes9x/master/port.h
+- https://raw.githubusercontent.com/snes9xgit/snes9x/master/apu/apu.cpp
+
+---
+
+## [DONE] fiberquest-ram-maps-multi-game
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Find RAM addresses for 4 additional SNES games to build the FiberQuest multi-game economy pack. Games: (1) Super Mario World — coins, lives, score; (2) Super Bomberman — player health/alive status, kill counter; (3) International Superstar Soccer Deluxe — score per team, goal event; (4) Zelda: A Link to the Past — rupees (money), shop purchase event, enemy kill. Need discrete event detection addresses, not just static state.
+**Tags:** fiberquest, snes, ram-map, economy
+**Seeds:**
+- https://datacrystal.tcrf.net/wiki/Super_Mario_World_(SNES)/RAM_map
+- https://datacrystal.tcrf.net/wiki/The_Legend_of_Zelda:_A_Link_to_the_Past/RAM_map
+- https://www.zophar.net/cheats/snes/super-mario-world.html
+- https://www.zophar.net/cheats/snes/the-legend-of-zelda-a-link-to-the-past.html
+- https://gamehacking.org/game/7740
+- https://gamehacking.org/game/6871
+
+---
+
+## [DONE] fiberquest-sdk-design
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Design the FiberQuest SDK architecture — the reusable framework that lets anyone add a Fiber economy to any SNES ROM without touching emulator C code. Key questions: (1) What does the RAM map JSON schema look like? (2) What does the payment rules config look like (trigger condition, direction IN/OUT, amount formula, debounce, label)? (3) How does the SDK expose events to the overlay and to Fiber? (4) What does "adding a new game" look like as a developer workflow? (5) How does the SDK handle bidirectional channels (both earn and spend in same session)? Design this to be publishable as an npm package or C header.
+**Tags:** fiberquest, sdk, design, framework
+**Seeds:**
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/net_retropad/net_retropad_core.c
+- https://docs.libretro.com/development/cores/developing-cores/
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/include/rcheevos.h
+- https://raw.githubusercontent.com/RetroAchievements/rcheevos/master/src/rcheevos/rc_runtime.c
+
+
+---
+
+## [PENDING] electron-node-ipc-retroarch-pattern
+**Priority:** HIGH
+**Added:** 2026-03-05
+**Goal:** Research Electron architecture for FiberQuest — specifically: (1) How to run UDP socket (RetroArch poller) in Electron main process and push events to renderer via IPC; (2) Best pattern for real-time event streaming main→renderer (ipcMain/ipcRenderer vs WebSocket localhost vs contextBridge); (3) Electron packaging for Mac/Windows/Linux (electron-builder vs electron-forge, auto-update); (4) How to bundle a Node.js backend (Fiber RPC client, UDP poller) cleanly inside Electron without exposing Node APIs to renderer; (5) Any existing Electron apps that wrap a game companion/overlay as reference pattern.
+**Tags:** fiberquest, electron, ipc, packaging
+**Seeds:**
+- https://raw.githubusercontent.com/electron/electron/main/docs/tutorial/ipc.md
+- https://www.electronjs.org/docs/latest/tutorial/ipc
+- https://raw.githubusercontent.com/electron/forge/main/README.md
+- https://raw.githubusercontent.com/electron-userland/electron-builder/master/README.md
+- https://www.electronjs.org/docs/latest/tutorial/context-isolation
+
+---
+
+## [PENDING] fiberquest-ui-design-patterns
+**Priority:** MEDIUM
+**Added:** 2026-03-05
+**Goal:** Research UI design patterns for a retro gaming + crypto payment companion app. Specifically: (1) What HUD overlay layouts work alongside a game window — sidebar panel, floating widget, picture-in-picture? (2) Best CSS/JS animation patterns for real-time payment notifications (slide-in toast, number ticker, pulse effect); (3) Retro-meets-crypto visual aesthetics — pixel fonts, scanline effects, dark terminal theme with neon accents; (4) React vs plain HTML/CSS for Electron renderer — which is faster to build and looks better for a hackathon; (5) Any reference apps with great "live transaction feed" UI (crypto trading terminals, stream overlays like StreamElements).
+**Tags:** fiberquest, ui, electron, design
+**Seeds:**
+- https://www.electronjs.org/docs/latest/tutorial/performance
+- https://raw.githubusercontent.com/streamelements/live-overlay/master/README.md
+- https://fonts.google.com/?category=Monospace
+- https://animate.style/
+- https://raw.githubusercontent.com/nicedoc/nicedoc/master/README.md
