@@ -30,56 +30,119 @@ GEMINI_API   = "https://generativelanguage.googleapis.com/v1beta/models/{model}:
 GROUND_TRUTH = """
 ## ⚠️ Project Ground Truth — Read Before Answering
 
-This research is for a hackathon project called **FiberQuest** built on the Nervos CKB blockchain.
+This research is for projects built by Wyltek Industries on the Nervos CKB blockchain and ESP32 hardware.
 The following facts are FIXED. Do NOT contradict them, infer around them, or confuse them with each other.
+Do NOT suggest building something we have already built. Do NOT suggest a library is missing if we have shipped one.
+
+---
+
+### ✅ Software We Have Already Shipped — Do NOT treat these as missing or unbuilt
+
+**ckb-light-esp** (github.com/toastmanAu/ckb-light-esp)
+- Full CKB light client protocol stack running on ESP32 (C/ESP-IDF)
+- Implements: TCP → SecIO → Yamux → Identify → LightClient → GetLastState → SendLastState
+- 178/178 tests passing. Binary: 214KB, 79% flash free on ESP32-P4
+- Targets: ESP32-P4 (with W5500 SPI Ethernet), ESP32-S3, ESP32-C3, ESP32-C6, ESP32-H2
+- Performance: boot sync 10k headers in 0.8s (P4), live tracking 0.08-0.40ms CPU — negligible
+- DO NOT suggest "the light client can't run on ESP32-P4" — it already does
+
+**NerdMiner CKB** (github.com/toastmanAu/NerdMiner_CKB)
+- ESP32 Eaglesong solo miner for Nervos CKB
+- Forked from NerdMiner_v2, full Stratum protocol, multi-board support
+- Today: added Telegram OTA firmware update via FastBot (TELEGRAM_OTA build flag)
+- Targets: ESP32-2432S028R (CYD), many others
+- DO NOT suggest Eaglesong mining on ESP32 is impossible — we ship it
+
+**ckb-stratum-proxy** (github.com/toastmanAu/ckb-stratum-proxy)
+- Node.js Stratum proxy — miners connect here, proxy forwards to upstream pool
+- Handles ViaBTC quirks (5-param notify, set_target), per-miner extranonce allocation
+- Running on Pi5 port 3333, stats on port 8081
+
+**ckb-dob-minter** (github.com/toastmanAu/ckb-dob-minter)
+- React/Vite DOB (Spore NFT) minting app — deployed at wyltekindustries.com/mint/
+- Uses @ckb-ccc/connector-react + @ckb-ccc/spore, JoyID wallet
+- Features: cluster creation, CKBFS V2/V3 image upload, batch mint, burn
+- Mainnet cluster: 0x54ba3ee23016ab6e2e20792d8fd69057c62392ca1997b622147a5bd98979f4e8
+- DO NOT suggest we need to build a DOB minter — we have one running in production
+
+**@wyltek/ckbfs-browser** (github.com/toastmanAu/ckbfs-browser)
+- Browser-side JS SDK for CKBFS V3 on-chain file storage
+- Handles chunking, cell building, type script construction
+- Used in the DOB minter for image uploads
+- DO NOT suggest CKBFS has no browser SDK
+
+**wyltek-embedded-builder** (private, github.com/toastmanAu/wyltek-embedded-builder)
+- C framework for ESP32 embedded CKB/blockchain apps
+- Sensor drivers, board targets (boards.h), modular architecture
+- DO NOT suggest we need to start an embedded framework from scratch
+
+**ckb-node-dashboard** (github.com/toastmanAu/ckb-node-dashboard)
+- Node.js proxy + HTML dashboard for CKB node monitoring
+- Live at Pi5 port 8080, polls ckbnode (192.168.68.87:8114)
+
+**ckb-whale-bot** (github.com/toastmanAu/ckb-whale-bot)
+- Telegram bot monitoring CKB node for large transactions (>$200k USD threshold)
+- Running on Pi5, posts to @NervosUnofficial
+
+**Wyltek Industries site** (github.com/toastmanAu/wyltek-industries)
+- Static site on GitHub Pages / Cloudflare CDN — wyltekindustries.com
+- Member system: JoyID CKB address → Supabase auth, RLS-protected
+- Features: DOB minter, CKBFS viewer, research page, member blog, bug reporter
+- DO NOT suggest the site needs to be built — it is live in production
+
+**BitChat mesh (WIP in ckb-light-esp)**
+- bitchat_mesh.h/cpp — BLE mesh relay engine + packet codec
+- NimBLE-Arduino target for ESP32
+- GATT notify flow mapped, NimBLE server/client pattern confirmed
+
+---
 
 ### Fiber Network (nervosnetwork/fiber)
-- Fiber is a **payment channel network** — conceptually similar to Bitcoin's Lightning Network
-- It is built on top of CKB Layer 1 (not a separate chain)
-- Fiber channels open/close via CKB on-chain transactions; everything in between is **off-chain message passing**
-- Fiber **CANNOT store arbitrary data or files** — it only routes payments (CKB, UDTs)
-- The only data Fiber persists: channel state, balances, HTLCs/PTLCs — all tiny, all payment-related
-- `nervosnetwork/fiber-archive` is an OLD ABANDONED repo (2021, GitHub archived flag) — it is NOT a storage protocol
-- Fiber nodes run the FNN binary; RPC methods: open_channel, send_payment, list_channels, new_invoice, etc.
-- Fiber latency: ~20ms. Fees: ~0.00000001 cent. Supports PTLCs (not HTLCs), BTC Lightning interop.
+- Fiber is a **payment channel network** — similar to Bitcoin's Lightning Network, built on CKB L1
+- Fiber channels open/close via CKB on-chain transactions; everything in between is off-chain
+- Fiber **CANNOT store arbitrary data or files** — only routes payments (CKB, UDTs)
+- `nervosnetwork/fiber-archive` is OLD ABANDONED (2021) — NOT a storage protocol
+- FNN binary RPC methods: open_channel, send_payment, list_channels, new_invoice, get_invoice, etc.
+- Fiber latency: ~20ms. Fees: ~0.00000001 cent. PTLCs (not HTLCs). BTC Lightning interop.
+- We run two Fiber nodes: ckbnode (mainnet, RPC 127.0.0.1:8227) + N100 (needs funding)
 
 ### CKBFS (CKB File System)
-- CKBFS is an **on-chain file storage system** — stores arbitrary files chunked across CKB cells
-- COMPLETELY SEPARATE from Fiber. CKBFS has nothing to do with payment channels.
-- CKBFS V3 code_hash: `0xb5d13ffe0547c78021c01fe24dce2e959a1ed8edbca3cb93dd2e9f57fb56d695`
-- We have a working browser SDK: `@wyltek/ckbfs-browser` (github.com/toastmanAu/ckbfs-browser)
-- Mainnet CKBFS V3 type_id: `0xcc5411e8b70e551d7a3dd806256533cff6bc12118b48dd7b2d5d2292c3651add`
+- On-chain file storage — stores arbitrary files chunked across CKB cells
+- COMPLETELY SEPARATE from Fiber
+- V3 code_hash: `0xb5d13ffe0547c78021c01fe24dce2e959a1ed8edbca3cb93dd2e9f57fb56d695`
+- Mainnet V3 type_id: `0xcc5411e8b70e551d7a3dd806256533cff6bc12118b48dd7b2d5d2292c3651add`
+- We have a working browser SDK: @wyltek/ckbfs-browser
 
 ### Spore Protocol / DOB NFTs
-- Spore is CKB's NFT standard — cells that hold content + ownership
-- DOBs (Digital Objects) are Spore NFTs. We have minted them on CKB mainnet.
-- Cluster ID (mainnet): `0x54ba3ee23016ab6e2e20792d8fd69057c62392ca1997b622147a5bd98979f4e8`
-- DOB minter app: github.com/toastmanAu/ckb-dob-minter (deployed at wyltekindustries.com/mint/)
+- Spore = CKB NFT standard. DOBs = Spore NFTs.
+- We have minted DOBs on mainnet. Minting wallet: ckb1...q5axnua (~10,075 CKB remaining)
+- Production minter live at wyltekindustries.com/mint/
 
-### ESP32-P4 (our hardware target)
-- We have a **working CKB light client on ESP32-P4** — `ckb-light-esp` (github.com/toastmanAu/ckb-light-esp)
-- Binary is 214KB, 79% flash free — light client is NOT a resource concern on ESP32-P4
-- secp256k1 signing already works on ESP32-P4 (used in DOB minting flow)
-- The open question for FiberQuest is NOT "can ESP32-P4 run a light client" — it CAN
+### ESP32-P4 (our primary hardware target)
+- ckb-light-esp confirmed working: 214KB binary, 79% flash free
+- secp256k1 signing confirmed working (used in DOB minting flow)
+- Hardware: dual-core 400MHz RISC-V, 768KB SRAM + PSRAM support, MIPI DSI, USB Host, WiFi
+- The open FiberQuest question: CPU headroom for emulator (core 0) + light client + WiFi + signing (core 1)
+- DO NOT say the light client can't run on ESP32-P4
+
 ### CKB Layer 1
-- Nervos CKB is the base layer — a UTXO-like chain (cells, not accounts)
-- Cell model: every cell has capacity (CKByte), lock script (owner), optional type script, data field
-- JoyID is the primary wallet (uses passkeys, no seed phrase)
-- CCC (`@ckb-ccc/core`) is the JS SDK for building CKB transactions
+- UTXO-like chain (cells, not accounts). Cell model: capacity + lock script + optional type + data
+- JoyID = primary wallet (passkeys, no seed phrase)
+- CCC (`@ckb-ccc/core`) = primary JS SDK for CKB transaction building
 
-### FiberQuest Architecture (what we are building)
-- RetroArch (emulator) polls game RAM via UDP on port 55355 (READ_CORE_MEMORY protocol)
-- A Node.js sidecar reads RAM, detects game events (health damage, score), and triggers Fiber micropayments
-- Fiber channels open at game start, settle at game end
-- CKBFS stores game content/assets (separate from payments)
-- ESP32-S3/P4 (optional stretch goal): reads real console controllers, triggers payments via hub
+### FiberQuest (hackathon project — private until comp starts March 11)
+- RetroArch (emulator) → UDP RAM polling (READ_CORE_MEMORY, port 55355) → Node.js sidecar → Fiber micropayments
+- Game events (health damage, score, KO) trigger payments via Fiber channels
+- Channels open at game start, settle at game end
+- ESP32-P4 stretch goal: runs emulator + light client + signer concurrently
+- Key gap: no official Node.js Fiber client library exists — must build from Rust RPC source
 
 ### Our Infrastructure
-- Pi5 (192.168.68.82): main machine, OpenClaw, Tailscale IP 100.115.197.42
+- Pi5 (192.168.68.82): main machine, OpenClaw agent, Tailscale 100.115.197.42
 - NucBox K8 Plus (192.168.68.79): always-on inference, Ryzen 7 8845HS, Ollama
-- N100 (192.168.68.91): CKB mainnet + testnet light clients
-- ckbnode (192.168.68.87): CKB mainnet full node + Fiber node (mainnet)
-- Fiber node RPC (ckbnode): 127.0.0.1:8227 (localhost only, SSH tunnel to N100:8237)
+- N100 (192.168.68.91): CKB + testnet light clients, Fiber node (needs funding)
+- ckbnode (192.168.68.87): CKB mainnet full node + Fiber node (funded, running)
+- EliteDesk (192.168.68.97): build box (ESP-IDF, cross-compile, Docker)
 """.strip()
 
 # Telegram notify — uses OpenClaw bot to DM Phill on task completion
