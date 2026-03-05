@@ -1513,7 +1513,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] snes-controller-protocol-implementation-details
+## [DONE] snes-controller-protocol-implementation-details
 **Priority:** MEDIUM
 **Output:** findings/snes-controller-protocol-implementation-details.md
 **Goal:** Obtain precise technical specifications for the SNES controller serial protocol (timing, bit order, voltage levels, button mapping) to enable direct connection and reading of physical SNES controllers via ESP32-P4 GPIO. This is critical for the "boldest demo" if USB controllers are not used.
@@ -1579,3 +1579,20 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 2. What is the CPU overhead of the WiFi stack during active network communication (e.g., UDP polling, sending signed messages)?
 3. What is the execution time and CPU impact of a `secp256k1` signing operation on the ESP32-P4?
 4. What is the remaining CPU headroom for other tasks, and are there any observed performance degradation or stuttering when all components run concurrently?
+---
+
+## [PENDING] esp32p4-lightclient-emulator-coexistence
+**Priority:** HIGH
+**Output:** findings/esp32p4-lightclient-emulator-coexistence.md
+**Goal:** Validate CPU/memory headroom for running ckb-light-esp (our existing CKB light client, 214KB binary, confirmed working on ESP32-P4) CONCURRENTLY with a NES/SNES emulator. We already know the light client works. The question is: can both run together without emulator frame drops? Map FreeRTOS task allocation across both cores — emulator on core 0, light client + WiFi + secp256k1 signing on core 1 — and identify any contention points (shared peripherals, WiFi interrupt load, heap fragmentation).
+**Seeds:**
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/src/main.cpp
+- https://raw.githubusercontent.com/toastmanAu/ckb-light-esp/main/src/ckb_light_client.h
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/api-guides/freertos-smp.html
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/system/freertos/real_time_stats/main/real_time_stats_example_main.c
+**Questions to answer:**
+1. What is the interrupt load of the WiFi stack on core 1 and does it interfere with emulator timing on core 0?
+2. How much heap does ckb-light-esp consume at peak (header chain + filter state)?
+3. Can secp256k1 signing (a one-shot ~1ms operation) be safely triggered from core 1 during emulator gameplay without causing frame drops?
+4. What FreeRTOS priority levels should each task use to guarantee emulator gets consistent CPU time?
+5. Is there a known pattern for "emulator on core 0, network stack on core 1" in ESP32 projects we can reference?

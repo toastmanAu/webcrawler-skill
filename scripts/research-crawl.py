@@ -56,6 +56,11 @@ The following facts are FIXED. Do NOT contradict them, infer around them, or con
 - Cluster ID (mainnet): `0x54ba3ee23016ab6e2e20792d8fd69057c62392ca1997b622147a5bd98979f4e8`
 - DOB minter app: github.com/toastmanAu/ckb-dob-minter (deployed at wyltekindustries.com/mint/)
 
+### ESP32-P4 (our hardware target)
+- We have a **working CKB light client on ESP32-P4** — `ckb-light-esp` (github.com/toastmanAu/ckb-light-esp)
+- Binary is 214KB, 79% flash free — light client is NOT a resource concern on ESP32-P4
+- secp256k1 signing already works on ESP32-P4 (used in DOB minting flow)
+- The open question for FiberQuest is NOT "can ESP32-P4 run a light client" — it CAN
 ### CKB Layer 1
 - Nervos CKB is the base layer — a UTXO-like chain (cells, not accounts)
 - Cell model: every cell has capacity (CKByte), lock script (owner), optional type script, data field
