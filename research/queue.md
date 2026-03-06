@@ -1390,7 +1390,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] ckb-light-client-esp32-sync-performance
+## [DONE] ckb-light-client-esp32-sync-performance
 **Priority:** MEDIUM
 **Output:** findings/ckb-light-client-esp32-sync-performance.md
 **Goal:** Research the performance characteristics of the CKB light client protocol from an embedded device perspective. We have ckb-light-esp running on ESP32-P4. Need to understand: how many peers does the light client need to sync reliably, typical initial sync time for a fresh device, bandwidth usage per transaction verification, memory requirements for the filter/proof data, and whether the ESP32-P4's 32MB PSRAM is sufficient for real-world use.
@@ -1408,7 +1408,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] telegram-bot-esp32-security-hardening
+## [DONE] telegram-bot-esp32-security-hardening
 **Priority:** MEDIUM
 **Output:** findings/telegram-bot-esp32-security-hardening.md
 **Goal:** Security hardening for our Telegram OTA bot on NerdMiner CKB. We currently whitelist by chat ID (compile-time). Research: what additional attack surface exists (replay attacks on Telegram updates, token exposure if device is physically inspected, bot token rotation procedure, rate limiting OTA triggers), and whether FastBot's update mechanism is safe from MITM on untrusted WiFi networks.
@@ -1426,7 +1426,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] wyltek-seo-current-audit
+## [DONE] wyltek-seo-current-audit
 **Priority:** LOW
 **Output:** findings/wyltek-seo-current-audit.md
 **Goal:** Audit the current SEO status of wyltekindustries.com. We've recently migrated to Cloudflare, added structured pages (hardware, research, members, blog). Need: current indexing status check approach, meta tag audit across key pages, sitemap.xml completeness, structured data opportunities (JSON-LD for hardware products), and quick wins to improve discoverability for searches like "CKB ESP32", "Nervos CKB embedded", "CKB light client ESP32".
@@ -1444,7 +1444,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] nerdminer-ckb-pool-stats-display
+## [DONE] nerdminer-ckb-pool-stats-display
 **Priority:** MEDIUM
 **Output:** findings/nerdminer-ckb-pool-stats-display.md
 **Goal:** Research how to pull live miner stats from ViaBTC pool API and display them on the NerdMiner CKB screen. Currently we show local hashrate but not pool-side accepted shares, pool difficulty, or estimated earnings. Need: ViaBTC pool API endpoints for miner stats (if public), alternative: parse stratum responses for share accepted/rejected counts, and how existing NerdMiner v2 forks display pool stats.
@@ -1463,7 +1463,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] synthesis-stack-gap-4
+## [DONE] synthesis-stack-gap-4
 **Priority:** SYNTHESIS
 **Output:** findings/stack-gap-analysis-4.md
 **Goal:** SYNTHESIS — Full gap analysis across all completed research (excluding FiberQuest tasks). Read MEMORY.md and all non-fiberquest findings files. Identify: (1) What parts of the Wyltek stack are well-researched and ready to build. (2) What gaps remain — things we know we need but haven't researched. (3) What new research tasks should be queued based on recent work (bug reporter, NerdMiner OTA, research page improvements, Telegram OTA, DOB minting system). (4) Any dependencies between planned features that could cause build order issues. Generate new PENDING tasks using ## [NEW_TASK] ... ## [/NEW_TASK] format for any HIGH or MEDIUM gaps.
@@ -1564,7 +1564,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32-p4-emulator-fiber-cpu-headroom-benchmarking
+## [DONE] esp32-p4-emulator-fiber-cpu-headroom-benchmarking
 **Priority:** LOW
 **Output:** findings/esp32-p4-emulator-fiber-cpu-headroom-benchmarking.md
 **Goal:** Benchmark the ESP32-P4's CPU and memory usage when running a NES/SNES emulator, WiFi stack, and `secp256k1` signing operations concurrently. This will validate the architectural assumptions and identify potential performance bottlenecks.
@@ -1730,7 +1730,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] electron-node-ipc-retroarch-pattern
+## [DONE] electron-node-ipc-retroarch-pattern
 **Priority:** HIGH
 **Added:** 2026-03-05
 **Goal:** Research Electron architecture for FiberQuest — specifically: (1) How to run UDP socket (RetroArch poller) in Electron main process and push events to renderer via IPC; (2) Best pattern for real-time event streaming main→renderer (ipcMain/ipcRenderer vs WebSocket localhost vs contextBridge); (3) Electron packaging for Mac/Windows/Linux (electron-builder vs electron-forge, auto-update); (4) How to bundle a Node.js backend (Fiber RPC client, UDP poller) cleanly inside Electron without exposing Node APIs to renderer; (5) Any existing Electron apps that wrap a game companion/overlay as reference pattern.
@@ -1744,7 +1744,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiberquest-ui-design-patterns
+## [DONE] fiberquest-ui-design-patterns
 **Priority:** MEDIUM
 **Added:** 2026-03-05
 **Goal:** Research UI design patterns for a retro gaming + crypto payment companion app. Specifically: (1) What HUD overlay layouts work alongside a game window — sidebar panel, floating widget, picture-in-picture? (2) Best CSS/JS animation patterns for real-time payment notifications (slide-in toast, number ticker, pulse effect); (3) Retro-meets-crypto visual aesthetics — pixel fonts, scanline effects, dark terminal theme with neon accents; (4) React vs plain HTML/CSS for Electron renderer — which is faster to build and looks better for a hackathon; (5) Any reference apps with great "live transaction feed" UI (crypto trading terminals, stream overlays like StreamElements).
@@ -1798,7 +1798,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] pi5-electron-app-autolaunch
+## [DONE] pi5-electron-app-autolaunch
 **Priority:** HIGH
 **Added:** 2026-03-05
 **Goal:** Auto-launch setup for Pi 5 demo machine — RetroArch + FiberQuest Electron app on boot, no desktop interaction needed. Key questions: (1) Best autostart method on Pi OS Bookworm with Wayland (autostart file vs systemd user service vs labwc autostart); (2) How to launch Electron AppImage on Pi OS — ARM64 AppImage support, dependencies; (3) Launch order: RetroArch first, then FiberQuest after N seconds delay; (4) Display compositor for side-by-side windows at 1024x600 — can both apps share screen cleanly? (5) Kiosk mode options — hide taskbar, disable screen blanking, keep both windows always on top.
@@ -1822,4 +1822,217 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://raw.githubusercontent.com/libretro/RetroArch/master/command.h
 - https://retropie.org.uk/docs/RetroArch-Network-Commands/
 - https://raw.githubusercontent.com/libretro/RetroArch/master/retroarch.cfg
+
+
+---
+
+## [DONE] fiberquest-retroarch-memory-read-empirical
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Find the exact empirical wire format for RetroArch READ_CORE_MEMORY network commands by reading existing working implementations. The web crawl of command.c couldn't confirm the exact format. Need real-world usage examples that have been tested. Key questions: (1) Exact plaintext format of READ_CORE_MEMORY request — is it "READ_CORE_MEMORY 0xADDR SIZE" or different? (2) Exact response format — "0xADDR=0xVALUE\n" or different? (3) WRITE_CORE_MEMORY request and response format? (4) retroarch.cfg keys to enable network commands (network_cmd_enable, network_cmd_port)? (5) Any working Node.js or Python snippets that have been confirmed working?
+**Tags:** fiberquest, retroarch, network-commands, memory, sidecar
+**Seeds:**
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/net_retropad/net_retropad_core.c
+- https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/scriptmodules/emulators/retroarch.sh
+- https://retropie.org.uk/docs/RetroArch-Network-Commands/
+- https://raw.githubusercontent.com/nicowillis/retroarch-memory/master/README.md
+- https://raw.githubusercontent.com/libretro/RetroArch/master/tasks/task_netplay_lan.c
+
+---
+
+## [DONE] fiberquest-fiber-rpc-node-client
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Build a minimal working Node.js Fiber RPC client. The JSON-RPC format for the Fiber node (fnn) is documented but not verified from Node.js. Need: (1) Exact curl examples for open_channel, send_payment, list_channels, close_channel that confirm working JSON format against a real fnn node; (2) Any existing Node.js Fiber RPC clients or wrappers (npm packages, GitHub repos); (3) Error response format — what does fnn return on invalid params? (4) Does fnn require authentication (API key, JWT) or is it open localhost-only? (5) Invoice format for send_payment — does it use BOLT11-style or CKB-native format?
+**Tags:** fiberquest, fiber, rpc, nodejs, client
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/rpc.md
+- https://api.github.com/repos/nervosnetwork/fiber/contents/src/rpc
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/src/rpc/types.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber-scripts/main/README.md
+
+---
+
+## [DONE] fiberquest-sf2-ram-addresses
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Find confirmed working RAM addresses for Street Fighter II Turbo (SNES) for use in FiberQuest. Previous architecture synthesis suggested P1 health ~0x0530 but this needs verification from actual RAM maps. Key questions: (1) P1 health address, P2 health address, and byte size/encoding; (2) Round timer address; (3) Match win counter per player; (4) Current screen/mode address (title screen vs fight vs continue screen) for detecting game state; (5) Are these addresses consistent across all SF2 Turbo regions (USA/JP/EUR)?
+**Tags:** fiberquest, sf2, snes, ram-map, game-state
+**Seeds:**
+- https://datacrystal.tcrf.net/wiki/Street_Fighter_II_Turbo:_Hyper_Fighting/RAM_map
+- https://www.retroachievements.org/game/1185
+- https://raw.githubusercontent.com/RetroAchievements/RAScripts/master/SNES/StreetFighterIITurbo.lua
+- https://gamehacking.org/game/5894
+- https://www.zophar.net/cheats/snes/street-fighter-ii-turbo-hyper-fighting.html
+
+---
+
+## [DONE] fiberquest-retropie-pi5-status
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Determine current Pi 5 support status for RetroPie and best SNES emulation setup. Previous crawl got a Cloudflare block on the Pi5 docs page. Key questions: (1) Does the official RetroPie installer support Pi 5 + Pi OS Bookworm (Dec 2024 status)? (2) If not officially supported, what's the recommended approach — manual RetroArch install via apt, or a fork? (3) Best SNES core on Pi5 (snes9x vs bsnes-mercury vs mesen-s) for accuracy + performance? (4) Any known issues with RetroArch + Wayland on Pi OS Bookworm? (5) Side-by-side window setup — can RetroArch run in a window (not fullscreen) alongside an Electron app?
+**Tags:** fiberquest, pi5, retropie, retroarch, snes, setup
+**Seeds:**
+- https://retropie.org.uk/docs/Raspberry-Pi-5/
+- https://github.com/RetroPie/RetroPie-Setup/discussions
+- https://raw.githubusercontent.com/RetroPie/RetroPie-Setup/master/scriptmodules/emulators/retroarch.sh
+- https://forums.libretro.com/t/retroarch-pi5-wayland/
+- https://raw.githubusercontent.com/libretro/RetroArch/master/Makefile.griffin
+
+---
+
+## [DONE] fiberquest-electron-sidecar-scaffold
+**Priority:** MEDIUM
+**Added:** 2026-03-06
+**Goal:** Research best practices for the FiberQuest Electron app structure — specifically co-locating the UDP poller and Fiber RPC client in the main process. Key questions: (1) Best pattern for long-running background loops in Electron main process (setInterval vs worker threads vs child_process); (2) How to handle UDP socket cleanup on app quit (app.on('before-quit')); (3) Error handling pattern — what happens if Fiber node is unreachable at startup? (4) How to bundle a Node.js app as Electron without webpack (electron-builder with asar); (5) ARM64 AppImage size — typical Electron app, how big?
+**Tags:** fiberquest, electron, sidecar, architecture, nodejs
+**Seeds:**
+- https://raw.githubusercontent.com/electron/electron/main/docs/api/app.md
+- https://raw.githubusercontent.com/electron/electron/main/docs/tutorial/process-model.md
+- https://www.electronjs.org/docs/latest/tutorial/performance
+- https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/electron-builder/README.md
+- https://raw.githubusercontent.com/nicedoc/nicedoc/master/README.md
+
+---
+
+## [DONE] fiberquest-hackathon-submission-prep
+**Added:** 2026-03-06
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Research the Fiber Network hackathon submission requirements, judging rubric, and prior winning entries to optimise FiberQuest's positioning. Mission brief says "agent-based application on CKB and/or Fiber/Perun Network". Key questions: (1) Exact judging criteria and weightings — how is "agent-based" defined, what does autonomy mean to judges? (2) What makes a strong agent submission vs a basic Fiber app? (3) Prior Nervos/Fiber hackathon winning entries — what patterns made them stand out? (4) Video demo requirements — length, format, what to show? (5) How important is deployed/live demo vs code-only? (6) How should we frame FiberQuest's sidecar as an autonomous payment agent to maximise score?
+**Tags:** fiberquest, hackathon, submission, nervos, judging
+**Seeds:**
+- https://dorahacks.io/hackathon/fiber-network
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://www.nervos.org/blog
+- https://raw.githubusercontent.com/nervosnetwork/awesome-nervos/main/README.md
+- https://dorahacks.io/hackathon/nervos
+
+---
+
+## [DONE] fiberquest-live-ui-reference-design
+**Priority:** LOW
+**Added:** 2026-03-06
+**Goal:** Find concrete UI references for the FiberQuest overlay — retro gaming meets live crypto payment feed. Key questions: (1) Examples of well-designed live transaction/payment feeds in crypto UIs (explorers, trading terminals); (2) Stream overlay design patterns — OBS overlays, StreamLabs widgets that show live events; (3) CSS techniques for CRT/scanline effects, phosphor glow, pixel-perfect retro fonts; (4) Number ticker animation libraries for JS (CountUp.js or similar); (5) Color palettes that feel both retro-gaming and crypto-native (dark bg, neon green/cyan accents).
+**Tags:** fiberquest, ui, design, overlay, css, retro
+**Seeds:**
+- https://raw.githubusercontent.com/nicedoc/nicedoc/master/README.md
+- https://fonts.google.com/specimen/Press+Start+2P
+- https://animate.style/
+- https://raw.githubusercontent.com/inorganik/CountUp.js/master/README.md
+- https://raw.githubusercontent.com/streamlabs-obs/streamlabs-obs/master/README.md
+
+
+---
+
+## [DONE] nervos-ecosystem-deep-dive
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Comprehensive map of the current Nervos/CKB ecosystem — what exists, what's being built, what's missing. This feeds strategic decisions about where Wyltek can plug gaps and create the most impact. Cover: (1) Layer 1 primitives — cell model, lock scripts, type scripts, UDT standards (xUDT, SUDT), Spore/DOB protocol, what's production-ready vs experimental; (2) Layer 2 — Fiber Network state, RGB++ bridge status, Bitcoin L2 activity on CKB; (3) Developer tooling — CCC, Lumos, ckb-sdk-js, ckb-sdk-rust, spore-sdk, CKB light client — gaps and pain points; (4) Wallet landscape — JoyID, Neuron, MetaMask CKB plugin — what wallet coverage exists for dApps; (5) Indexer/data layer — CKB Explorer, ckb-indexer, lightnode, what data APIs exist for app developers; (6) DeFi / DEX — what financial primitives exist natively (UTXOSwap, any AMMs, lending?); (7) NFT/content ecosystem — Spore collections, DOB issuers, what's launched on mainnet; (8) Gaming — any existing gaming projects on CKB, what's the state of play; (9) Identity — DID standard, .bit domains, adoption; (10) Community + developer activity — active builders, GitHub activity, hackathon history. Conclude with: what are the 5 biggest missing ingredients for CKB to reach widespread use?
+**Tags:** nervos, ckb, ecosystem, strategy, architecture
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/awesome-nervos/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/docs.nervos.org/develop/docs/ecosystem/projects.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/README.md
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/README.md
+
+---
+
+## [DONE] nervos-missing-ingredients-analysis
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Deep analysis of what CKB is missing for widespread developer and user adoption — infrastructure gaps, UX gaps, ecosystem gaps. Specific angles: (1) Onboarding — how hard is it for a new developer to ship their first CKB dApp today vs Ethereum/Solana? What's the friction? (2) Tooling gaps — what does every Ethereum dev take for granted (Hardhat, Foundry, The Graph, ethers.js, OpenZeppelin) that doesn't exist on CKB? (3) Mobile — is there a CKB mobile SDK? Can you build a React Native app that interacts with CKB? (4) Gasless UX — does CKB have meta-transactions or account abstraction for removing the "user needs CKB to do anything" UX problem? (5) Oracle infrastructure — is there a Chainlink equivalent on CKB? Any price feeds? (6) Cross-chain bridges — what's the state of bridging USDC, ETH, BTC onto CKB for liquidity? (7) Smart contract composability — how does CKB's cell model compare to EVM composability? What patterns exist for multi-contract interactions? (8) Data availability — can you store meaningful app state on CKB cheaply, or does the capacity model make this prohibitive? (9) Event/notification infrastructure — how do apps listen for on-chain events without running a full node? (10) Testing infrastructure — is there a CKB devnet/testnet that's easy to spin up locally?
+**Tags:** nervos, ckb, gaps, adoption, dx, infrastructure
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0022-transaction-structure/0022-transaction-structure.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0009-vm-syscalls/0009-vm-syscalls.md
+- https://raw.githubusercontent.com/nervosnetwork/docs.nervos.org/develop/docs/basics/introduction.md
+- https://raw.githubusercontent.com/ckb-devrel/ckb-devkit/main/README.md
+- https://raw.githubusercontent.com/cryptape/kuai/main/README.md
+- https://raw.githubusercontent.com/ckb-ecell/axon/main/README.md
+- https://raw.githubusercontent.com/rgb-org/rgb-core/main/README.md
+
+---
+
+## [DONE] nervos-rgb-plus-plus-deep-dive
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Deep dive into RGB++ — CKB's isomorphic binding protocol that links Bitcoin UTXOs to CKB cells. This is potentially the biggest unlock for mass adoption (Bitcoin L2 narrative). Cover: (1) How does RGB++ work technically — what does "isomorphic binding" mean, how are Bitcoin UTXOs mapped to CKB cells? (2) What transactions can you do with RGB++ assets — transfer, DeFi, NFT minting? (3) What assets are currently live on RGB++ (xUDT tokens, DOBs, other)? (4) Developer experience — how do you build an RGB++ dApp? What SDKs exist? (5) User experience — what wallet handles RGB++ assets? Does the user need to know about CKB at all? (6) Current limitations and roadmap — what doesn't work yet? (7) Strategic importance: does RGB++ give CKB a Bitcoin L2 story that could drive mainstream builder interest? (8) Comparison to other Bitcoin L2s (Lightning, Ordinals, Stacks, Merlin) — what's CKB's unique position?
+**Tags:** nervos, ckb, rgb++, bitcoin, l2, ecosystem
+**Seeds:**
+- https://raw.githubusercontent.com/ckb-cell/rgbpp-sdk/main/README.md
+- https://raw.githubusercontent.com/ckb-cell/rgbpp-sdk/main/docs/rgb++.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0045-rgb-plus-plus/0045-rgb-plus-plus.md
+- https://raw.githubusercontent.com/ckb-devrel/rgbpp-primer/main/README.md
+- https://raw.githubusercontent.com/ckb-cell/utxo-global-wallet/main/README.md
+
+---
+
+## [DONE] nervos-wyltek-opportunity-map
+**Priority:** MEDIUM
+**Added:** 2026-03-06
+**Goal:** SYNTHESIS — after nervos-ecosystem-deep-dive, nervos-missing-ingredients-analysis, and nervos-rgb-plus-plus-deep-dive are done, synthesise into a strategic opportunity map for Wyltek. Which gaps align with Wyltek's existing stack (embedded hardware, CKB tooling, Fiber integration, DOB minting, web5 identity)? Rank opportunities by: (1) impact on ecosystem (filling a gap many builders need), (2) alignment with Wyltek's skills/assets, (3) time to ship (days vs months), (4) defensibility (is this something only Wyltek can credibly build?). Output: top 5 opportunities Wyltek should pursue in the next 3 months, with concrete first steps for each.
+**Tags:** nervos, wyltek, strategy, opportunities, roadmap
+**Seeds:** (internal — reads nervos findings + MEMORY.md)
+
+
+---
+
+## [DONE] fiberquest-tournament-onchain-cell-design
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Deep dive into CKB cell model for tournament on-chain objects. Key questions: (1) How do you design a Type Script that enforces a state machine (OPEN→LOCKED→ACTIVE→SETTLED) — what does the script validation logic look like in pseudo-code? (2) How do you link two cells (tournament cell + escrow cell) by ID and enforce that both are consumed together in settlement tx? (3) What is the minimum cell capacity needed for a tournament cell with ~500 bytes of JSON data? (4) How does the "editable until lock_time" pattern work — can a Type Script read the current block timestamp to enforce time-based rules? (5) How do you return cell capacity to the owner on settlement (cell consumption → owner output)? (6) Any existing CKB projects using similar state machine cell patterns to reference?
+**Tags:** fiberquest, tournament, ckb, cell-model, type-script, on-chain
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0022-transaction-structure/0022-transaction-structure.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0009-vm-syscalls/0009-vm-syscalls.md
+- https://raw.githubusercontent.com/sporeprotocol/spore-sdk/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0019-data-structures/0019-data-structures.md
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/README.md
+
+---
+
+## [DONE] fiberquest-tournament-escrow-patterns
+**Priority:** HIGH
+**Added:** 2026-03-06
+**Goal:** Research patterns for multi-party escrow on CKB — specifically for tournament prize pools that accumulate entry fees from multiple players and distribute to winners. Key questions: (1) What's the cleanest pattern for an escrow cell that grows as players register (each registration tx adds to the escrow balance)? (2) How do you enforce entry fee payment atomically with tournament cell registration in a single tx? (3) For entry-fee-only tournaments, how do you prove the escrow balance = sum of all entry fees on-chain? (4) What's the best pattern for batch payouts — one tx that outputs to N winners simultaneously? (5) How do you handle automatic refunds if min_players not met — can a Type Script enforce this, or does it require the agent to initiate the tx? (6) Any Fiber Network patterns for holding funds in escrow pending a future event?
+**Tags:** fiberquest, tournament, escrow, ckb, multi-party, payout
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0023-dao-deposit-withdraw/0023-dao-deposit-withdraw.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/main/rfcs/0022-transaction-structure/0022-transaction-structure.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/rpc.md
+- https://raw.githubusercontent.com/ckb-ccc/ccc/main/packages/core/src/ckb/transaction.ts
+- https://raw.githubusercontent.com/nervosnetwork/ckb-system-scripts/main/c/secp256k1_blake160_sighash_all.c
+
+---
+
+## [DONE] fiberquest-retroarch-multi-session
+**Priority:** MEDIUM
+**Added:** 2026-03-06
+**Goal:** Research running multiple RetroArch instances simultaneously for multi-player tournament monitoring. Key questions: (1) Can you run multiple RetroArch instances on the same machine with different UDP ports (e.g. 55355, 55356, 55357)? (2) How do you configure separate retroarch.cfg files per instance with different network command ports? (3) For LAN tournament play — can multiple Pi5s each run one RetroArch instance and the agent monitors all of them remotely via UDP? (4) RetroArch netplay — does it allow synchronized game state across multiple clients? If so, can you poll RAM from the netplay host? (5) What's the maximum number of simultaneous instances that a Pi5 can handle? (6) For the demo: what's the simplest way to simulate 2-player tournament on a single Pi5?
+**Tags:** fiberquest, tournament, retroarch, multi-session, netplay, pi5
+**Seeds:**
+- https://retropie.org.uk/docs/RetroArch-Network-Commands/
+- https://raw.githubusercontent.com/libretro/RetroArch/master/network/netplay/netplay_frontend.c
+- https://raw.githubusercontent.com/libretro/RetroArch/master/README.md
+- https://retropie.org.uk/docs/Netplay/
+- https://raw.githubusercontent.com/libretro/RetroArch/master/config.def.h
+
+---
+
+## [PENDING] fiberquest-tournament-ui-design
+**Priority:** MEDIUM
+**Added:** 2026-03-06
+**Goal:** Research UI patterns for a tournament creation and browsing page in an Electron app. Key questions: (1) Best UX patterns for a multi-step tournament creation wizard (type → parameters → funding → confirm → on-chain submit)? (2) How to display a live-updating prize pool that grows as players register (polling Supabase or CKB indexer)? (3) Tournament bracket / leaderboard visualisation patterns for 2–8 players — what libraries or CSS patterns work well? (4) How to display on-chain cell data in a readable way (tournament status, edit history for editable tournaments, settlement tx links)? (5) Progress indicators for async blockchain txs (submitted → confirmed → live)? (6) Mobile-responsive tournament card grid patterns?
+**Tags:** fiberquest, tournament, ui, electron, ux, design
+**Seeds:**
+- https://raw.githubusercontent.com/nicedoc/nicedoc/master/README.md
+- https://animate.style/
+- https://raw.githubusercontent.com/chartjs/Chart.js/master/README.md
+- https://raw.githubusercontent.com/gregberge/loadable-components/master/README.md
+- https://raw.githubusercontent.com/electron/electron/main/docs/tutorial/security.md
 

@@ -16,8 +16,8 @@ Command: `python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py --fi
 
 ## Research Dashboard (port 9989) — LOCAL TESTBED ONLY
 ⚠️ Local only — not public facing. Accessible via Tailscale at http://100.115.197.42:9989
-Check `curl -sf http://localhost:9989/ -o /dev/null` — if down, restart:
-`python3 /home/phill/research-dashboard/server.py &`
+Check `systemctl --user is-active research-dashboard` — if inactive, restart:
+`systemctl --user restart research-dashboard`
 - Silent restart, no notification needed
 
 ## Kernel Dashboard (port 9999) — PRIVATE, Tailscale only

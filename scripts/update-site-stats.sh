@@ -69,12 +69,27 @@ PYEOF
 # Commit and push if anything changed
 cd "$SITE"
 
-# Sync research findings
+# Sync research findings — exclude private/strategic files
 FINDINGS_SRC="/home/phill/.openclaw/workspace/research/findings"
 FINDINGS_DEST="$SITE/research"
 mkdir -p "$FINDINGS_DEST"
-rsync -a --delete "$FINDINGS_SRC"/ "$FINDINGS_DEST"/
-echo "[stats] Research findings synced"
+rsync -a --delete \
+  --exclude="stack-gap-analysis*.md" \
+  --exclude="*-synthesis*.md" \
+  --exclude="*-gap-analysis*.md" \
+  --exclude="nervos-wyltek-*.md" \
+  --exclude="supabase-*.md" \
+  --exclude="wyltek-membership-*.md" \
+  --exclude="sidecar-secure-key-*.md" \
+  --exclude="fiberquest-hackathon-*.md" \
+  --exclude="fiber-hackathon-*.md" \
+  "$FINDINGS_SRC"/ "$FINDINGS_DEST"/
+echo "[stats] Research findings synced (private files excluded)"
+
+# Remove any already-committed sensitive files
+for pattern in "stack-gap-analysis" "synthesis" "gap-analysis" "nervos-wyltek" "supabase-" "wyltek-membership" "sidecar-secure-key" "hackathon"; do
+  find "$FINDINGS_DEST" -name "*${pattern}*" -delete 2>/dev/null || true
+done
 
 if ! git diff --quiet || git status --short | grep -q "research/"; then
     git add index.html research/
