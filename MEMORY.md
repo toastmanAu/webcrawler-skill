@@ -153,7 +153,7 @@
   - P2P port 8229, RPC 127.0.0.1:8226
   - Node ID: 0301ae73e52494ecb09d3cadad9ed164276662016862f7ba1c9cbe6a150d3ab07a
   - PeerId: QmTh1V2gHqXKs59sGL24XpRHFGLch4J6wT4sdGB7EhRgAm
-  - Wallet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqg0dg5q5dpt0ww2exefvx4f68vffqa670gnhk9ej
+  - Wallet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgzxfhhs329hf0lr3gnwxnzyn270drqr3csvq7pn
   - Key password: n100-fiber-2026
   - NEEDS FUNDING (99+ CKB) to auto-accept channels
 - Channel between ckbnode↔N100: PENDING (N100 insufficient balance)

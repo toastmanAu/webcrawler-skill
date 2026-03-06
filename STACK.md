@@ -147,3 +147,18 @@ Last updated: 2026-03-05
 | check-models.sh | Verify model API health (Anthropic, CKBDev, HF) | Every ~1hr |
 | check-bug-reports.js | Check GitHub for open bug reports | Every 4hrs |
 | research-crawl.py | Idle research crawler (Gemini 2.5 Flash) | Pi: fiberquest tasks on heartbeat; NucBox: general every 15min |
+
+## Common Knowledge Hub (CKH)
+| Item | Detail |
+|------|--------|
+| Repo | https://github.com/toastmanAu/common-knowledge-hub |
+| Stack | Electron, vanilla JS, Node.js |
+| Purpose | Cross-platform desktop app — Nervos stack launcher (full node, Fiber, light client, stratum proxy) |
+| UI pattern | App-store style: component list → click → detail page with all config options inline |
+| Config | Writes TOML/YAML directly to ~/.ckh/<service>-data/ — CKH owns all config |
+| Install | Download-on-demand per component (no bundled binaries — keeps app tiny) |
+| Platforms | linux-arm64 (primary/SBC), linux-x64, macOS, Windows |
+| Services | ckbNode (120GB), fiberNode (0.5GB), lightClient (0.2GB), stratum (bundled) |
+| Key files | src/main.js, src/index.html, src/preload.js, services/registry.js, services/installer.js, services/monitor.js, services/config-writer.js |
+| Status | Active development — scaffold + component store + console + config writing done |
+| SBC angle | Board images boot straight into CKH kiosk mode — zero setup |

@@ -289,18 +289,15 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. What's the expected sign time on ESP32-P4 for a practical SPHINCS+ parameter set, both in pure software and with hardware acceleration (extrapolate from similar MCU benchmarks if direct data is unavailable)?
 5. Are there any prior art implementations or benchmarks of SPHINCS+ on ESP32 or similar Xtensa/RISC-V MCUs?
 
-## [NEW_TASK] ckb-snapshot-infra-revisit
+## [PENDING] ckb-snapshot-infra-revisit
 **Priority:** MEDIUM
 **Output:** findings/ckb-snapshot-infra-revisit.md
 **Goal:** Determine best practices for CKB snapshot hosting on Cloudflare R2, addressing previous 404 errors and missing community context.
 **Seeds:**
-- https://docs.nervos.org/docs/basics/guides/run-ckb-node
-- https://github.com/nervosnetwork/ckb/tree/develop/docs
-- https://forum.nervos.org/
-- https://developers.cloudflare.com/r2/examples/rclone/
-- https://developers.cloudflare.com/r2/api/s3/presigned-urls/
-- https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-compression.html
-- https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-versioning.html
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/CHANGELOG.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/docs/run-ckb-with-docker.md
+- https://developers.cloudflare.com/r2/reference/data-location/
+- https://raw.githubusercontent.com/trufflesuite/ganache/develop/src/chains/ethereum/ethereum/README.md
 **Questions to answer:**
 1. What compression format does the CKB community expect or commonly use for node snapshots (e.g., zstd, lz4, gz, tar.zst)?
 2. How do other major blockchain projects (e.g., Bitcoin, Substrate, Ethereum) typically handle snapshot versioning and provide a "latest" pointer for easy access?
@@ -325,7 +322,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 3. What specific data (live PIDs, fault codes, immobiliser status, VIN, mileage) can typically be READ from a Clio RS 172 via K-Line or CAN?
 4. What specific parameters or functions (e.g., key programming, idle speed adjustment, ignition timing, throttle adaptation reset, service interval reset) can typically be WRITTEN to a Clio RS 172 ECU via K-Line or CAN, and what are the associated risks?
 
-## [NEW_TASK] ckb-chess-fiber-rpcs-revisit
+## [PENDING] ckb-chess-fiber-rpcs-revisit
 **Priority:** MEDIUM
 **Output:** findings/ckb-chess-fiber-rpcs-revisit.md
 **Goal:** Identify the specific Fiber RPCs required for the ckb-chess relayer, addressing previous 404 errors and clarifying the payment/state transport flow.
@@ -371,7 +368,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 2. Is ADB accessible by default on these head units, and what are the common methods for enabling it (e.g., developer options, specific codes)?
 3. What are the specific limitations for running persistent background services (like a CKB light client or Fiber node) on these head units, especially concerning Android's process killing mechanisms on newer versions?
 
-## [NEW_TASK] llm-cost-optimisation-pricing-update
+## [PENDING] llm-cost-optimisation-pricing-update
 **Priority:** HIGH
 **Output:** findings/llm-cost-optimisation-pricing-update.md
 **Goal:** Obtain current pricing, rate limits, and free tier details for key LLM models to inform LiteLLM routing and cost optimization.
@@ -2024,7 +2021,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] fiberquest-tournament-ui-design
+## [DONE] fiberquest-tournament-ui-design
 **Priority:** MEDIUM
 **Added:** 2026-03-06
 **Goal:** Research UI patterns for a tournament creation and browsing page in an Electron app. Key questions: (1) Best UX patterns for a multi-step tournament creation wizard (type → parameters → funding → confirm → on-chain submit)? (2) How to display a live-updating prize pool that grows as players register (polling Supabase or CKB indexer)? (3) Tournament bracket / leaderboard visualisation patterns for 2–8 players — what libraries or CSS patterns work well? (4) How to display on-chain cell data in a readable way (tournament status, edit history for editable tournaments, settlement tx links)? (5) Progress indicators for async blockchain txs (submitted → confirmed → live)? (6) Mobile-responsive tournament card grid patterns?
@@ -2036,3 +2033,32 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://raw.githubusercontent.com/gregberge/loadable-components/master/README.md
 - https://raw.githubusercontent.com/electron/electron/main/docs/tutorial/security.md
 
+
+---
+
+## [DONE] ckh-and-snapshot-strategy
+**Priority:** SYNTHESIS
+**Output:** findings/ckh-and-snapshot-strategy.md
+**Goal:** SYNTHESIS — Read MEMORY.md. Produce a strategic analysis of Common Knowledge Hub (CKH) and the Wyltek snapshot infrastructure. Answer: (1) What is CKH's position in the Nervos ecosystem — who are the target users, what problem does it solve better than existing tools (CKB Node Manager, manual setup guides)? (2) What should the remote app catalogue at apps.wyltekindustries.com include at launch — which 10 tools/apps would make the strongest first impression? (3) How should the snapshot pipeline evolve — mainnet + testnet, update frequency, GPG signing, integrity verification, how does CKH consume the latest.json to auto-download? (4) What GitHub Actions CI/CD pipeline does CKH need — how do we build AppImage for arm64, x64, macOS, Windows? Which runner handles arm64 builds? (5) What's the CKH roadmap for the next 30 days — what features unlock the most value fastest? (6) How does CKH fit into the broader Wyltek product story alongside the embedded builder, DOB minter, and FiberQuest?
+**Seeds:** (internal — reads MEMORY.md + research/findings/*.md + workspace files)
+**Questions to answer:**
+1. Who are CKH's first 100 users and where do we find them?
+2. What's missing from the current CKH feature set that would block a v0.1 release?
+3. How do snapshots + CKH together reduce time-to-synced from days to minutes?
+
+## sensecap-m1-ckb-repurpose
+- id: sensecap-m1-ckb-repurpose
+- priority: HIGH
+- status: PENDING
+- tags: hardware, lora, ckb, sensecap, pi4
+- seeds:
+  - https://raw.githubusercontent.com/Lora-net/sx1302_hal/master/README.md
+  - https://www.sensecapmx.com/docs/sensecap-m1/overview/
+  - https://github.com/Seeed-Studio/SenseCraft/blob/main/docs/sensecap_m1.md
+- goal: |
+    SenseCAP M1 repurpose for CKB LoRa gateway.
+    1. How to safely backup ECC key / Helium identity from SD before swap
+    2. SX1302 HAL setup on Raspbian Lite Pi4 — which pins, which config
+    3. Docker setup for ckb-light-client ARM64 on Pi4 — minimal resource usage
+    4. Can SX1302 concentrator + ckb-light-client + possibly Fiber node coexist on 4GB Pi4?
+    5. Any existing open-source CKB LoRa gateway projects to build on?

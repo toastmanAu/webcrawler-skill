@@ -66,7 +66,7 @@ Check `systemctl --user is-active ckb-chat-bridge.service` — if inactive, rest
 
 ## Founding Member DOB Minter (check every heartbeat)
 Run: `node /home/phill/ckb-dob-minter-script/mint-queue-runner.js --mainnet 2>&1`
-- If output contains "Would mint" or "✅ Spore ID" → notify Phill: "🎉 Founding Member #X DOB minted → <address>"
+- If output contains "Would mint" or "✅ Spore ID" → notify Phill: "🎉 Founding Member #X DOB minted → <address>", then update projects: `node /home/phill/kernel-dash/update-projects.js founding-member-dob done:add "Member #X minted: <spore-id>"`
 - If output contains "No pending entries" → silent (nothing to do)
 - If output contains error → alert Phill immediately
 - Track last mint in heartbeat-state.json under key `lastMint`
@@ -75,6 +75,14 @@ Run: `node /home/phill/ckb-dob-minter-script/mint-queue-runner.js --mainnet 2>&1
 Check `curl -sf http://localhost:8081/` — if down, run `systemctl --user restart ckb-stratum`
 Alert Phill if it can't be restarted.
 Mode: SOLO — direct to ckbnode (192.168.68.87:8114). Rewards go to Phill's address.
+
+## Snapshot Pipeline Monitor (while snapshotInProgress in heartbeat-state.json)
+If `snapshotInProgress` key exists in heartbeat-state.json:
+- Check: `ssh phill@192.168.68.79 'du -sh /tmp/ckb-snapshot-staging/ 2>/dev/null && tail -3 ~/ckb-snapshot.log'`
+- If rsync finished (log shows "Compressing\|Uploading\|DONE\|complete"): update projects.json → `node /home/phill/kernel-dash/update-projects.js ckb-snapshot status live`, set progress 90, clear blocked, notify Phill
+- If still running: update `node /home/phill/kernel-dash/update-projects.js ckb-snapshot in_progress:clear` then add current size/total line — silent
+- If log shows ERROR: notify Phill immediately
+- Remove `snapshotInProgress` from heartbeat-state.json once pipeline is DONE or FAILED
 
 ## Backup (1x/day — ~4pm ACST)
 Run `bash /home/phill/.openclaw/workspace/scripts/backup.sh` — track last run in heartbeat-state.json under key `backup`.
@@ -99,6 +107,14 @@ Run: `node /home/phill/ckb-antiscam/analyse-events.js 12`
 - If fresh account joins >10 in 12h: alert Phill — possible bot wave incoming
 - If any bans in dry_run mode show `trigger: trading-spam` or `bot-behaviour`: report patterns to Phill with suggestion to go live
 - Check `tail -5 /home/phill/ckb-antiscam/antiscam.log` for any ERROR lines
+
+## Anti-Scam Daily Summary (1x/day — ~9pm ACST)
+Run: `node /home/phill/ckb-antiscam/daily-summary.js --notify --save`
+- Sends Telegram digest to Nervos Network group with: joins, leaves, messages, bot flags, admin actions, learn mode accuracy (precision/recall), top triggers
+- Saves to `data/-1001154129103/daily-stats.jsonl` for trend tracking
+- After running: update projects → `node /home/phill/kernel-dash/update-projects.js ckb-antiscam in_progress:clear` then add "Day X of 14 calibration — check calibrate.js for current accuracy"
+- Track last run in heartbeat-state.json under key `antiscamDailySummary`
+- Only run once per day — skip if already run today
 
 ## NerdMiner CKB
 - Pushed to GitHub (dev branch) - no action needed
