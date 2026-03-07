@@ -2065,7 +2065,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] tamperproof-biometric-auth
+## [DONE] tamperproof-biometric-auth
 **Priority:** MEDIUM
 **Output:** findings/tamperproof-biometric-auth.md
 **Goal:** Research low-cost biometric authentication hardware (fingerprint, iris) for proof-of-person use cases — focusing on commercial availability, price trends, tamper-resistance, and anti-spoofing. Can cheap fingerprint scanners be made tamper-proof? What attack vectors exist (fake prints, module bypass, wire-tap)? What designs or enclosures make them harder to defeat? Is iris scanning (phone-grade IR) viable at low cost?
@@ -2090,7 +2090,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] sphincs-plus-quantum-purse-esp32-wallet
+## [DONE] sphincs-plus-quantum-purse-esp32-wallet
 **Priority:** HIGH
 **Output:** findings/sphincs-plus-quantum-purse-esp32-wallet.md
 **Goal:** Deep research into building an ESP32-P4 hardware wallet that signs CKB transactions using SPHINCS+ post-quantum signatures, compatible with Quantum Purse (built by **tea2x**, CKB Eco Fund Spark Program grantee — the first quantum-resistant wallet on CKB mainnet). Covers: (1) Quantum Purse architecture and what signing format it expects, (2) SPHINCS+ parameter sets practical on ESP32-P4 with hardware SHA acceleration, (3) feasibility of an integrated wallet UI that talks to Quantum Purse, (4) key storage using ESP32-P4 eFuse/secure boot.
@@ -2116,7 +2116,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] rk3528-armbian-linux-path
+## [DONE] rk3528-armbian-linux-path
 **Priority:** HIGH
 **Output:** findings/rk3528-armbian-linux-path.md
 **Goal:** Find the best working path to run Armbian (or Ubuntu) on the H96 Max RK3528 TV box. What's the current state of RK3528 Linux support? Which community builds work? What drivers are broken (WiFi, ethernet, USB 3.0)? What's the flash procedure — SD card boot, eMMC flash, maskrom mode? Is ethernet reliable (critical for node use)?
@@ -2136,7 +2136,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] rk3528-ckb-node-setup
+## [DONE] rk3528-ckb-node-setup
 **Priority:** HIGH
 **Output:** findings/rk3528-ckb-node-setup.md
 **Goal:** Map the exact procedure to run a CKB full node on RK3528 Armbian. Covers: aarch64 binary download, config for external SSD data dir, systemd service, pruning options to manage storage, RPC access for signing remote, Fiber node co-location feasibility on 4GB RAM.
@@ -2156,7 +2156,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] esp32s3-signing-remote-architecture
+## [DONE] esp32s3-signing-remote-architecture
 **Priority:** MEDIUM
 **Output:** findings/esp32s3-signing-remote-architecture.md
 **Goal:** Design the communication layer between the ESP32-S3 signing remote and the RK3528 node box. What API design (REST vs WebSocket vs BLE) works best for low-latency transaction approval on a home LAN? How does the signing remote receive an unsigned transaction, display it human-readably, and return a signed one? What ESP32-S3 board is best suited for "TV remote" form factor with touchscreen?

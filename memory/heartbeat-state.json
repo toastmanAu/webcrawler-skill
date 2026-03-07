@@ -1,22 +1,22 @@
 {
   "lastChecks": {
     "modelCheck": 1772868542290,
-    "dashboard": 1772868542290,
-    "ckbNode": 1772868542290,
-    "whaleBot": 1772868542290,
+    "dashboard": 1772877802405,
+    "ckbNode": 1772877802405,
+    "whaleBot": 1772877802405,
     "stratum": 1772868542290,
     "uvTracker": 1772784342411,
-    "chatBridge": 1772868542290,
+    "chatBridge": 1772877802405,
     "antiScam": 1772868542290,
-    "backup": 1772839018949,
+    "backup": 1772870326683,
     "vaultUpdate": 1772621248,
-    "lastResearchCrawl": 1772868542290,
+    "lastResearchCrawl": 1772877108,
     "testResults": 1772831781099,
-    "bugReports": 1772831781099,
+    "bugReports": 1772877802405,
     "siteStats": 1772831781099,
     "antiscamDailySummary": 0,
     "snapshot": 1772864934062,
-    "loungRelay": 1772868542290
+    "loungRelay": 1772877802405
   },
   "telegramSerialPRDone": true,
   "telegramSerialPR": {
@@ -37,6 +37,7 @@
   "snapshotFailedAt": 1772801189214,
   "snapshotFailReason": null,
   "snapshotV5Ready": true,
-  "snapshotV5Pid": 1852036,
-  "snapshotV5StartedAt": 1772813935141
+  "snapshotV5Pid": 1872457,
+  "snapshotV5StartedAt": 1772813935141,
+  "snapshotV5RestartedAt": 1772872177729
 }
