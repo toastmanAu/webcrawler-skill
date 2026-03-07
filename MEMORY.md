@@ -287,3 +287,19 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - Key file: /home/phill/.openclaw/workspace/secrets/minting-wallet.txt (chmod 600, never commit)
 - Purpose: Wyltek Founding Member DOB minting (50 Spore cells, mainnet)
 - Status: testnet CKB being claimed from faucet; testnet dry run first
+
+## WyVault Hardware Update (2026-03-08)
+- **Target board changed**: ESP32-P4 4.3" IPS dev board (ordered, arriving post-hackathon)
+- 4.3" IPS capacitive touch display — proper wallet signing UI
+- Onboard ESP32-C6 = WiFi 6 + BT5 (C6 is comms coprocessor, P4 does crypto)
+- Replaces WT9932P4-TINY plan (too small display for wallet UX)
+- AliExpress link: https://a.aliexpress.com/_m0xhu9X
+
+## WyTerminal (2026-03-08 — SHIPPED ✅)
+- Firmware: T-Display S3 AMOLED (RM67162 1.91", ESP32-S3)
+- Repo: https://github.com/toastmanAu/WyRelay (firmware/WyTerminal_AMOLED.ino)
+- Features: USB HID keyboard + Telegram bot + live AMOLED terminal display
+- Library: Arduino_GFX + Arduino_RM67162 (QSPI)
+- Compiled + flashed from Pi via arduino-cli — confirmed showing as USB HID keyboard
+- Commands: /run /type /key /enter /paste /clear /status /help
+- Daemon (wyrelay-daemon.py): shell bridge, screenshot→TG, file upload, sysinfo

@@ -2214,3 +2214,28 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 5. Are there working Firefly ROC-RK3566-PC dual display DTS files we can reference directly?
 6. What's the X11/Wayland config to assign different Chromium windows to different CRTC outputs?
 7. Any known issues with RK3566 dual display — blank screen on one output, tearing, sync issues?
+
+---
+
+## [PENDING] ickb-stack-integration
+**Priority:** MEDIUM
+**Output:** findings/ickb-stack-integration.md
+**Goal:** Research iCKB protocol and identify practical integration points with our stack. Cover: (1) What is iCKB — how does it work as a liquid staking derivative on CKB? What's the yield mechanism and how does the exchange rate accrue? (2) Integration with Fiber Network — can iCKB be used in Fiber payment channels instead of raw CKB? What are the tradeoffs (liquidity, atomicity, channel capacity)? (3) Integration with our DOB/Spore minting flow — could Founding Members stake CKB via iCKB and use yield to mint DOBs? (4) Wyltek POS integration — accept iCKB as payment? Convert on the fly? (5) CKH node — could iCKB yield fund node operation costs automatically? (6) Any SDK or contract interfaces available for programmatic iCKB mint/redeem? (7) Risks: smart contract risk, depeg scenarios, liquidity depth on mainnet.
+**Seeds:**
+- https://raw.githubusercontent.com/ickb/whitepaper/main/README.md
+- https://raw.githubusercontent.com/ickb/v1-core/main/README.md
+- https://raw.githubusercontent.com/ickb/v1-interface/main/README.md
+- https://api.github.com/repos/ickb/v1-core/contents
+
+---
+
+## [PENDING] wyvault-neuron-sphincs-integration
+**Priority:** HIGH
+**Output:** findings/wyvault-neuron-sphincs-integration.md
+**Goal:** Research what it would take to add SPHINCS+ (Quantum Purse) hardware wallet support to Neuron. Cover: (1) Neuron codebase structure — where lock scripts are registered, where signing is routed, where hardware wallet (Ledger) integration lives. What files/modules need changing. (2) Quantum Purse lock script — what is the mainnet code hash? How does QP encode addresses? Is it standard CKB full address format? (3) Ledger APDU protocol used by Neuron — what commands does it send for signing? How would we add a SIGN_TX_SPHINCS command? (4) Witness format for SPHINCS+-128f — how large is it (~17KB)? Does CKB have any witness size limits? (5) Neuron plugin API — does Neuron support plugins that could add QP support without a core PR? (6) Grant opportunity — has Nervos Foundation / CKB Eco Fund funded wallet integrations before? Is a Spark grant viable for this? Who to contact (tea2x already knows QP side). (7) Estimated dev effort and who could realistically build the Neuron PR. (8) Prior art — has any other blockchain wallet added post-quantum hardware signing support?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/neuron/develop/packages/neuron-wallet/src/services/hardware/ledger.ts
+- https://raw.githubusercontent.com/nervosnetwork/neuron/develop/packages/neuron-wallet/src/services/lock-utils.ts
+- https://raw.githubusercontent.com/nervosnetwork/neuron/develop/README.md
+- https://api.github.com/repos/nervosnetwork/neuron/contents/packages/neuron-wallet/src
+- https://raw.githubusercontent.com/tea2x/quantum-purse/main/README.md
