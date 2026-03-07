@@ -91,6 +91,11 @@ Run `bash /home/phill/.openclaw/workspace/scripts/backup.sh` — track last run 
 - If EliteDesk unreachable: skip rsync, still push GitHub, log warning
 - If GitHub push fails: alert Phill
 
+## Wyltek Lounge Relay
+Check `systemctl --user is-active wyltek-lounge-relay` — if inactive, restart: `systemctl --user restart wyltek-lounge-relay`
+- Polls Supabase lounge_messages every 10s, forwards to Phill's DM via @wyltekLoungeBot (bot token: 8775043920:AAFahyrwVxgpZWv4rg1k0-ASO8i9mVhSyg8)
+- Silent restart, no notification needed unless it fails to come back up
+
 ## UV Tracker
 Check `curl -sf http://localhost:9988/` — if down, run:
 `cd /home/phill/uv-tracker && setsid python3 -m http.server 9988 --bind 0.0.0.0 >> /tmp/uv-server.log 2>&1 &`

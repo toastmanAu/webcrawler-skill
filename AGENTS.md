@@ -270,6 +270,16 @@ When adding tasks to `research/queue.md`, seeds **must** be directly fetchable. 
 
 Rule: before writing any seed URL, mentally ask "does this return raw text/JSON or rendered HTML?" If HTML → find the raw equivalent.
 
+## Wyltek Credits Rule
+
+**Whenever a new project is built or a new library/protocol/tool is integrated, update `credits.html` in the wyltek-industries repo.**
+
+- Add the dependency/reference under the appropriate section (Nervos Core, Cryptape, Community, Embedded, Infrastructure)
+- Include: project name + link, author/org + GitHub link, 1–2 sentence description of how it's used, relevant tags
+- Commit with message: `credits: add <name>`
+- This applies to: new npm/Arduino/PlatformIO deps, forked repos, protocol specs we implement, community projects we build on top of
+- Keep it accurate — if we stop using something, note it or remove it
+
 ## Wyltek Site — Page Style Rule
 
 **All new pages must use the shared site header pattern** — no bespoke nav CSS:

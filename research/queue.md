@@ -2062,3 +2062,112 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
     3. Docker setup for ckb-light-client ARM64 on Pi4 — minimal resource usage
     4. Can SX1302 concentrator + ckb-light-client + possibly Fiber node coexist on 4GB Pi4?
     5. Any existing open-source CKB LoRa gateway projects to build on?
+
+---
+
+## [PENDING] tamperproof-biometric-auth
+**Priority:** MEDIUM
+**Output:** findings/tamperproof-biometric-auth.md
+**Goal:** Research low-cost biometric authentication hardware (fingerprint, iris) for proof-of-person use cases — focusing on commercial availability, price trends, tamper-resistance, and anti-spoofing. Can cheap fingerprint scanners be made tamper-proof? What attack vectors exist (fake prints, module bypass, wire-tap)? What designs or enclosures make them harder to defeat? Is iris scanning (phone-grade IR) viable at low cost?
+**Seeds:**
+- https://raw.githubusercontent.com/adafruit/Adafruit-Fingerprint-Sensor-Library/master/README.md
+- https://en.wikipedia.org/wiki/Fingerprint_recognition
+- https://en.wikipedia.org/wiki/Iris_recognition
+- https://raw.githubusercontent.com/sparkfun/Fingerprint_Scanner-TTL/master/README.md
+- https://www.mouser.com/blog/fingerprint-sensor-modules
+**Questions to answer:**
+1. What cheap fingerprint scanner modules exist (R307, AS608, GT521Fx)? Price range, liveness detection support?
+2. How hard is it to spoof a cheap capacitive vs optical fingerprint scanner? Known attacks?
+3. What hardware/enclosure techniques make fingerprint modules tamper-evident or tamper-resistant (epoxy potting, mesh wiring, secure element pairing)?
+4. Is phone-grade iris scanning (Samsung-style IR) available as a standalone module? Cost?
+5. Compared to retina (~$10k+), what accuracy/uniqueness does iris scanning provide at $100-300?
+6. Are there open source tamper-proof biometric reference designs for embedded/ESP32 use?
+7. What's the realistic near-horizon for sub-$50 reliable liveness-detecting fingerprint auth?
+8. Could biometric data (fingerprint template or iris scan) be stored on a hardware cold wallet device? What are the privacy tradeoffs vs storing a hash on-chain?
+9. What on-chain proof-of-personhood patterns exist — e.g. World ID (iris hash + ZK proof), Proof of Humanity. How does a biometric hash commitment scheme work without exposing raw data?
+10. Custody model: user holds their own biometric data (like a seed phrase) — what UX patterns reduce the risk of data loss? Hardware secure enclaves, encrypted backups, social recovery?
+11. How does this compare to existing self-sovereign identity approaches in crypto (DID, VC, Worldcoin)?
+
+---
+
+## [PENDING] sphincs-plus-quantum-purse-esp32-wallet
+**Priority:** HIGH
+**Output:** findings/sphincs-plus-quantum-purse-esp32-wallet.md
+**Goal:** Deep research into building an ESP32-P4 hardware wallet that signs CKB transactions using SPHINCS+ post-quantum signatures, compatible with Quantum Purse (built by **tea2x**, CKB Eco Fund Spark Program grantee — the first quantum-resistant wallet on CKB mainnet). Covers: (1) Quantum Purse architecture and what signing format it expects, (2) SPHINCS+ parameter sets practical on ESP32-P4 with hardware SHA acceleration, (3) feasibility of an integrated wallet UI that talks to Quantum Purse, (4) key storage using ESP32-P4 eFuse/secure boot.
+**Seeds:**
+- https://raw.githubusercontent.com/cryptape/quantum-resistant-lock-script/main/README.md
+- https://raw.githubusercontent.com/cryptape/quantum-purse/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0022-transaction-structure/0022-transaction-structure.md
+- https://raw.githubusercontent.com/pq-crystals/sphincsplus/master/README.md
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/mbedtls/mbedtls/include/mbedtls/sha256.h
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/esp_hw_support/include/esp_sha.h
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/bootloader_support/include/esp_secure_boot.h
+**Questions to answer:**
+1. What is Quantum Purse? How does it differ from a standard CKB lock script — what signing algorithm and message format does it use?
+2. Which SPHINCS+ parameter set does Quantum Purse use (sphincs-sha2-128s, 256s, shake, etc.)? Is it fixed or user-selectable?
+3. What does the witness field look like for a Quantum Purse transaction — what bytes does the ESP32 need to produce?
+4. What are the signing performance benchmarks for SPHINCS+ on ESP32-P4? Are there any ESP32 or ARM Cortex benchmarks to extrapolate from?
+5. Does ESP-IDF expose hardware SHA-256/512 via a simple mbedTLS or esp_sha API that a SPHINCS+ implementation could use as a backend?
+6. What is the signature size for SPHINCS+ (128s vs 256s)? How does it affect CKB transaction size and fees?
+7. Can the ESP32-P4 eFuse + Digital Signature peripheral securely store and use a SPHINCS+ private key? What are the constraints (key size, HSM-like usage)?
+8. Is there an existing C implementation of SPHINCS+ (pq-crystals reference or similar) that could be ported to ESP32-P4 with minimal changes?
+9. What would an integrated wallet UI look like — connect to Quantum Purse web app via QR, sign offline, broadcast? Any existing hardware wallet integrations with Quantum Purse?
+10. What CKB transaction fields must the ESP32 serialize before signing — is Molecule serialization required at the signing layer?
+
+---
+
+## [PENDING] rk3528-armbian-linux-path
+**Priority:** HIGH
+**Output:** findings/rk3528-armbian-linux-path.md
+**Goal:** Find the best working path to run Armbian (or Ubuntu) on the H96 Max RK3528 TV box. What's the current state of RK3528 Linux support? Which community builds work? What drivers are broken (WiFi, ethernet, USB 3.0)? What's the flash procedure — SD card boot, eMMC flash, maskrom mode? Is ethernet reliable (critical for node use)?
+**Seeds:**
+- https://forum.armbian.com/topic/30215-ambian-tv-box-rk3528/
+- https://raw.githubusercontent.com/ilyakurdyukov/rk3528-tvbox/main/README.md
+- https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/README.md
+- https://raw.githubusercontent.com/friendlyarm/sd-fuse_rk3528/master/README.md
+**Questions to answer:**
+1. What is the current state of Armbian support for RK3528 TV boxes — official, community, or experimental only?
+2. Which specific RK3528 TV box builds are confirmed booting with working ethernet and USB 3.0?
+3. What is the flash procedure — SD card only, or can we flash to eMMC? Is maskrom mode needed?
+4. Are there any known issues with the H96 Max specifically vs other RK3528 boxes (Vontar DQ08 etc)?
+5. What kernel version is used and does it support USB 3.0 for external SSD (critical for CKB chain data)?
+6. Is HDMI output working for desktop/framebuffer display from Armbian?
+7. What's the recommended partition layout for OS on eMMC + chain data on external USB SSD?
+
+---
+
+## [PENDING] rk3528-ckb-node-setup
+**Priority:** HIGH
+**Output:** findings/rk3528-ckb-node-setup.md
+**Goal:** Map the exact procedure to run a CKB full node on RK3528 Armbian. Covers: aarch64 binary download, config for external SSD data dir, systemd service, pruning options to manage storage, RPC access for signing remote, Fiber node co-location feasibility on 4GB RAM.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/docs/get-ckb.md
+- https://docs-old.nervos.org/docs/basics/guides/run-ckb-with-docker
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+**Questions to answer:**
+1. What aarch64 CKB binary is available — does nervosnetwork/ckb publish arm64 releases?
+2. How do you configure CKB data directory to point at an external USB SSD on Linux?
+3. What are the RAM requirements for CKB full node at current chain height — is 4GB sufficient?
+4. Can CKB full node + Fiber node run simultaneously on 4GB RAM / RK3528?
+5. What systemd service config is recommended for CKB on Armbian?
+6. How to expose CKB RPC only to LAN (not public) for the signing remote to consume?
+7. Pruning/storage options — can we limit chain storage growth on a budget SSD?
+
+---
+
+## [PENDING] esp32s3-signing-remote-architecture
+**Priority:** MEDIUM
+**Output:** findings/esp32s3-signing-remote-architecture.md
+**Goal:** Design the communication layer between the ESP32-S3 signing remote and the RK3528 node box. What API design (REST vs WebSocket vs BLE) works best for low-latency transaction approval on a home LAN? How does the signing remote receive an unsigned transaction, display it human-readably, and return a signed one? What ESP32-S3 board is best suited for "TV remote" form factor with touchscreen?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/rpc/README.md
+- https://raw.githubusercontent.com/toastmanAu/wyltek-embedded-builder/main/README.md
+- https://docs.espressif.com/projects/esp-idf/en/latest/esp32s3/api-reference/network/esp_wifi.html
+**Questions to answer:**
+1. What ESP32-S3 touchscreen boards exist in a compact "remote" form factor (sub-100mm)? CST816 touch + colour display?
+2. REST vs WebSocket for node box ↔ signing remote comms — latency and reliability on home LAN?
+3. What CKB RPC calls does the signing remote need to consume (get pending tx, broadcast signed tx)?
+4. How should unsigned transaction data be serialised and transferred to the signing remote?
+5. What display resolution/size is practical for showing a human-readable transaction summary (address, amount, fee)?
+6. How should the signing remote handle being offline or out of WiFi range safely?
