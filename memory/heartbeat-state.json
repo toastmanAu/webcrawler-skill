@@ -10,13 +10,14 @@
     "antiScam": 1772868542290,
     "backup": 1772870326683,
     "vaultUpdate": 1772621248,
-    "lastResearchCrawl": 1772877108,
+    "lastResearchCrawl": 1772879024,
     "testResults": 1772831781099,
     "bugReports": 1772877802405,
     "siteStats": 1772831781099,
     "antiscamDailySummary": 0,
     "snapshot": 1772864934062,
-    "loungRelay": 1772877802405
+    "loungRelay": 1772877802405,
+    "testnetMove": 1772881596893
   },
   "telegramSerialPRDone": true,
   "telegramSerialPR": {

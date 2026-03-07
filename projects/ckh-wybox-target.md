@@ -36,13 +36,28 @@
 - CKB snapshot pre-loaded at image build time
 - systemd services for all components
 
-### Display / UI
-- 800×480 DSI touchscreen — CKH touchscreen UI
-- Touchscreen input for wallet, Fiber, node stats
-- No keyboard/mouse required
-- DSI overlay: written and kernel-confirmed (`card1-DSI-1: connected`)
-- Re-probe service: `dsi-panel-reprobe.service` in place
-- Remaining: confirm pixel output on reboot (next hardware session goal)
+### Display / UI — Three Modes
+
+**Must confirm working before building for each mode.**
+
+**Mode 1 — DSI only** (default, standalone node)
+- 800×480 touchscreen is sole display, touch input
+- Full CKH control UI on DSI (`localhost:3000/control`)
+- ✅ Kernel recognises panel (`card1-DSI-1: connected`)
+- 🔲 Pixel output on reboot NOT YET CONFIRMED — **next hardware goal**
+
+**Mode 2 — HDMI only** (TV/WyBox style)
+- HDMI to TV, no DSI attached, keyboard/remote for input
+- 🔲 Not yet tested on OPi3B
+
+**Mode 3 — Dual DSI + HDMI** (control station)
+- DSI = touch control panel (`localhost:3000/control`)
+- HDMI = read-only TV display (`localhost:3000/display`)
+- RK3566 VOP2 supports two outputs (VP0 + VP1) — needs DTS config
+- 🔲 Research task queued: `opi3b-dual-display-dsi-hdmi`
+- 🔲 Do NOT build dual-display UI until Mode 1 + Mode 3 both confirmed
+
+**Sequence:** Mode 1 confirmed → Mode 2 tested → Mode 3 researched + tested → build `/display` route
 
 ### Status
 - Hardware: ✅ 4 units in hand, 20+ in wild

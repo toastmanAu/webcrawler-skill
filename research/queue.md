@@ -2171,3 +2171,46 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. How should unsigned transaction data be serialised and transferred to the signing remote?
 5. What display resolution/size is practical for showing a human-readable transaction summary (address, amount, fee)?
 6. How should the signing remote handle being offline or out of WiFi range safely?
+
+---
+
+## [DONE] ckb-chess-fiber-electron-gui
+**Priority:** MEDIUM
+**Output:** findings/ckb-chess-fiber-electron-gui.md
+**Goal:** Research and design an Electron GUI for CKB Chess with Fiber payment integration, suitable for embedding into the Common Knowledge Hub (CKH) app. How should the chess UI communicate with a local Fiber node for move-by-move micropayments? What existing CKB Chess implementations exist to build on? What's the best Electron + Fiber RPC architecture for a game that processes payments per move?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/architecture.md
+- https://raw.githubusercontent.com/chess-js/chess.js/master/README.md
+- https://raw.githubusercontent.com/nicholasstephan/ckb-chess/main/README.md
+**Questions to answer:**
+1. What existing CKB Chess implementations exist (on-chain, off-chain, Fiber-based)? Any prior art to build on?
+2. How does a Fiber channel handle per-move micropayments — is one channel opened per game, or per session?
+3. What Fiber RPC calls are needed for: open channel, send payment, settle game, close channel?
+4. What chess UI libraries work well in Electron — chessboard.js, chess.js, cm-chessboard? License compatibility?
+5. What's the minimum Fiber channel capacity needed for a full chess game (say 100 moves at 1 CKB/move)?
+6. How should the game handle disconnection mid-game — timeout rules, channel force-close?
+7. How does the chess app integrate with CKH's existing Fiber node management (already running on same machine)?
+8. Should game state be stored on-chain (Spore/DOB per game record) or off-chain (local DB)?
+9. What's the UX flow: challenge opponent → open channel → play → settle → close? Or always-open channel pool?
+10. Could DOBs represent game records / achievements — e.g. mint a DOB for a won game with move history embedded?
+
+---
+
+## [PENDING] opi3b-dual-display-dsi-hdmi
+**Priority:** HIGH
+**Output:** findings/opi3b-dual-display-dsi-hdmi.md
+**Goal:** Confirm and document the exact device tree configuration for simultaneous DSI + HDMI output on Orange Pi 3B (RK3566). What VP (Video Port) assignments are needed? Does the BSP 5.10 kernel support dual display, or does it require mainline? What Armbian overlays or DTS changes enable both outputs at once? Are there known working examples from Firefly ROC-RK3566-PC or other RK3566 boards we can port?
+**Seeds:**
+- https://raw.githubusercontent.com/armbian/build/main/patch/kernel/archive/rockchip64-6.6/rk3566-dsi-hdmi-dual.patch
+- https://raw.githubusercontent.com/torvalds/linux/master/arch/arm64/boot/dts/rockchip/rk3566-roc-pc.dts
+- https://raw.githubusercontent.com/torvalds/linux/master/drivers/gpu/drm/rockchip/rockchip_vop2.c
+- https://forum.armbian.com/topic/30215-armbian-tv-box-rk3566/
+**Questions to answer:**
+1. Does RK3566 VOP2 support simultaneous DSI + HDMI output — same content (mirror) or independent?
+2. Which Video Port (VP0/VP1) should be assigned to HDMI and which to DSI on OPi3B?
+3. What DTS changes are needed vs the existing opi3b-waveshare5-dsi overlay we already have?
+4. Does BSP kernel 5.10 support dual display or do we need Armbian mainline (6.x)?
+5. Are there working Firefly ROC-RK3566-PC dual display DTS files we can reference directly?
+6. What's the X11/Wayland config to assign different Chromium windows to different CRTC outputs?
+7. Any known issues with RK3566 dual display — blank screen on one output, tearing, sync issues?
