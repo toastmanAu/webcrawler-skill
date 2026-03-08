@@ -1,184 +1,123 @@
 # Research: ckb-chess-fiber-rpcs-revisit
 
-**Date:** 2026-03-03  
+**Date:** 2026-03-08  
 **Status:** AUTO-CRAWLED (Gemini gemini-2.5-flash)  
-**Seeds:** https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs, https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs, https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs, https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md, https://raw.githubusercontent.com/nervosnetwork/fiber/main/docs/payment-lifecycle.md, https://raw.githubusercontent.com/toastmanAu/ckb-chess/main/README.md
+**Seeds:** https://github.com/nervosnetwork/fiber/tree/main/docs, https://github.com/nervosnetwork/fiber/tree/main/crates/fiber-lib/src/rpc, https://github.com/nervosnetwork/fiber/tree/main/tests/bruno/fiber, https://github.com/toastmanAu/ckb-chess/blob/main/README.md, https://github.com/ArkOS/ArkOS, https://github.com/JELOS/JELOS
 
 ---
 
-## Research Note: ckb-chess-fiber-rpcs-revisit
+Date: 2026-03-08
 
-**Date:** 2026-03-03
+## Summary
 
-### Summary
-The ckb-chess project leverages Nervos Fiber payment channels for on-chain chess games, treating each move as a micro-payment with the game state hash embedded within the message. This approach uses Fiber for state transport, escrow, and settlement, eliminating the need for a separate P2P layer. The Fiber RPCs provide the necessary interface for channel management (opening, closing), payment execution, and invoice handling, which are fundamental to the ckb-chess game lifecycle. Custom records within Fiber payment messages are identified as the mechanism for embedding game state hashes.
+The "ckb-chess-fiber-rpcs-revisit" topic centers on integrating the Fiber payment channel network with a CKB Chess project, likely for in-game micropayments, similar to the FiberQuest hackathon project. Fiber facilitates fast, low-fee off-chain CKB and UDT transactions but cannot store arbitrary data. A significant technical gap is the absence of an official Node.js Fiber client library, necessitating custom development from Rust RPC definitions. While Wyltek Industries operates Fiber nodes and has a CKB light client running on ESP32-P4, the CPU headroom for concurrent operations (emulator, light client, signing) on the P4 remains an open question. Information regarding specific gaming Linux distributions' `systemd` support or details on Android-based handhelds and car head units is not available in the provided content.
 
-### 1. Exact RPCs needed for relayer: open_channel, send_payment, new_invoice, get_invoice, list_channels?
+## Questions to Answer
 
-Yes, all the listed RPCs are available and relevant for the ckb-chess relayer, along with their respective parameters.
+### 1. What are the core technical details of this topic?
 
-*   **`open_channel`**:
-    *   **Purpose**: Initiates the opening of a payment channel between two peers, locking CKB or UDT funds. This is used at the start of a ckb-chess game to establish the escrow.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs`
-    *   **Method Signature**: `#[method(name = "open_channel")] async fn open_channel(&self, params: OpenChannelParams) -> Result<OpenChannelResult>;`
-    *   **Key Parameters**: `peer_id`, `funding_amount`.
+The core technical details of "ckb-chess-fiber-rpcs-revisit" involve leveraging the Fiber payment channel network for potential in-game transactions within a CKB Chess application. Fiber is a payment channel network built on CKB L1, designed for routing payments (CKB, UDTs) with low latency (~20ms) and minimal fees (~0.00000001 cent). It operates off-chain after initial on-chain channel opening/closing.
 
-*   **`send_payment`**:
-    *   **Purpose**: Sends a payment through a Fiber channel. In ckb-chess, each move is represented as a micro-payment, with game state embedded.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs` (listed in `rpc/README.md` under Module Payment)
-    *   **Method Signature**: `#[method(name = "send_payment")] async fn send_payment(&self, params: SendPaymentCommandParams) -> Result<GetPaymentCommandResult>;` (inferred from `README.md` and `SendPaymentCommandParams` struct)
-    *   **Key Parameters**: `target_pubkey`, `amount`, `invoice`, `custom_records`.
+Key aspects include:
+*   **Fiber's Role**: Facilitating micropayments for game events (e.g., moves, captures, game outcomes) or player interactions, analogous to FiberQuest's use for health damage, score, or KO events.
+*   **RPC Integration**: Utilizing Fiber's FNN binary RPC methods (e.g., `open_channel`, `send_payment`, `list_channels`, `new_invoice`, `get_invoice`) to interact with the Fiber network.
+*   **Client Development**: A critical detail is the absence of an official Node.js Fiber client library, meaning any Node.js-based integration would require building a custom client from the Rust RPC source definitions.
+*   **Hardware Context**: While the `ckb-light-esp` client runs on ESP32-P4, the "open FiberQuest question" regarding CPU headroom for concurrently running an emulator (core 0), light client, WiFi, and signing (core 1) on the ESP32-P4 highlights potential performance considerations for embedded deployments.
 
-*   **`new_invoice`**:
-    *   **Purpose**: Generates a new invoice for receiving payments. In ckb-chess, the player expecting a "move-payment" would generate an invoice.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs`
-    *   **Method Signature**: `#[method(name = "new_invoice")] async fn new_invoice(&self, params: NewInvoiceParams) -> Result<InvoiceResult>;`
-    *   **Key Parameters**: `amount`, `description`, `currency`, `payment_hash`.
+### 2. What specific APIs, protocols, or interfaces are available?
 
-*   **`get_invoice`**:
-    *   **Purpose**: Retrieves the details and status of an existing invoice using its payment hash.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs`
-    *   **Method Signature**: `#[method(name = "get_invoice")] async fn get_invoice(&self, payment_hash: InvoiceParams) -> Result<GetInvoiceResult>;`
-    *   **Key Parameters**: `payment_hash`.
+The following specific APIs, protocols, or interfaces are available or relevant:
 
-*   **`list_channels`**:
-    *   **Purpose**: Lists all active or closed channels for a given peer or all peers. Useful for monitoring game channels.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs`
-    *   **Method Signature**: `#[method(name = "list_channels")] async fn list_channels(&self, params: ListChannelsParams) -> Result<ListChannelsResult>;`
-    *   **Key Parameters**: `peer_id`, `include_closed`.
+*   **Fiber FNN Binary RPC Methods**:
+    *   `open_channel`
+    *   `send_payment`
+    *   `list_channels`
+    *   `new_invoice`
+    *   `get_invoice`
+    *   Other unspecified methods for Fiber network interaction.
+    These methods are defined in Rust within the `nervosnetwork/fiber/crates/fiber-lib/src/rpc` directory.
+*   **UDP RAM Polling**: For game state interaction, the FiberQuest project uses `UDP RAM polling (READ_CORE_MEMORY, port 55355)` to extract game events from an emulator. This interface could be relevant if `ckb-chess` also involves an emulator.
 
-### 2. How to embed game state hash in Fiber payment messages?
+### 3. What are the known limitations or failure modes?
 
-The game state hash can be embedded in Fiber payment messages using the `custom_records` field within the `SendPaymentCommandParams` struct.
+Known limitations or failure modes include:
 
-The `ckb-chess/README.md` explicitly states: "Each move shifts 1 microCKB from loser-in-progress to winner-in-progress, with the game state hash embedded in the message."
+*   **Fiber's Data Storage Limitation**: Fiber **CANNOT store arbitrary data or files**; it is exclusively a payment channel network. The `nervosnetwork/fiber-archive` is an old, abandoned project and not a storage protocol.
+*   **Lack of Official Node.js Fiber Client Library**: There is **no official Node.js Fiber client library**. This means any Node.js-based application (like the FiberQuest sidecar) must build its client from the Rust RPC source, which could be a development bottleneck or source of errors.
+*   **ESP32-P4 CPU Headroom**: For the ESP32-P4, the "open FiberQuest question" regarding **CPU headroom for emulator (core 0) + light client + WiFi + signing (core 1)** concurrently running suggests a potential performance limitation or failure mode if the combined workload exceeds the hardware's capacity.
+*   **Android Process Killing Mechanisms**: As identified in Question 10, **Android's process killing mechanisms on newer versions** are a specific limitation for running persistent background services (like a CKB light client or Fiber node) on Android-based devices.
 
-The `SendPaymentCommandParams` struct, defined in `crates/fiber-lib/src/rpc/payment.rs`, includes:
-```rust
-pub struct SendPaymentCommandParams {
-    // ... other fields ...
-    /// Some custom records for the payment which contains a map of u32 to Vec<u8>
-    /// The key is the record type, and the value is the serialized data
-    pub custom_records: Option<PaymentCustomRecords>,
-    // ... other fields ...
-}
-```
-The `PaymentCustomRecords` struct is defined as:
-```rust
-pub struct PaymentCustomRecords {
-    #[serde(flatten)]
-    #[serde_as(as = "HashMap<U32Hex, SliceHex>")]
-    pub data: HashMap<u32, Vec<u8>>,
-}
-```
-The `move_hash` (which is `Blake2b(prev_state_hash || move_notation || move_number || player_pubkey || timestamp_claim)`) can be serialized into a `Vec<u8>` and then included as a value in the `data` HashMap of `PaymentCustomRecords`. A specific `u32` key (e.g., `0x1`) can be designated for the ckb-chess game state hash.
+### 4. Are there working examples or reference implementations?
 
-### 3. Full RPC call sequence for a complete ckb-chess game lifecycle?
+Yes, there are working examples and reference implementations:
 
-Based on the `ckb-chess/README.md` lifecycle and Fiber RPCs, a complete ckb-chess game lifecycle would involve the following sequence:
+*   **Fiber Nodes**: Wyltek Industries runs two Fiber nodes: `ckbnode` (mainnet, RPC 127.0.0.1:8227) and `N100` (needs funding). These serve as live instances of the Fiber network.
+*   **FiberQuest (Hackathon Project)**: This project is a work-in-progress hackathon entry that aims to integrate RetroArch (emulator) with Fiber micropayments via a Node.js sidecar. It serves as a direct reference for connecting game events to Fiber transactions.
+*   **ckb-light-esp**: This project demonstrates a full CKB light client protocol stack running on ESP32-P4, confirming the feasibility of running CKB-related services on embedded hardware.
 
-**I. Game Setup (Channel Opening)**
-1.  **Peer Connection**: Both players (A and B) establish a connection.
-    *   **RPC**: `peer_connect_peer`
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md`
-2.  **Channel Initiation**: One player (e.g., Player A) initiates the channel opening.
-    *   **RPC**: `channel_open_channel`
-    *   **Parameters**: `OpenChannelParams` including `peer_id` of Player B, `funding_amount` (initial escrow), and other channel configurations.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs`
-3.  **Channel Acceptance**: The other player (Player B) accepts the channel.
-    *   **RPC**: `channel_accept_channel`
-    *   **Parameters**: `AcceptChannelParams` including `temporary_channel_id` from Player A's `OpenChannelResult`, `funding_amount`, etc.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs`
-    *   *Result*: A funded Fiber channel is established, serving as the escrow for the game.
+No specific working examples or reference implementations for `ckb-chess` were found due to a fetch error for its README.md.
 
-**II. Game Play (Moves)**
-For each move in the game (e.g., Player A makes a move, then Player B makes a move):
-1.  **Move Hash Calculation**: The player whose turn it is calculates the `move_hash` as `Blake2b(prev_state_hash || move_notation || move_number || player_pubkey || timestamp_claim)`.
-    *   **Source**: `https://raw.githubusercontent.com/toastmanAu/ckb-chess/main/README.md`
-2.  **Invoice Generation**: The player who is about to receive the "move-payment" (i.e., the player who just made a valid move or the one whose turn it is to be paid) generates an invoice for a micro-CKB amount (e.g., 1 microCKB).
-    *   **RPC**: `invoice_new_invoice`
-    *   **Parameters**: `NewInvoiceParams` including `amount` (1 microCKB), `description` (can include game ID, move number), and optionally `payment_hash` or `payment_preimage`.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs`
-3.  **Payment with Embedded State**: The player whose turn it was (the "loser-in-progress") sends the micro-payment to the recipient, embedding the calculated `move_hash` in the `custom_records`.
-    *   **RPC**: `payment_send_payment`
-    *   **Parameters**: `SendPaymentCommandParams` including `target_pubkey` (of the recipient), `amount` (1 microCKB), `invoice` (the generated invoice string), and `custom_records` containing the `move_hash`.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs`
-4.  **Invoice Retrieval (Optional)**: The recipient can retrieve the invoice details to confirm the payment.
-    *   **RPC**: `invoice_get_invoice`
-    *   **Parameters**: `InvoiceParams` with the `payment_hash` from the invoice.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs`
+### 5. For RK3566-based handhelds, which gaming Linux distributions (e.g., ArkOS, JELOS, Batocera.linux) definitively support running arbitrary Linux applications, custom scripts, and `systemd` services alongside the emulator frontend?
 
-**III. Game End (Channel Closing)**
-1.  **Game Conclusion**: Once the game reaches a final state (e.g., checkmate, stalemate, resignation), the winner is determined.
-2.  **Channel Shutdown**: The channel is closed, reflecting the final balance distribution based on the game's outcome. The ckb-chess contract on CKB will validate the full move history (implicitly committed via the `move_hash` in each payment) and release funds to the winner.
-    *   **RPC**: `channel_shutdown_channel`
-    *   **Parameters**: `ShutdownChannelParams` (not fully shown in snippets, but listed in `rpc/README.md`) including the `channel_id`.
-    *   **Source**: `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md`
+Based on the provided content, it is **not possible to definitively answer** which gaming Linux distributions (ArkOS, JELOS, Batocera.linux) for RK3566-based handhelds support arbitrary Linux applications, custom scripts, and `systemd` services.
 
-**IV. Dispute / Timeout (Off-chain claim, on-chain validation)**
-1.  **Timeout Claim**: If a player stops responding, the other player can claim a timeout.
-    *   **Fiber RPCs**: While Fiber can facilitate monitoring (`channel_list_channels`) or potentially submitting transactions, the core logic for *claiming* the timeout and validating it against the game's timelock is handled by the ckb-chess contract on the CKB chain, not directly by a specific Fiber RPC for dispute resolution. The `ckb-chess/README.md` states this involves submitting the claim on-chain.
+*   The `ArkOS/ArkOS` GitHub page does not explicitly detail support for arbitrary Linux applications, custom scripts, or `systemd` services.
+*   Content for `JELOS/JELOS` and `Batocera.linux` was not accessible (HTTP Error 404).
 
-### Gaps / Follow-up
+### 6. What is the default operating system (Android or Linux distro) for the Anbernic RG-ARC-D, and what is its root/ADB accessibility situation?
 
-1.  **Full `channel_shutdown_channel` parameters**: The provided content lists `channel_shutdown_channel` in `rpc/README.md` but does not include its parameter struct in `rpc/channel.rs`. Understanding its parameters would clarify how the final settlement is initiated.
-2.  **Specific `u32` key for `custom_records`**: While `custom_records` is identified for embedding the game state hash, the specific `u32` key to be used (e.g., `0x1`, `0x2`) would need to be defined as part of the ckb-chess protocol specification.
-3.  **Error Handling and Retries**: The provided content describes the happy path. A full relayer implementation would need to detail error handling, payment retries, and channel recovery mechanisms, which are not explicitly covered by the RPC definitions themselves.
-4.  **On-chain Contract Interaction**: The `ckb-chess` contract's interaction with the CKB chain (e.g., submitting the final signed state, claiming timeout) is mentioned as external to Fiber RPCs. Further research into the CKB SDK would be needed to understand how the relayer would interact with the contract for these final on-chain steps.
+The provided content **does not contain any information** regarding the Anbernic RG-ARC-D's default operating system, root access, or ADB accessibility.
 
-### Relevant Code/API Snippets
+### 7. For the Retroid Pocket 4 Pro, what is its default Android version, does it support ADB over WiFi, and can full APKs (including custom launchers) be sideloaded without root?
 
-**Embedding Game State Hash (`payment_send_payment`):**
-From `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/payment.rs`:
-```rust
-#[serde_as]
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct SendPaymentCommandParams {
-    // ... other fields ...
-    /// Some custom records for the payment which contains a map of u32 to Vec<u8>
-    /// The key is the record type, and the value is the serialized data
-    pub custom_records: Option<PaymentCustomRecords>,
-    // ... other fields ...
-}
+The provided content **does not contain any information** regarding the Retroid Pocket 4 Pro's default Android version, ADB over WiFi support, or the ability to sideload full APKs (including custom launchers) without root.
 
-#[serde_as]
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize, Default)]
-pub struct PaymentCustomRecords {
-    /// The custom records to be included in the payment.
-    #[serde(flatten)]
-    #[serde_as(as = "HashMap<U32Hex, SliceHex>")]
-    pub data: HashMap<u32, Vec<u8>>,
-}
-```
+### 8. What is the typical Android version range for Hispo S8 and similar MTK/Qualcomm car head units, and is root access generally available or easily achievable?
 
-**`open_channel` RPC:**
-From `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/channel.rs`:
-```rust
-#[cfg(not(target_arch = "wasm32"))]
-#[rpc(server)]
-trait ChannelRpc {
-    /// Attempts to open a channel with a peer.
-    #[method(name = "open_channel")]
-    async fn open_channel(
-        &self,
-        params: OpenChannelParams,
-    ) -> Result<OpenChannelResult>;
-    // ... other channel methods ...
-}
-```
+The provided content **does not contain any information** regarding the typical Android version range for Hispo S8 or similar MTK/Qualcomm car head units, nor whether root access is generally available or easily achievable on these devices.
 
-**`new_invoice` RPC:**
-From `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/invoice.rs`:
-```rust
-#[cfg(not(target_arch = "wasm32"))]
-#[rpc(server)]
-trait InvoiceRpc {
-    /// Generates a new invoice.
-    #[method(name = "new_invoice")]
-    async fn new_invoice(
-        &self,
-        params: NewInvoiceParams,
-    ) -> Result<InvoiceResult>;
-    // ... other invoice methods ...
-}
-```
+### 9. Is ADB accessible by default on these head units, and what are the common methods for enabling it (e.g., developer options, specific codes)?
+
+The provided content **does not contain any information** regarding whether ADB is accessible by default on car head units or the common methods for enabling it.
+
+### 10. What are the specific limitations for running persistent background services (like a CKB light client or Fiber node) on these head units, especially concerning Android's process killing mechanisms on newer versions?
+
+The question itself identifies **Android's process killing mechanisms on newer versions** as a specific limitation for running persistent background services (like a CKB light client or Fiber node) on car head units. However, the provided content **does not offer further details or elaboration** on these specific limitations for car head units, nor does it suggest methods for mitigating them.
+
+## Gaps / Follow-up
+
+*   **Node.js Fiber Client Library**: Investigate the feasibility and effort required to build a robust Node.js client library from the Rust Fiber RPC definitions. This is a critical gap for Node.js-based projects like FiberQuest's sidecar.
+*   **ckb-chess Project Details**: Obtain the `ckb-chess` README.md or other documentation to understand its specific architecture, intended use of Fiber, and target platforms.
+*   **Embedded Linux Distributions (RK3566)**: Research specific documentation or community resources for ArkOS, JELOS, and Batocera.linux to confirm `systemd` support, arbitrary application execution, and custom scripting capabilities on RK3566-based handhelds.
+*   **Android Handhelds and Car Head Units**: Conduct dedicated research on the Anbernic RG-ARC-D, Retroid Pocket 4 Pro, Hispo S8, and similar car head units to determine:
+    *   Default OS and Android versions.
+    *   Root access availability and ease of achievement.
+    *   ADB accessibility (default, WiFi, enabling methods).
+    *   Specific strategies or workarounds for managing Android's process killing mechanisms to ensure persistent background services.
+*   **ESP32-P4 CPU Headroom**: Conduct performance testing on the ESP32-P4 to quantify the CPU and memory usage when running an emulator, `ckb-light-esp`, WiFi, and secp256k1 signing concurrently, to definitively answer the "open FiberQuest question."
+
+## Relevant Code/API Snippets
+
+*   **Fiber RPC Methods (FNN binary RPC)**:
+    *   `open_channel`
+    *   `send_payment`
+    *   `list_channels`
+    *   `new_invoice`
+    *   `get_invoice`
+    (Source: Project Ground Truth)
+
+*   **Location of Fiber Rust RPC Definitions**:
+    `https://github.com/nervosnetwork/fiber/tree/main/crates/fiber-lib/src/rpc`
+
+*   **FiberQuest UDP RAM Polling Interface**:
+    `UDP RAM polling (READ_CORE_MEMORY, port 55355)`
+    (Source: Project Ground Truth - FiberQuest description)
+
+---
+
+## ⚠️ Quality Note
+
+Findings are thin — seeds did not return sufficient content to answer the research questions. This task has been automatically re-queued with a request for better seeds.
+
+**Thin phrase count:** 7  
+**Content length:** 9798 chars

@@ -291,7 +291,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[IN_PROGRESS] ckb-snapshot-infra-revisit
+[DONE] ckb-snapshot-infra-revisit
 **Priority:** MEDIUM
 **Output:** findings/ckb-snapshot-infra-revisit.md
 **Goal:** ckb snapshot infra revisit
@@ -325,7 +325,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[IN_PROGRESS] ckb-chess-fiber-rpcs-revisit
+[DONE] ckb-chess-fiber-rpcs-revisit
 **Priority:** MEDIUM
 **Output:** findings/ckb-chess-fiber-rpcs-revisit.md
 **Goal:** ckb chess fiber rpcs revisit
@@ -373,7 +373,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[PENDING] llm-cost-optimisation-pricing-update
+[DONE] llm-cost-optimisation-pricing-update
 **Priority:** MEDIUM
 **Output:** findings/llm-cost-optimisation-pricing-update.md
 **Goal:** llm cost optimisation pricing update
@@ -2269,7 +2269,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[PENDING] wylora-usb-lora-dongle
+[DONE] wylora-usb-lora-dongle
 **Priority:** MEDIUM
 **Output:** findings/wylora-usb-lora-dongle.md
 **Goal:** Design USB dongle with ESP32-S3 + SX1262 LoRa radio + SMA connector. Appears as USB NCM ethernet adapter on host. Exposes local HTTP API for LoRa send/receive. CKB node + WyLora = instant LoRa gateway, no Helium hardware needed.
@@ -2341,7 +2341,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[PENDING] ickb-stack-integration-revisit-revisit
+[DONE] ickb-stack-integration-revisit-revisit
 **Priority:** MEDIUM
 **Output:** findings/ickb-stack-integration-revisit-revisit.md
 **Goal:** Re-research "ickb-stack-integration-revisit" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
@@ -2354,7 +2354,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[PENDING] wyvault-neuron-sphincs-integration-revisit
+[DONE] wyvault-neuron-sphincs-integration-revisit
 **Priority:** MEDIUM
 **Output:** findings/wyvault-neuron-sphincs-integration-revisit.md
 **Goal:** Re-research "wyvault-neuron-sphincs-integration" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
@@ -2367,7 +2367,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-[PENDING] sensecap-lora-ckb-bridge
+[DONE] sensecap-lora-ckb-bridge
 **Priority:** MEDIUM
 **Output:** findings/sensecap-lora-ckb-bridge.md
 **Goal:** Design a LoRaWAN → CKB bridge using SenseCAP hardware. How does SenseCAP (M2 gateway or SenseCAP S210x sensors) connect to a LoRaWAN network server, and how can CKB transaction events or sensor data be relayed over LoRa? What's the architecture: gateway → ChirpStack/TTN → MQTT → CKB node? Can we trigger CKB transactions from LoRa uplinks (e.g. sensor reading → on-chain data cell)? What are the bandwidth/payload constraints of LoRaWAN vs CKB transaction sizes?
@@ -2382,3 +2382,95 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 3. How do we bridge LoRa uplink data to a CKB transaction — what's the relay architecture?
 4. What are the payload size limits on LoRaWAN and how does that constrain CKB tx data?
 5. Is there prior art for LoRa → blockchain bridges we can adapt?
+
+---
+
+[DONE] llm-cost-optimisation-pricing-update-revisit
+**Priority:** MEDIUM
+**Output:** findings/llm-cost-optimisation-pricing-update-revisit.md
+**Goal:** Re-research "llm-cost-optimisation-pricing-update" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+
+---
+
+[DONE] wyvault-neuron-sphincs-integration-revisit-revisit
+**Priority:** MEDIUM
+**Output:** findings/wyvault-neuron-sphincs-integration-revisit-revisit.md
+**Goal:** Re-research "wyvault-neuron-sphincs-integration-revisit" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+
+---
+
+[DONE] wyvault-neuron-sphincs-integration-revisit-revisit-revisit
+**Priority:** MEDIUM
+**Output:** findings/wyvault-neuron-sphincs-integration-revisit-revisit-revisit.md
+**Goal:** Re-research "wyvault-neuron-sphincs-integration-revisit-revisit" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+
+---
+
+[DONE] ckb-chess-fiber-rpcs-revisit-revisit
+**Priority:** MEDIUM
+**Output:** findings/ckb-chess-fiber-rpcs-revisit-revisit.md
+**Goal:** Re-research "ckb-chess-fiber-rpcs-revisit" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+
+---
+
+## [DONE] wyvault-lite-ckb-signing
+**Priority:** HIGH
+**Output:** findings/wyvault-lite-ckb-signing.md
+**Goal:** Research the complete CKB transaction signing pipeline for implementation on ESP32-S3 (WyVault Lite hardware wallet). Answer: (1) Exact CKB signing algorithm — is it secp256k1 + blake2b160 address hash? What is the exact signing message format (witness structure, tx hash construction)? (2) Which blake2b variant — blake2b-256? What are the personalisation parameters CKB uses? (3) BIP32 key derivation path for CKB — is m/44'/309'/0'/0/0 the standard? Any CKB-specific derivation quirks? (4) Are there C implementations of blake2b + secp256k1 suitable for ESP-IDF (no OS dependencies, no heap allocations)? Preferred: libb2 or BLAKE2 reference impl. (5) What does a minimal CKB raw transaction look like that needs signing — what fields, what byte layout? (6) Can the signed tx be encoded as a QR code — what's the typical byte size of a signed CKB transfer tx? What QR version/error correction level needed? (7) Any prior art of CKB signing on embedded/constrained devices?
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/docs/ckb_transaction_structure.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0022-transaction-structure/0022-transaction-structure.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0024-ckb-genesis-script-list/0024-ckb-genesis-script-list.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-sdk-rust/develop/README.md
+- https://api.github.com/repos/nervosnetwork/ckb-sdk-js/contents/packages/ckb-sdk-utils/src
+
+---
+
+## [DONE] wyvault-lite-bip39-esp32
+**Priority:** HIGH
+**Output:** findings/wyvault-lite-bip39-esp32.md
+**Goal:** Research BIP39/BIP32 implementation on ESP32-S3 for WyVault Lite. Answer: (1) Best C library for BIP39 mnemonic generation + validation on ESP-IDF — trezor-crypto? bip39-c? What are the RAM/flash requirements? (2) BIP32 HD derivation in C on ESP32 — trezor-crypto hdnode implementation feasibility, RAM usage per derivation step. (3) ESP32-S3 hardware RNG quality — is esp_random() suitable for key generation entropy or does it need additional mixing? (4) Flash encryption on ESP32-S3 — what does enabling it involve at firmware level? Does it affect OTA? Can it be enabled post-flashing or only at first boot? (5) Secure boot v2 on ESP32-S3 — signing key generation, efuse burning process, what makes it irreversible. (6) What is the minimum viable secure key storage on ESP32-S3 without a secure element — NVS encryption? eFuse key storage? (7) Any open source ESP32 hardware wallet projects to reference (not Jade — something simpler/more readable)?
+**Seeds:**
+- https://raw.githubusercontent.com/trezor/trezor-crypto/master/README.md
+- https://raw.githubusercontent.com/trezor/trezor-crypto/master/bip39.c
+- https://raw.githubusercontent.com/trezor/trezor-crypto/master/bip32.c
+- https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/security/flash-encryption.html
+- https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/security/secure-boot-v2.html
+- https://raw.githubusercontent.com/Blockstream/Jade/master/README.md
+
+---
+
+## [DONE] wyvault-lite-qr-airgap
+**Priority:** MEDIUM
+**Output:** findings/wyvault-lite-qr-airgap.md
+**Goal:** Research air-gapped QR signing workflow for WyVault Lite. Answer: (1) What is the standard format for unsigned tx QR codes in existing hardware wallets (PSBT for Bitcoin, what for CKB)? (2) QR code generation on ESP32 — best C library (libqrencode? nayuki?), RAM requirements, speed at 320×480 display resolution. (3) What is the maximum data size for a QR code that's scannable by a phone camera from a 3.5" screen? (4) Animated QR / multi-part QR — is it needed for CKB tx sizes, or does a single QR fit? (5) BC-UR encoding standard (used by Keystone/Passport) — worth implementing or overkill for a first version? (6) Companion web app approach — what's the simplest way to build a browser-based unsigned tx generator that outputs a QR, then accepts a signed tx QR back? (7) LVGL on JC3248W535 — is there existing working code/examples for this exact board?
+**Seeds:**
+- https://raw.githubusercontent.com/nayuki/QR-Code-generator/master/c/qrcodegen.h
+- https://raw.githubusercontent.com/nayuki/QR-Code-generator/master/c/qrcodegen.c
+- https://raw.githubusercontent.com/lvgl/lvgl/master/README.md
+- https://api.github.com/repos/Guition/JC3248W535/contents
+- https://raw.githubusercontent.com/BlockchainCommons/Research/master/papers/bcr-2020-005-ur.md
