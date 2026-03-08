@@ -289,21 +289,22 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 4. What's the expected sign time on ESP32-P4 for a practical SPHINCS+ parameter set, both in pure software and with hardware acceleration (extrapolate from similar MCU benchmarks if direct data is unavailable)?
 5. Are there any prior art implementations or benchmarks of SPHINCS+ on ESP32 or similar Xtensa/RISC-V MCUs?
 
-## [PENDING] ckb-snapshot-infra-revisit
+---
+
+[IN_PROGRESS] ckb-snapshot-infra-revisit
 **Priority:** MEDIUM
 **Output:** findings/ckb-snapshot-infra-revisit.md
-**Goal:** Determine best practices for CKB snapshot hosting on Cloudflare R2, addressing previous 404 errors and missing community context.
+**Goal:** ckb snapshot infra revisit
 **Seeds:**
 - https://raw.githubusercontent.com/nervosnetwork/ckb/develop/CHANGELOG.md
 - https://raw.githubusercontent.com/nervosnetwork/ckb/develop/docs/run-ckb-with-docker.md
 - https://developers.cloudflare.com/r2/reference/data-location/
 - https://raw.githubusercontent.com/trufflesuite/ganache/develop/src/chains/ethereum/ethereum/README.md
 **Questions to answer:**
-1. What compression format does the CKB community expect or commonly use for node snapshots (e.g., zstd, lz4, gz, tar.zst)?
-2. How do other major blockchain projects (e.g., Bitcoin, Substrate, Ethereum) typically handle snapshot versioning and provide a "latest" pointer for easy access?
-3. Is there an existing CKB community snapshot already hosted somewhere, and what are its characteristics (size, update frequency, format)?
-4. What's the optimal `Cache-Control` header strategy for R2-hosted CKB snapshots, balancing freshness and download performance?
-
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
 ## [NEW_TASK] obd2-clio-rs172-esp32-revisit
 **Priority:** HIGH
 **Output:** findings/obd2-clio-rs172-esp32-revisit.md
@@ -322,20 +323,22 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 3. What specific data (live PIDs, fault codes, immobiliser status, VIN, mileage) can typically be READ from a Clio RS 172 via K-Line or CAN?
 4. What specific parameters or functions (e.g., key programming, idle speed adjustment, ignition timing, throttle adaptation reset, service interval reset) can typically be WRITTEN to a Clio RS 172 ECU via K-Line or CAN, and what are the associated risks?
 
-## [PENDING] ckb-chess-fiber-rpcs-revisit
+---
+
+[IN_PROGRESS] ckb-chess-fiber-rpcs-revisit
 **Priority:** MEDIUM
 **Output:** findings/ckb-chess-fiber-rpcs-revisit.md
-**Goal:** Identify the specific Fiber RPCs required for the ckb-chess relayer, addressing previous 404 errors and clarifying the payment/state transport flow.
+**Goal:** ckb chess fiber rpcs revisit
 **Seeds:**
 - https://github.com/nervosnetwork/fiber/tree/main/docs
 - https://github.com/nervosnetwork/fiber/tree/main/crates/fiber-lib/src/rpc
 - https://github.com/nervosnetwork/fiber/tree/main/tests/bruno/fiber
 - https://github.com/toastmanAu/ckb-chess/blob/main/README.md
 **Questions to answer:**
-1. What are the specific Fiber RPCs (e.g., `open_channel`, `send_payment`, `new_invoice`, `get_invoice`, `list_channels`, `close_channel`) required for the ckb-chess relayer to manage game state and balance adjustments?
-2. How can game state hashes be reliably embedded within Fiber payment messages or other channel update mechanisms?
-3. What is the precise sequence of Fiber RPC calls for a full ckb-chess game lifecycle, from channel opening to final settlement, including handling moves and timeouts?
-
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
 ## [NEW_TASK] handheld-gaming-rk3566-deep-dive
 **Priority:** MEDIUM
 **Output:** findings/handheld-gaming-rk3566-deep-dive.md
@@ -368,10 +371,12 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 2. Is ADB accessible by default on these head units, and what are the common methods for enabling it (e.g., developer options, specific codes)?
 3. What are the specific limitations for running persistent background services (like a CKB light client or Fiber node) on these head units, especially concerning Android's process killing mechanisms on newer versions?
 
-## [PENDING] llm-cost-optimisation-pricing-update
-**Priority:** HIGH
+---
+
+[PENDING] llm-cost-optimisation-pricing-update
+**Priority:** MEDIUM
 **Output:** findings/llm-cost-optimisation-pricing-update.md
-**Goal:** Obtain current pricing, rate limits, and free tier details for key LLM models to inform LiteLLM routing and cost optimization.
+**Goal:** llm cost optimisation pricing update
 **Seeds:**
 - https://www.anthropic.com/api
 - https://cloud.google.com/vertex-ai/pricing#generative_ai_models
@@ -381,12 +386,10 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://huggingface.co/docs/api-inference/detailed_parameters#rate-limits
 - https://litellm.ai/docs/routing
 **Questions to answer:**
-1. What are the current prices per million input/output tokens for: Claude Sonnet 4.5, Claude Haiku 3.5, Gemini 2.5 Flash, Gemini 2.5 Pro, GPT-4o mini, Llama 3.3 70B (via HF Inference API), DeepSeek V3 (via HF Inference API or OpenRouter)?
-2. What are the actual rate limits, typical queue times, and reliability expectations for sustained use of the HuggingFace free inference tier?
-3. What are the specific RPM/TPD limits for the Gemini 2.5 Flash free tier, and how do they compare to paid tiers?
-4. Does OpenRouter offer a meaningful cost difference compared to direct API access for Claude and Gemini models, considering their aggregation and potential bulk discounts?
-5. Can LiteLLM be configured to automatically route requests to the *cheapest capable model* based on real-time pricing and model capabilities, and what is the setup complexity for this?
-
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
 ## [NEW_TASK] esp32-ckb-dob-signing-flow
 **Priority:** MEDIUM
 **Output:** findings/esp32-ckb-dob-signing-flow.md
@@ -2197,7 +2200,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] opi3b-dual-display-dsi-hdmi
+## [DONE] opi3b-dual-display-dsi-hdmi
 **Priority:** HIGH
 **Output:** findings/opi3b-dual-display-dsi-hdmi.md
 **Goal:** Confirm and document the exact device tree configuration for simultaneous DSI + HDMI output on Orange Pi 3B (RK3566). What VP (Video Port) assignments are needed? Does the BSP 5.10 kernel support dual display, or does it require mainline? What Armbian overlays or DTS changes enable both outputs at once? Are there known working examples from Firefly ROC-RK3566-PC or other RK3566 boards we can port?
@@ -2217,7 +2220,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] ickb-stack-integration
+## [DONE] ickb-stack-integration
 **Priority:** MEDIUM
 **Output:** findings/ickb-stack-integration.md
 **Goal:** Research iCKB protocol and identify practical integration points with our stack. Cover: (1) What is iCKB — how does it work as a liquid staking derivative on CKB? What's the yield mechanism and how does the exchange rate accrue? (2) Integration with Fiber Network — can iCKB be used in Fiber payment channels instead of raw CKB? What are the tradeoffs (liquidity, atomicity, channel capacity)? (3) Integration with our DOB/Spore minting flow — could Founding Members stake CKB via iCKB and use yield to mint DOBs? (4) Wyltek POS integration — accept iCKB as payment? Convert on the fly? (5) CKH node — could iCKB yield fund node operation costs automatically? (6) Any SDK or contract interfaces available for programmatic iCKB mint/redeem? (7) Risks: smart contract risk, depeg scenarios, liquidity depth on mainnet.
@@ -2229,7 +2232,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] wyvault-neuron-sphincs-integration
+## [DONE] wyvault-neuron-sphincs-integration
 **Priority:** HIGH
 **Output:** findings/wyvault-neuron-sphincs-integration.md
 **Goal:** Research what it would take to add SPHINCS+ (Quantum Purse) hardware wallet support to Neuron. Cover: (1) Neuron codebase structure — where lock scripts are registered, where signing is routed, where hardware wallet (Ledger) integration lives. What files/modules need changing. (2) Quantum Purse lock script — what is the mainnet code hash? How does QP encode addresses? Is it standard CKB full address format? (3) Ledger APDU protocol used by Neuron — what commands does it send for signing? How would we add a SIGN_TX_SPHINCS command? (4) Witness format for SPHINCS+-128f — how large is it (~17KB)? Does CKB have any witness size limits? (5) Neuron plugin API — does Neuron support plugins that could add QP support without a core PR? (6) Grant opportunity — has Nervos Foundation / CKB Eco Fund funded wallet integrations before? Is a Spark grant viable for this? Who to contact (tea2x already knows QP side). (7) Estimated dev effort and who could realistically build the Neuron PR. (8) Prior art — has any other blockchain wallet added post-quantum hardware signing support?
@@ -2239,3 +2242,143 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://raw.githubusercontent.com/nervosnetwork/neuron/develop/README.md
 - https://api.github.com/repos/nervosnetwork/neuron/contents/packages/neuron-wallet/src
 - https://raw.githubusercontent.com/tea2x/quantum-purse/main/README.md
+
+## [DONE] wyterminal-usb-hid-telegram-relay
+- id: wyterminal-usb-hid-telegram-relay
+- goal: Research and implement ESP32-S3 AMOLED device as USB HID keyboard + Telegram-controlled Linux terminal relay
+- tags: esp32, usb-hid, telegram, linux, relay
+- priority: HIGH
+- status: DONE
+- findings: firmware/WyTerminal.ino — Flask relay on Pi, SSH hop to any target, screenshot via gnome-screenshot, dynamic /target switching, sudo relay via /input
+
+## [DONE] usb-ncm-composite-esp32s3
+- id: usb-ncm-composite-esp32s3
+- goal: Implement USB CDC-NCM ethernet composite device on ESP32-S3 alongside HID — board presents as USB network adapter, host gets IP via DHCP, relay runs on target
+- tags: esp32, usb-ncm, lwip, composite-usb, networking
+- priority: HIGH
+- status: DONE
+- findings: TinyUSB NCM compiled in ESP32 Arduino core (CFG_TUD_NCM=1). Custom usb_ncm.cpp implements netif output/input, minimal DHCP server, lwIP TCP HTTP client. Board IP 192.168.7.2, host 192.168.7.1.
+
+## [DONE] wyrelay-usb-hid-keyboard-esp32
+- id: wyrelay-usb-hid-keyboard-esp32
+- goal: Minimal USB HID keyboard relay via Telegram — type any text or key combo on any connected machine remotely
+- tags: esp32, usb-hid, telegram, keyboard
+- priority: MEDIUM
+- status: DONE
+- findings: repo toastmanAu/WyRelay — stripped-down WyTerminal without display/relay; just HID keyboard controlled via Telegram bot
+
+---
+
+[PENDING] wylora-usb-lora-dongle
+**Priority:** MEDIUM
+**Output:** findings/wylora-usb-lora-dongle.md
+**Goal:** Design USB dongle with ESP32-S3 + SX1262 LoRa radio + SMA connector. Appears as USB NCM ethernet adapter on host. Exposes local HTTP API for LoRa send/receive. CKB node + WyLora = instant LoRa gateway, no Helium hardware needed.
+**Seeds:**
+
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+## [DONE] wyvault-esp32p4-ckb-hardware-wallet
+- id: wyvault-esp32p4-ckb-hardware-wallet
+- goal: ESP32-P4 CKB hardware wallet with secp256k1 + SPHINCS+ hybrid PQR key architecture, Ledger APDU over USB HID
+- tags: esp32-p4, hardware-wallet, secp256k1, sphincs-plus, ckb, pqr
+- priority: HIGH
+- status: DONE
+- findings: repo toastmanAu/WyVault — secp256k1 ~5ms, SPHINCS+-128f ~200ms, hybrid ephemeral+permanent eFuse key model
+
+## [DONE] sensecap-m1-repurpose-ckb-lora
+- id: sensecap-m1-repurpose-ckb-lora
+- goal: Repurpose decommissioned SenseCAP M1 Helium gateways (MT7628 + SX1302) as CKB LoRa bridges. Replace Helium OS with Raspberry Pi OS or OpenWrt, run sx1302_hal + CKB light client.
+- tags: sensecap, lora, sx1302, ckb, helium, openwrt
+- priority: MEDIUM
+- status: DONE
+- findings: Samsung 128GB flashed with RPi OS Lite 64-bit, booted at .85. SSH access setup. Main bridge script deferred. WyLora dongle may supersede this approach.
+
+## [DONE] nerdminer-ckb-esp32-eaglesong
+- id: nerdminer-ckb-esp32-eaglesong
+- goal: ESP32 solo Eaglesong miner (NerdMiner fork) targeting CKB network. Stratum protocol, pool-compatible, display block/hashrate on TFT.
+- tags: esp32, ckb, eaglesong, mining, stratum
+- priority: MEDIUM  
+- status: DONE
+- findings: repo toastmanAu/NerdMiner_CKB — Eaglesong implemented, stratum working against viabtc. Pi5 stratum proxy at port 3333 routes to pool. CYD (ESP32-2432S028R) target board.
+
+---
+
+[DONE] opi3b-dual-display-dsi-hdmi-revisit
+**Priority:** HIGH
+**Output:** findings/opi3b-dual-display-dsi-hdmi-revisit.md
+**Goal:** Re-research OPi3B simultaneous DSI + HDMI dual display on RK3566 VOP2. VP assignment, DTS changes, mainline vs BSP kernel support. Find working dual-display DTS from Firefly ROC-RK3566-PC or similar RK3566 boards.
+**Seeds:**
+- https://raw.githubusercontent.com/armbian/build/main/patch/kernel/rockchip64-current/0002-rk3566-roc-pc-add-dsi.patch
+- https://raw.githubusercontent.com/torvalds/linux/master/arch/arm64/boot/dts/rockchip/rk3566-firefly-roc-pc.dts
+- https://raw.githubusercontent.com/armbian/build/main/config/boards/orangepi3b.conf
+- https://raw.githubusercontent.com/torvalds/linux/master/Documentation/devicetree/bindings/display/rockchip/rockchip-vop2.yaml
+- https://raw.githubusercontent.com/rockchip-linux/kernel/develop-5.10/arch/arm64/boot/dts/rockchip/rk3566-orangepi-3b.dts
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+---
+
+[DONE] ickb-stack-integration-revisit
+**Priority:** MEDIUM
+**Output:** findings/ickb-stack-integration-revisit.md
+**Goal:** Research iCKB liquid staking on CKB — yield mechanism, exchange rate accrual, Fiber channel compatibility, SDK interfaces, DOB/Spore integration, POS payment use case, risks (depeg, smart contract, liquidity depth on mainnet).
+**Seeds:**
+- https://raw.githubusercontent.com/ickb/whitepaper/HEAD/README.md
+- https://raw.githubusercontent.com/ickb/whitepaper/HEAD/2024_overview.md
+- https://raw.githubusercontent.com/ickb/contracts/HEAD/README.md
+- https://raw.githubusercontent.com/ickb/template/main/README.md
+**Questions to answer:**
+1. How does iCKB yield accrue — what is the exchange rate mechanism?
+2. Can iCKB be used in Fiber payment channels? What are the tradeoffs?
+3. Is there a programmatic SDK for minting/redeeming iCKB?
+4. What are the main risks: depeg, smart contract bugs, liquidity?
+5. Could iCKB yield fund CKB node operation costs automatically?
+
+---
+
+[PENDING] ickb-stack-integration-revisit-revisit
+**Priority:** MEDIUM
+**Output:** findings/ickb-stack-integration-revisit-revisit.md
+**Goal:** Re-research "ickb-stack-integration-revisit" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+
+---
+
+[PENDING] wyvault-neuron-sphincs-integration-revisit
+**Priority:** MEDIUM
+**Output:** findings/wyvault-neuron-sphincs-integration-revisit.md
+**Goal:** Re-research "wyvault-neuron-sphincs-integration" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+
+---
+
+[PENDING] sensecap-lora-ckb-bridge
+**Priority:** MEDIUM
+**Output:** findings/sensecap-lora-ckb-bridge.md
+**Goal:** Design a LoRaWAN → CKB bridge using SenseCAP hardware. How does SenseCAP (M2 gateway or SenseCAP S210x sensors) connect to a LoRaWAN network server, and how can CKB transaction events or sensor data be relayed over LoRa? What's the architecture: gateway → ChirpStack/TTN → MQTT → CKB node? Can we trigger CKB transactions from LoRa uplinks (e.g. sensor reading → on-chain data cell)? What are the bandwidth/payload constraints of LoRaWAN vs CKB transaction sizes?
+**Seeds:**
+- https://raw.githubusercontent.com/Seeed-Solution/SenseCAP-One-Series-Meteorological-Station/master/README.md
+- https://raw.githubusercontent.com/Seeed-Studio/SenseCAP-Node-LoRaWAN/main/README.md
+- https://www.chirpstack.io/docs/
+- https://raw.githubusercontent.com/brocaar/chirpstack-application-server/master/README.md
+**Questions to answer:**
+1. What SenseCAP hardware is best suited — M2 gateway, indicator, or sensor nodes?
+2. What LoRaWAN network server works best locally (ChirpStack self-hosted vs TTN)?
+3. How do we bridge LoRa uplink data to a CKB transaction — what's the relay architecture?
+4. What are the payload size limits on LoRaWAN and how does that constrain CKB tx data?
+5. Is there prior art for LoRa → blockchain bridges we can adapt?

@@ -14,12 +14,13 @@ Cost: ~$0.01-0.05 per task at Gemini Flash rates
 import os, sys, re, json, time, argparse, glob
 import urllib.request, urllib.error
 
-WORKSPACE       = os.path.expanduser("~/.openclaw/workspace")
+WORKSPACE       = os.environ.get("RESEARCH_WORKSPACE", os.path.expanduser("~/.openclaw/workspace"))
 QUEUE_FILE      = os.path.join(WORKSPACE, "research/queue.md")
 FINDINGS_DIR    = os.path.join(WORKSPACE, "research/findings")
 ENV_FILE        = os.path.expanduser("~/.openclaw/.env")
 HEARTBEAT_STATE = os.path.join(WORKSPACE, "memory/heartbeat-state.json")
 MEMORY_FILE     = os.path.join(WORKSPACE, "MEMORY.md")
+CLAIMS_DIR      = os.path.join(WORKSPACE, "research/claims")  # task lock files to prevent double-work
 
 GEMINI_MODEL = "gemini-2.5-flash"
 GEMINI_API   = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
@@ -206,6 +207,41 @@ def gemini_query(api_key, prompt):
         return data["candidates"][0]["content"]["parts"][0]["text"]
 
 
+
+# ─── Claim locking — prevents multiple crawlers picking the same task ────────
+
+def claim_task(task_id, worker_id=None):
+    """Write a claim file for task_id. Returns True if claim succeeded, False if already claimed."""
+    import socket, hashlib
+    os.makedirs(CLAIMS_DIR, exist_ok=True)
+    claim_file = os.path.join(CLAIMS_DIR, f"{task_id}.claimed")
+    if os.path.exists(claim_file):
+        # Check if stale (>2 hours old = crawler probably died)
+        age = time.time() - os.path.getmtime(claim_file)
+        if age < 7200:
+            return False  # Active claim by another worker
+        print(f"  [claim] Stale claim on {task_id} ({int(age/60)}min old) — overriding")
+    worker = worker_id or socket.gethostname()
+    with open(claim_file, "w") as f:
+        json.dump({"task": task_id, "worker": worker, "claimed_at": time.time()}, f)
+    return True
+
+def release_claim(task_id):
+    """Remove claim file after task is done or failed."""
+    claim_file = os.path.join(CLAIMS_DIR, f"{task_id}.claimed")
+    try:
+        os.remove(claim_file)
+    except FileNotFoundError:
+        pass
+
+def is_claimed(task_id):
+    """Return True if task has an active (non-stale) claim."""
+    claim_file = os.path.join(CLAIMS_DIR, f"{task_id}.claimed")
+    if not os.path.exists(claim_file):
+        return False
+    age = time.time() - os.path.getmtime(claim_file)
+    return age < 7200  # 2h stale timeout
+
 def parse_tasks(queue_text):
     tasks = []
     blocks = re.split(r"\n---\n", queue_text)
@@ -389,11 +425,67 @@ Write a structured markdown research note with:
     print(f"  Written: {output_path}")
     mark_done(task["id"])
 
+    # Quality check — detect thin/inadequate findings and auto-requeue
+    if not is_synthesis and not dry_run:
+        _check_findings_quality(task, result)
+
     # For synthesis tasks: parse any new task blocks from the result and append to queue
     if is_synthesis and not dry_run:
         _inject_new_tasks(result)
 
     return output_path
+
+
+def _check_findings_quality(task, findings_text):
+    """
+    Detect thin findings (poor seeds, not enough content, Gemini couldn't answer)
+    and auto-queue a revised task with better seeds and a note.
+    Thresholds: <400 chars of actual content, or >3 "not found"/"not provided"/"not contain" phrases.
+    """
+    THIN_PHRASES = [
+        "not explicitly", "not contain", "not provided", "not found",
+        "no specific", "no information", "cannot determine", "not available",
+        "unable to find", "not mentioned", "does not address", "not covered"
+    ]
+    content_len = len(findings_text.strip())
+    thin_hits = sum(findings_text.lower().count(p) for p in THIN_PHRASES)
+
+    is_thin = content_len < 400 or thin_hits >= 6
+
+    if not is_thin:
+        return
+
+    print(f"  ⚠️  Thin findings detected (len={content_len}, thin_phrases={thin_hits}) — queuing re-research")
+
+    # Append a note to the existing findings file
+    output_path = os.path.join(WORKSPACE, "research", task["output"])
+    with open(output_path, "a") as f:
+        f.write(f"\n\n---\n\n## ⚠️ Quality Note\n\nFindings are thin — seeds did not return sufficient content to answer the research questions. This task has been automatically re-queued with a request for better seeds.\n\n**Thin phrase count:** {thin_hits}  \n**Content length:** {content_len} chars\n")
+
+    # Add a re-research task to queue
+    revisit_id = f"{task['id']}-revisit"
+    queue_content = open(QUEUE_FILE).read()
+    if revisit_id in queue_content:
+        print(f"  Re-research task {revisit_id} already exists, skipping")
+        return
+
+    new_block = f"""
+---
+
+[PENDING] {revisit_id}
+**Priority:** MEDIUM
+**Output:** findings/{revisit_id}.md
+**Goal:** Re-research "{task['id']}" with better seeds — initial crawl returned thin findings (poor seed URLs, 404s, or topic too broad). Find primary sources: official docs, GitHub raw source, spec sheets, RFCs, or forum posts with concrete answers.
+**Seeds:**
+**Questions to answer:**
+1. What are the core technical details of this topic?
+2. What specific APIs, protocols, or interfaces are available?
+3. What are the known limitations or failure modes?
+4. Are there working examples or reference implementations?
+"""
+    with open(QUEUE_FILE, "a") as f:
+        f.write(new_block)
+    print(f"  Auto-queued: {revisit_id}")
 
 
 def _inject_new_tasks(synthesis_output):
@@ -494,6 +586,9 @@ def main():
         pending = [t for t in tasks if t["status"] == "PENDING"]
         priority_order = {"HIGH": 0, "MEDIUM": 1, "LOW": 2, "SYNTHESIS": 9}
         pending.sort(key=lambda t: priority_order.get(t["priority"], 5))
+        # Skip tasks already claimed by another crawler
+        os.makedirs(CLAIMS_DIR, exist_ok=True)
+        pending = [t for t in pending if not is_claimed(t["id"])]
         tasks = pending[:1]
 
     if not tasks:
@@ -501,7 +596,13 @@ def main():
         return
 
     for task in tasks:
-        run_task(task, api_key, dry_run=args.dry_run)
+        if not claim_task(task["id"]):
+            print(f"Task {task['id']} was just claimed by another crawler — skipping")
+            continue
+        try:
+            run_task(task, api_key, dry_run=args.dry_run)
+        finally:
+            release_claim(task["id"])
 
     # Update heartbeat timestamp
     try:

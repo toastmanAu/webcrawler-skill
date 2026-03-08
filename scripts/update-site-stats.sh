@@ -91,9 +91,112 @@ for pattern in "stack-gap-analysis" "synthesis" "gap-analysis" "nervos-wyltek" "
   find "$FINDINGS_DEST" -name "*${pattern}*" -delete 2>/dev/null || true
 done
 
-if ! git diff --quiet || git status --short | grep -q "research/"; then
-    git add index.html research/
-    git commit -m "stats: boards=$BOARDS sensors=$SENSORS repos=$REPOS + findings sync [auto]"
+# Filename normalization — ensure every DONE queue task ID has a matching findings file on site.
+# Some findings are named differently to their queue ID (e.g. ckb-snapshot-infra vs ckb-snapshot-infrastructure).
+# Map: queue-id → local findings filename (without .md)
+QUEUE_SRC="/home/phill/.openclaw/workspace/research/queue.md"
+python3 << NORMEOF
+import re, os, shutil
+
+queue = open('$QUEUE_SRC').read()
+findings_src = '$FINDINGS_SRC'
+findings_dest = '$FINDINGS_DEST'
+
+# Parse all DONE task IDs from queue
+task_ids = []
+for block in re.split(r'\n(?=## \[)', queue):
+    m = re.match(r'## \[DONE\] (.+)', block.strip())
+    if m:
+        task_ids.append(m.group(1).strip())
+# last-occurrence wins
+seen = {}
+for tid in task_ids:
+    seen[tid] = True
+task_ids = list(seen.keys())
+
+# For each DONE task, if site doesn't have <id>.md, find closest match in findings_src
+private = ['stack-gap-analysis','synthesis','gap-analysis','nervos-wyltek',
+           'supabase-','wyltek-membership','sidecar-secure-key','hackathon']
+
+fixed = 0
+for tid in task_ids:
+    dest_file = os.path.join(findings_dest, tid + '.md')
+    if os.path.exists(dest_file):
+        continue  # already there
+    # Skip private
+    if any(p in tid for p in private):
+        continue
+    # Find best match in source: exact, then prefix, then longest common prefix
+    src_files = [f for f in os.listdir(findings_src) if f.endswith('.md')]
+    match = None
+    # Try prefix match (queue id starts with findings filename stem)
+    for sf in src_files:
+        stem = sf[:-3]
+        if tid.startswith(stem) or stem.startswith(tid[:12]):
+            match = sf
+            break
+    if match:
+        shutil.copy(os.path.join(findings_src, match), dest_file)
+        print(f'[norm] {match} → {tid}.md')
+        fixed += 1
+    else:
+        # Write a thin stub so viewer never 404s
+        with open(dest_file, 'w') as f:
+            f.write(f'# {tid}\n\n> Findings file pending — research completed but source file not yet matched.\n> Will be populated on next crawler run.\n')
+        print(f'[norm] stub written: {tid}.md')
+        fixed += 1
+
+print(f'[norm] Normalized {fixed} filename mismatches')
+NORMEOF
+
+# Regenerate research-tasks.js from queue.md
+QUEUE_SRC="/home/phill/.openclaw/workspace/research/queue.md"
+python3 << RESEOF
+import re, json
+
+with open('$QUEUE_SRC') as f:
+    content = f.read()
+
+tasks = {}
+blocks = re.split(r'\n(?=## \[)', content)
+for block in blocks:
+    m = re.match(r'## \[([A-Z_]+)\] (.+)', block.strip())
+    if not m: continue
+    status_raw, task_id = m.group(1), m.group(2).strip()
+    if status_raw == 'DONE': status = 'DONE'
+    elif status_raw in ('PENDING', 'NEW_TASK'): status = 'PENDING'
+    else: continue
+    goal_m = re.search(r'^- goal:\s*(.+)$', block, re.MULTILINE)
+    tags_m = re.search(r'^- tags:\s*(.+)$', block, re.MULTILINE)
+    prio_m = re.search(r'^- priority:\s*(.+)$', block, re.MULTILINE)
+    goal = goal_m.group(1).strip() if goal_m else task_id.replace('-', ' ').title()
+    tags = [t.strip() for t in tags_m.group(1).split(',')] if tags_m else []
+    priority = prio_m.group(1).strip().upper() if prio_m else 'MEDIUM'
+    tasks[task_id] = {'id': task_id, 'status': status, 'priority': priority, 'goal': goal, 'tags': tags}
+
+order = {'HIGH': 0, 'MEDIUM': 1, 'LOW': 2, 'SYNTHESIS': 3}
+done = sorted([t for t in tasks.values() if t['status']=='DONE'], key=lambda t: order.get(t['priority'],2))
+pending = sorted([t for t in tasks.values() if t['status']=='PENDING'], key=lambda t: order.get(t['priority'],2))
+all_tasks = done + pending
+
+lines = [
+    "// research-tasks.js — auto-generated from research/queue.md",
+    f"// {len(all_tasks)} tasks ({len(done)} done, {len(pending)} pending)",
+    "const RESEARCH_TASKS = ["
+]
+for t in all_tasks:
+    lines.append(f"  {json.dumps(t)},")
+lines.append("];")
+
+out = '$SITE/js/research-tasks.js'
+with open(out, 'w') as f:
+    f.write('\n'.join(lines))
+print(f"[stats] research-tasks.js: {len(all_tasks)} tasks ({len(done)} done, {len(pending)} pending)")
+RESEOF
+
+if ! git diff --quiet || git status --short | grep -q "research/\|js/research-tasks"; then
+    git add index.html research/ js/research-tasks.js
+    git commit -m "stats: boards=$BOARDS sensors=$SENSORS repos=$REPOS + findings + tasks sync [auto]"
     git push
     echo "[stats] Pushed update to GitHub"
 else

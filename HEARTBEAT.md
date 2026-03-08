@@ -1,12 +1,24 @@
 # HEARTBEAT.md
 
+## Dead Seed Reseeder (1x/day — runs after research crawler)
+Run `python3 /home/phill/.openclaw/workspace/scripts/reseed-dead-findings.py`
+- Scans all findings/ for 404 indicators, "thin findings", "quality note", dead seed phrases
+- For each dead finding: asks Gemini to find replacement URLs, verifies they're reachable
+- Auto-queues a `<task-id>-reseed` PENDING task with verified seeds
+- Skips if revisit/reseed already queued
+- Tracks last run in heartbeat-state.json under key `lastReseedCheck` (runs once per day)
+- If reseeded > 0: notify Phill with count
+
 ## Idle Research Crawler (runs automatically when nothing else needs attention)
 **Split responsibility:**
 - **Pi (Kernel/me)** → FiberQuest tasks only (fiberquest-* and fiber-* tagged tasks) — private until comp starts
 - **NucBox** → all other general stack research (already running via cron every 15min)
 
 Rule: if there are PENDING fiberquest-* or fiber-* tasks in `research/queue.md` AND `lastResearchCrawl` in heartbeat-state.json is >15min ago → run one task.
-Command: `python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py --filter fiberquest,fiber`
+Command: sync claims from NucBox first, then crawl:
+```
+rsync -q phill@192.168.68.79:/home/phill/workspace/research/claims/ /home/phill/.openclaw/workspace/research/claims/ 2>/dev/null; python3 /home/phill/.openclaw/workspace/scripts/research-crawl.py --filter fiberquest,fiber
+```
 - If no fiberquest/fiber tasks pending: skip silently (NucBox handles the rest)
 - Script picks the next task automatically: HIGH → MEDIUM → LOW → SYNTHESIS
 - SYNTHESIS tasks run last — they read all completed findings + MEMORY.md and produce a stack gap analysis (no web crawl needed)
