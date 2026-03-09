@@ -2554,3 +2554,55 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 - https://raw.githubusercontent.com/nervosnetwork/ckb/develop/sync/src/filter/get_block_filters_process.rs
 - https://raw.githubusercontent.com/nervosnetwork/ckb/develop/test/src/specs/sync/block_filter.rs
 - https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0044-ckb-light-client/0044-ckb-light-client.md
+
+---
+
+## [PENDING] ckb-custom-lang-feasibility
+**Priority:** HIGH
+**Output:** findings/ckb-custom-lang-feasibility.md
+**Goal:** Deep feasibility study for a lightweight, C-like language designed specifically for CKB scripting. CKB-VM executes RISC-V bytecode — any language that compiles to RISC-V is valid. We want to understand: (1) what prior art exists for embedded/systems DSLs that compile to RISC-V or similar targets, (2) how existing CKB script languages (ckb-js-vm/QuickJS, Lua ports) are structured, (3) what a purpose-built CKB language would need as first-class primitives, (4) realistic implementation path for a small team. The end goal is evaluating whether a "CKB Script Language" — C-like syntax, deterministic, cycle-aware, with native cell/capacity/lock types — is buildable and what it would take.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb-js-vm/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-js-vm/main/docs/development.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-c-stdlib/master/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-c-stdlib/master/ckb_syscalls.h
+- https://raw.githubusercontent.com/nervosnetwork/ckb-c-stdlib/master/ckb_dlfcn.h
+- https://raw.githubusercontent.com/rui314/chibicc/main/README.md
+- https://raw.githubusercontent.com/rui314/chibicc/main/chibicc.h
+- https://raw.githubusercontent.com/rui314/8cc/master/README.md
+**Questions to answer:**
+1. How is ckb-js-vm structured — QuickJS compiled to RISC-V, script reads JS from cell data, executes it? What does the glue layer look like?
+2. What syscalls does CKB expose to scripts (ckb_load_cell, ckb_load_script, etc.) and how are they bound in C stdlib? These would be the native primitives any new language needs.
+3. chibicc (Rui Ueyama's small C compiler) — does it support RISC-V backend? Could it be embedded as an on-chain compiler cell?
+4. What's the cycle cost of running an interpreter vs AOT compilation on-chain? Is there published benchmarking for ckb-js-vm cycle usage?
+5. Prior art: Forth on RISC-V, Lua on RISC-V, any other small language runtimes targeting RISC-V — what binary sizes do they compile to?
+6. What would "CKB-native types" look like in a language? (Script, Cell, CellInput, Capacity as u64 with overflow protection, H256 for hashes)
+7. Linear/affine type systems for cell ownership — has anyone proposed this for CKB? Compare to Move language's resource model.
+8. Minimal viable compiler pipeline: source → AST → RISC-V assembly → binary. What existing open-source components could be reused (LLVM too heavy, QBE backend, libgccjit, RVCC)?
+9. Are there any CKB RFCs or community proposals for a higher-level scripting layer?
+
+---
+
+## [PENDING] ckb-risc-v-compiler-toolchain
+**Priority:** MEDIUM
+**Output:** findings/ckb-risc-v-compiler-toolchain.md
+**Goal:** Map the practical compiler toolchain options for targeting CKB-VM (RISC-V rv64imc). Focus on lightweight/embeddable options — not "use LLVM" but specifically: small C compilers that output RISC-V (chibicc, RVCC, 8cc), QBE as a lightweight backend, tcc (Tiny C Compiler) RISC-V support status, and what the Nervos team actually uses to build C scripts. Secondary: understand the binary size constraints (what's a reasonable script binary size on-chain?), how shared libraries work via ckb_dlopen, and whether an on-chain JIT is cycle-feasible.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb-c-stdlib/master/Makefile
+- https://raw.githubusercontent.com/nervosnetwork/ckb-c-stdlib/master/molecule/blockchain.mol
+- https://raw.githubusercontent.com/nicowillis/rvcc/main/README.md
+- https://raw.githubusercontent.com/bellard/tcc/master/README
+- https://c9x.me/compile/doc/il.html
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0002-ckb/0002-ckb.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0032-ckb-vm-version-selection/0032-ckb-vm-version-selection.md
+- https://raw.githubusercontent.com/XuJiandong/ckb-script-templates/main/README.md
+**Questions to answer:**
+1. What does the Nervos team use to compile C scripts — riscv64-unknown-elf-gcc with what flags? Any size optimisation tricks documented?
+2. TCC (Tiny C Compiler) — does it have a working RISC-V64 backend? Could it be compiled to RISC-V itself (recursive compiler-as-script)?
+3. QBE backend — what languages have used QBE as their backend? Could a new CKB language use QBE → RISC-V asm?
+4. chibicc RISC-V support — Rui added x86-64 and ARM64. Is RISC-V64 in a fork? What would it take to add?
+5. Binary size reality: what do existing CKB C scripts weigh in at? Is there a size limit per cell?
+6. ckb_dlopen / shared libraries — how do scripts share code libraries on-chain without duplicating binary blobs?
+7. CKB-VM version history — what instruction extensions are available (rv64imc baseline, any additions)?
+8. Cycle counting — is there documentation on cycles-per-instruction for CKB-VM? How do script authors estimate cost?
+
