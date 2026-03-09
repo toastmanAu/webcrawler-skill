@@ -295,6 +295,25 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - Replaces WT9932P4-TINY plan (too small display for wallet UX)
 - AliExpress link: https://a.aliexpress.com/_m0xhu9X
 
+## Wyltek Telegram Mini App (2026-03-09 — SCAFFOLDED)
+- Repo: https://github.com/toastmanAu/wyltek-miniapp
+- Vite + vanilla JS, 5 tabs: Home, Chain, Research, Lounge, Members
+- Auth: `@joyid/miniapp` SDK (JoyID workaround for Telegram's passkey restrictions)
+- Chain tab: live CKB + BTC node data via Cloudflare Worker RPC proxy (`workers/rpc-proxy.js`)
+- Lounge: realtime Supabase subscription, same `lounge_messages` table as site
+- To go live: BotFather bot → deploy Worker `wyltek-rpc.toastmanau.workers.dev` → deploy app → set Menu Button URL
+- Worker needs: `CKB_RPC_URL`, `BTC_RPC_URL`, `BTC_RPC_USER`, `BTC_RPC_PASS` env vars
+- Lounge send Worker (`wyltek-lounge.toastmanau.workers.dev`) not yet created
+- Pi Tailscale IP (100.115.197.42) is the cleanest way to expose nodes to the Worker
+
+## WyTerminal v4.2 FFat Key Lesson (2026-03-09)
+- **FFat.mkdir/exists use paths WITHOUT mount prefix**: `"/.ssh"` not `"/spiffs/.ssh"`
+- libssh VFS functions still use full path `/spiffs/.ssh/id_ed25519` (correct — goes through OS VFS layer)
+- After fix: `key=ok` ✅ — FFat persisting keypair across reboots
+- TCP timeout to 192.168.68.87 (wlan0) still failing — next test: ethernet IP 192.168.68.105
+- `UseDNS no` enabled on ckbnode sshd (was commented out, may have defaulted to yes)
+- Current pubkey on ckbnode: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILZvSo7Et3uOBh+v4h+EGrkzXduk+4Z849+yTu6aZHXy WyTerminal`
+
 ## WyTerminal (2026-03-08 — SHIPPED ✅)
 - Firmware: T-Display S3 AMOLED (RM67162 1.91", ESP32-S3)
 - Repo: https://github.com/toastmanAu/WyRelay (firmware/WyTerminal_AMOLED.ino)
@@ -303,3 +322,24 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - Compiled + flashed from Pi via arduino-cli — confirmed showing as USB HID keyboard
 - Commands: /run /type /key /enter /paste /clear /status /help
 - Daemon (wyrelay-daemon.py): shell bridge, screenshot→TG, file upload, sysinfo
+
+## Wyltek Mini App — Fiber Tab (2026-03-09)
+- Fiber tab built: Channels / Network / Probe sub-views
+- Liquidity bar, open/close channel, route probe via `build_router`
+- Latest commit: `d67c2b3` — full commit list in memory/2026-03-09.md
+- Biscuit auth disabled on ckbnode fiber (localhost-only, safe)
+- Worker `/fiber` route added to `rpc-proxy.js` → `http://192.168.68.79:8237`
+- Mini App deployed: `https://toastmanau.github.io/wyltek-miniapp/`
+
+## Fiber Tunnel (N100) — Persisted as Systemd Service (2026-03-09)
+- `/etc/systemd/system/fiber-tunnel.service` — autossh, enabled, starts on boot
+- Root SSH key of N100 (`root@phill-NucBox-K8-Plus`) added to ckbnode `authorized_keys`
+- Tunnel confirmed: `localhost:8237` → ckbnode `127.0.0.1:8227` ✅
+- Previously was just a manual process — now survives reboots
+
+## Site Stats Git Conflict Pattern
+- `update-site-stats.sh` uses `/home/phill/workspace/wyltek-industries-site`
+- Main dev checkout is `/tmp/wyltek-site-tmp`
+- Two repos diverge → push conflict when both commit
+- Fix: `git reset --hard origin/master` in the stats repo, then re-run script
+- Long-term: consolidate to one checkout

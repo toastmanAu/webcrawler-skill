@@ -2474,3 +2474,83 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 - https://raw.githubusercontent.com/lvgl/lvgl/master/README.md
 - https://api.github.com/repos/Guition/JC3248W535/contents
 - https://raw.githubusercontent.com/BlockchainCommons/Research/master/papers/bcr-2020-005-ur.md
+
+---
+
+## [PENDING] ckb-flyclient-mmr-rpc
+
+**Priority:** MEDIUM
+**Tags:** ckb, flyclient, mmr, light-client, rpc, mini-app
+**Added:** 2026-03-09
+
+**Goal:** Determine whether CKB full nodes already expose MMR (Merkle Mountain Range) data via their JSON-RPC API, and whether a challenge-response "prove chain tip" feature could be built without a custom sidecar.
+
+**Research questions:**
+1. Does `get_header` or `get_block` return `extra_hash` / `extension` fields containing the MMR root? (CKB hardfork added this)
+2. Is there an existing RPC method to get MMR proof paths for specific block indices?
+3. What does the `ckb-merkle-mountain-range` Rust crate expose — could a Node.js/WASM wrapper do client-side verification?
+4. How does the CKB light client currently use MMR internally — is the protocol documented?
+5. Are there existing implementations of FlyClient-style challenge-response proofs for CKB specifically?
+6. What would a minimal "Challenge Node" sidecar look like — accept entropy, return sampled headers + MMR proof paths?
+
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/rpc/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0044-ckb-light-client/0044-ckb-light-client.md
+- https://crates.io/crates/ckb-merkle-mountain-range
+- https://raw.githubusercontent.com/nervosnetwork/merkle-mountain-range/master/src/lib.rs
+- https://talk.nervos.org/t/emergent-software-flyclient-implementation/4806
+
+**Additional deliverable:**
+If the research concludes that a single new RPC method (e.g. `get_mmr_proof(block_hash, challenge_entropy)`) would enable full trustless challenge-response verification from the client side — write up a complete proposal document in `research/findings/ckb-flyclient-mmr-rpc-proposal.md` including:
+- Exact proposed RPC method name, parameters, and return schema
+- Why it eliminates the need for a centrally hosted sidecar
+- Step-by-step client verification algorithm (suitable for JS implementation)
+- Security argument: why user-supplied entropy prevents precomputation attacks
+- Reference to existing `ckb-merkle-mountain-range` crate internals that would implement it
+- Draft PR description targeting nervosnetwork/ckb (not the code, just the rationale + spec)
+
+The goal: if the CKB node already stores MMR internally (it does — it's in the block extension field), one new RPC call to expose proof paths is all that's needed. No sidecar, no centralisation. This should be compelling to the core team.
+
+**Output:** research/findings/ckb-flyclient-mmr-rpc.md
+
+
+---
+
+## [DONE] ckb-gcs-block-filters-js
+**Priority:** HIGH
+**Output:** findings/ckb-gcs-block-filters-js.md
+**Goal:** Research CKB's GCS (Golomb-Coded Set) block filter implementation — understand the exact encoding format, parameters (P, M values), and hash function used. Determine whether the `get_block_filter` JSON-RPC method is available on mainnet full nodes today, what it returns, and what the response format looks like. Find or derive a pure-JavaScript implementation of GCS filter checking (no WASM, no native deps) that can decode a CKB block filter and test whether a given lock script hash appears in it. Identify any existing JS/TS libraries that handle CKB GCS filters. Document any gaps between the spec and what's actually implemented in ckb v0.200+.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/rpc/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0044-ckb-light-client/0044-ckb-light-client.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-light-client/develop/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/util/types/src/core/block_filter.rs
+- https://api.github.com/repos/nervosnetwork/ckb/contents/util/types/src/core
+
+---
+
+## [PENDING] ckb-browser-light-client-poc
+**Priority:** HIGH
+**Output:** findings/ckb-browser-light-client-poc.md
+**Goal:** Design and prototype a pure-JavaScript browser light client for CKB that uses a full node's JSON-RPC (over HTTPS) as its data source — NO P2P networking, NO WASM required. Architecture: (1) fetch GCS block filters via `get_block_filter` RPC to identify which blocks touch a given lock script, (2) fetch only matching blocks via `get_block`, (3) parse transactions and derive UTXOs in JS, (4) verify chain integrity via MMR proofs (once `get_block_mmr_proof` RPC is available — use `get_header` chain as fallback for now). Research: does `ccc` (CKB Component Collection) do any of this already? Does `lumos` have a filter-based sync? What would a minimal 200-line proof-of-concept look like for the mini app's wallet tab — connect to Wyltek node, scan last 1000 blocks for a given secp256k1 lock, return live balance without trusting the node's reported balance? Identify the exact JS primitives needed: BLAKE2b (noble-hashes), GCS decoder, molecule struct parser for CellOutput, CKB address decoder.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/rpc/README.md
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0044-ckb-light-client/0044-ckb-light-client.md
+- https://raw.githubusercontent.com/ckb-js/lumos/develop/packages/ckb-indexer/README.md
+- https://raw.githubusercontent.com/ckb-js/ccc/master/README.md
+- https://raw.githubusercontent.com/paulmillr/noble-hashes/main/README.md
+- https://api.github.com/repos/nervosnetwork/ckb-light-client/contents/src
+
+---
+
+## [DONE] ckb-gcs-block-filters-js-revisit
+**Priority:** HIGH
+**Output:** findings/ckb-gcs-block-filters-js.md
+**Goal:** Research CKB's GCS block filter implementation with correct source paths. The filter implementation is in the `block-filter` crate (NOT util/types). Find: exact GCS encoding (P and M parameters, hash function — likely SipHash-2-4 as used in BIP158), what `get_block_filter` RPC returns (response schema), whether filters commit to lock script hashes or full script hashes, and how to implement a pure-JS GCS membership check. Also check if `ckb-js-toolkit`, `@ckb-ccc/core`, or `lumos` have any GCS filter code.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/block-filter/src/filter.rs
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/block-filter/src/lib.rs
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/block-filter/Cargo.toml
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/sync/src/filter/get_block_filters_process.rs
+- https://raw.githubusercontent.com/nervosnetwork/ckb/develop/test/src/specs/sync/block_filter.rs
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0044-ckb-light-client/0044-ckb-light-client.md
