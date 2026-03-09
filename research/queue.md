@@ -2606,3 +2606,54 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 7. CKB-VM version history — what instruction extensions are available (rv64imc baseline, any additions)?
 8. Cycle counting — is there documentation on cycles-per-instruction for CKB-VM? How do script authors estimate cost?
 
+
+---
+
+## [PENDING] ckb-lang-embedded-implementation
+**Priority:** HIGH
+**Output:** findings/ckb-lang-embedded-implementation.md
+**Goal:** Investigate the physical/hardware implementation path for a CKB-native scripting language on embedded devices. Two angles: (1) running CKB script verification directly on microcontrollers (light client verification at the edge), and (2) a language that dual-targets — compiles to CKB-VM RISC-V for on-chain execution AND to native MCU code for device-side logic. Key insight to explore: ESP32-C3/C6/H2 are RISC-V (rv32imc) and CKB-VM is rv64imc — same ISA family. What does that gap mean in practice? Can CKB scripts or a CKB-dialect run natively on RISC-V MCUs with minimal porting? Also covers: hardware wallet signing integration (WyVault angle), IoT device identity on CKB, payment channel state machines running on embedded hardware.
+**Seeds:**
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/riscv/include/riscv/rv_utils.h
+- https://raw.githubusercontent.com/espressif/esp-idf/master/components/esp_hw_support/include/esp_cpu.h
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/src/machine/mod.rs
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/definitions/src/instructions/mod.rs
+- https://raw.githubusercontent.com/nervosnetwork/rfcs/master/rfcs/0003-ckb-vm/0003-ckb-vm.md
+- https://raw.githubusercontent.com/nervosnetwork/ckb-c-stdlib/master/ckb_syscalls.h
+**Questions to answer:**
+1. ESP32-C3/C6/H2 are rv32imc; CKB-VM is rv64imc. What's the exact delta? Is it purely 32→64 bit registers, or are there instruction differences? Could a rv32 CKB-VM interpreter run on ESP32-C with minimal changes?
+2. Has anyone ported CKB-VM to run as an interpreter on a microcontroller? What are the RAM/flash requirements of the VM itself?
+3. What's the minimum viable CKB script verifier for embedded — not full VM, just enough to verify a lock script result for a specific known script hash? Is there a stripped-down verification path?
+4. Dual-target compilation: what languages already support compiling to both RISC-V64 (CKB-VM) and RISC-V32 (ESP32-C) from the same source? Any toolchain that handles both word sizes from one codebase?
+5. Hardware wallet angle: if a CKB script defines a signing protocol, can the same protocol logic run on a device (WyVault/ESP32-S3) without re-implementing it separately? What would a "shared script logic" architecture look like?
+6. IoT device identity: a device generates a keypair, its lock script is deployed on CKB, it can prove ownership of cells. How would a device-side language runtime interact with a light client to verify incoming payments?
+7. Memory constraints: ESP32-S3 has 512KB SRAM + PSRAM option. RP2040 has 264KB. What's the minimum RAM a CKB script interpreter needs to run non-trivial scripts?
+8. JTAG/debug tooling for RISC-V embedded: if we're writing a language that targets both CKB-VM and MCU, what does the debug story look like? OpenOCD for the chip side, ckb-debugger for the VM side?
+9. Real-world precedent: have any blockchain projects shipped a light-weight VM interpreter on MCU hardware for on-device transaction verification? (Ethereum has some work here — find specifics)
+10. Wyltek embedded builder angle: could the language be the scripting layer for wyltek-embedded-builder boards? Device-specific logic written once, deployed both to the chain (as a lock/type script) and to the device firmware.
+
+---
+
+## [PENDING] ckb-vm-risc-v-embedded-port
+**Priority:** MEDIUM
+**Output:** findings/ckb-vm-risc-v-embedded-port.md
+**Goal:** Specifically investigate porting or embedding the CKB-VM (or a stripped subset) onto RISC-V and ARM microcontrollers. Focus on: binary size of a minimal ckb-vm interpreter, heap/stack requirements, which parts of the VM are removable for an embedded context (no JIT, no AOT, interpreter-only), and whether the ESP32-C6's rv32imc core can run rv64imc code via emulation or needs a translation layer. Also: RP2040 (Cortex-M0+) as a target for a pure C interpreter — size and performance benchmarks if available.
+**Seeds:**
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/Cargo.toml
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/src/interpreter.rs
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/src/machine/asm/mod.rs
+- https://raw.githubusercontent.com/nervosnetwork/ckb-vm/main/benches/vm_metrics.rs
+- https://raw.githubusercontent.com/raspberrypi/pico-sdk/master/README.md
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/get-started/hello_world/main/hello_world_main.c
+- https://api.github.com/repos/nervosnetwork/ckb-vm/contents/src
+**Questions to answer:**
+1. CKB-VM is written in Rust — what does it compile to in terms of binary size for a no_std embedded target? Is there a no_std feature flag or would it need significant porting?
+2. The interpreter mode (not JIT/AOT) — how many lines of code, what are its dependencies? Could it be rewritten in C for embedded portability?
+3. rv64imc on rv32imc emulation: is there prior art for running 64-bit RISC-V code on a 32-bit RISC-V core? What's the performance cost?
+4. RP2040 as a target: Cortex-M0+ with 264KB RAM. Is there a C implementation of a RISC-V interpreter small enough to fit? (Previous work: rvemu, mini-rv32ima, etc.)
+5. mini-rv32ima (Charles Lohr's ~1000 line RISC-V emulator) — could this be adapted to rv64imc for CKB-VM compatibility? What instruction set extensions would need adding?
+6. ESP32-S3 with PSRAM: 8MB external PSRAM available. Does this change the feasibility? What CKB script complexity becomes possible with 8MB heap?
+7. Cycle limit as a natural embedded timeout: CKB-VM's cycle counting could double as a watchdog/resource limiter for embedded execution. Is this a useful property for IoT use cases?
+8. Security model: running CKB scripts on-device for payment verification — what are the attack surfaces? Can a malicious script escape the VM sandbox on embedded hardware?
+
