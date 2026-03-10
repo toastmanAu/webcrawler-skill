@@ -2477,7 +2477,7 @@ Status: PENDING | IN_PROGRESS | DONE | SKIP
 
 ---
 
-## [PENDING] ckb-flyclient-mmr-rpc
+## [DONE] ckb-flyclient-mmr-rpc
 
 **Priority:** MEDIUM
 **Tags:** ckb, flyclient, mmr, light-client, rpc, mini-app
@@ -2529,7 +2529,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] ckb-browser-light-client-poc
+## [DONE] ckb-browser-light-client-poc
 **Priority:** HIGH
 **Output:** findings/ckb-browser-light-client-poc.md
 **Goal:** Design and prototype a pure-JavaScript browser light client for CKB that uses a full node's JSON-RPC (over HTTPS) as its data source — NO P2P networking, NO WASM required. Architecture: (1) fetch GCS block filters via `get_block_filter` RPC to identify which blocks touch a given lock script, (2) fetch only matching blocks via `get_block`, (3) parse transactions and derive UTXOs in JS, (4) verify chain integrity via MMR proofs (once `get_block_mmr_proof` RPC is available — use `get_header` chain as fallback for now). Research: does `ccc` (CKB Component Collection) do any of this already? Does `lumos` have a filter-based sync? What would a minimal 200-line proof-of-concept look like for the mini app's wallet tab — connect to Wyltek node, scan last 1000 blocks for a given secp256k1 lock, return live balance without trusting the node's reported balance? Identify the exact JS primitives needed: BLAKE2b (noble-hashes), GCS decoder, molecule struct parser for CellOutput, CKB address decoder.
@@ -2557,7 +2557,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] ckb-custom-lang-feasibility
+## [DONE] ckb-custom-lang-feasibility
 **Priority:** HIGH
 **Output:** findings/ckb-custom-lang-feasibility.md
 **Goal:** Deep feasibility study for a lightweight, C-like language designed specifically for CKB scripting. CKB-VM executes RISC-V bytecode — any language that compiles to RISC-V is valid. We want to understand: (1) what prior art exists for embedded/systems DSLs that compile to RISC-V or similar targets, (2) how existing CKB script languages (ckb-js-vm/QuickJS, Lua ports) are structured, (3) what a purpose-built CKB language would need as first-class primitives, (4) realistic implementation path for a small team. The end goal is evaluating whether a "CKB Script Language" — C-like syntax, deterministic, cycle-aware, with native cell/capacity/lock types — is buildable and what it would take.
@@ -2583,7 +2583,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] ckb-risc-v-compiler-toolchain
+## [DONE] ckb-risc-v-compiler-toolchain
 **Priority:** MEDIUM
 **Output:** findings/ckb-risc-v-compiler-toolchain.md
 **Goal:** Map the practical compiler toolchain options for targeting CKB-VM (RISC-V rv64imc). Focus on lightweight/embeddable options — not "use LLVM" but specifically: small C compilers that output RISC-V (chibicc, RVCC, 8cc), QBE as a lightweight backend, tcc (Tiny C Compiler) RISC-V support status, and what the Nervos team actually uses to build C scripts. Secondary: understand the binary size constraints (what's a reasonable script binary size on-chain?), how shared libraries work via ckb_dlopen, and whether an on-chain JIT is cycle-feasible.
@@ -2609,7 +2609,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] ckb-lang-embedded-implementation
+## [DONE] ckb-lang-embedded-implementation
 **Priority:** HIGH
 **Output:** findings/ckb-lang-embedded-implementation.md
 **Goal:** Investigate the physical/hardware implementation path for a CKB-native scripting language on embedded devices. Two angles: (1) running CKB script verification directly on microcontrollers (light client verification at the edge), and (2) a language that dual-targets — compiles to CKB-VM RISC-V for on-chain execution AND to native MCU code for device-side logic. Key insight to explore: ESP32-C3/C6/H2 are RISC-V (rv32imc) and CKB-VM is rv64imc — same ISA family. What does that gap mean in practice? Can CKB scripts or a CKB-dialect run natively on RISC-V MCUs with minimal porting? Also covers: hardware wallet signing integration (WyVault angle), IoT device identity on CKB, payment channel state machines running on embedded hardware.
@@ -2635,7 +2635,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] ckb-vm-risc-v-embedded-port
+## [DONE] ckb-vm-risc-v-embedded-port
 **Priority:** MEDIUM
 **Output:** findings/ckb-vm-risc-v-embedded-port.md
 **Goal:** Specifically investigate porting or embedding the CKB-VM (or a stripped subset) onto RISC-V and ARM microcontrollers. Focus on: binary size of a minimal ckb-vm interpreter, heap/stack requirements, which parts of the VM are removable for an embedded context (no JIT, no AOT, interpreter-only), and whether the ESP32-C6's rv32imc core can run rv64imc code via emulation or needs a translation layer. Also: RP2040 (Cortex-M0+) as a target for a pure C interpreter — size and performance benchmarks if available.
@@ -2657,3 +2657,77 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 7. Cycle limit as a natural embedded timeout: CKB-VM's cycle counting could double as a watchdog/resource limiter for embedded execution. Is this a useful property for IoT use cases?
 8. Security model: running CKB scripts on-device for payment verification — what are the attack surfaces? Can a malicious script escape the VM sandbox on embedded hardware?
 
+
+---
+
+## [PENDING] fiberquest-fiber-rpc-live-test
+
+**Priority:** HIGH
+**Tags:** fiberquest, fiber, rpc, nodejs, client
+**Added:** 2026-03-10
+
+**Goal:** Document actual JSON-RPC request/response schemas for all Fiber node methods via live testing against the running ckbnode Fiber RPC. Produce a cheatsheet of confirmed call shapes.
+
+**Seeds:**
+- http://127.0.0.1:18227 (via N100 SSH tunnel localhost:8237)
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/src/rpc/mod.rs
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+
+**Questions to answer:**
+1. What is the exact JSON-RPC schema for `list_channels` — response shape?
+2. `open_channel`: required params, types (hex string vs decimal?), response shape including channel_id format
+3. `send_payment`: invoice format, amount format, response shape and timing
+4. `new_invoice`: amount param format, description, expiry — response shape
+5. `get_node_info`: what fields are returned (peer_id, node_id, listening_addr)?
+6. Error codes: what do Fiber errors look like? JSON structure?
+7. Are there WebSocket RPC subscriptions for payment confirmations, or polling only?
+
+**Output:** `findings/fiberquest-fiber-rpc-cheatsheet.md` with real request/response examples
+
+---
+
+## [PENDING] fiberquest-nodejs-client-design
+
+**Priority:** HIGH
+**Tags:** fiberquest, fiber, nodejs, client, npm
+**Added:** 2026-03-10
+
+**Goal:** Design a clean, minimal Node.js Fiber RPC client class. Should wrap all Fiber methods with typed params, async/await, proper error handling, and JSDoc. This is the ecosystem contribution.
+
+**Seeds:**
+- findings/fiberquest-fiber-rpc-cheatsheet.md (must exist first)
+- https://raw.githubusercontent.com/axios/axios/main/README.md
+- https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+
+**Questions to answer:**
+1. Best error handling pattern: throw vs return { error } vs result type?
+2. Should amounts be BigInt, string (hex), or number? What does Fiber actually accept?
+3. Connection management: single HTTP client vs persistent WebSocket?
+4. Invoice object design: what fields from Fiber's invoice response are useful for the sidecar?
+5. How should the client handle payment timeout / channel not ready?
+
+**Output:** `findings/fiberquest-nodejs-client-design.md` with full class design + code scaffold
+
+---
+
+## [PENDING] fiberquest-hackathon-criteria-scrape
+
+**Priority:** MEDIUM
+**Tags:** fiberquest, hackathon, dorahacks
+**Added:** 2026-03-10
+
+**Goal:** Retrieve actual judging criteria from the Fiber Network hackathon. DoraHacks URL returns 405 via curl — try browser rendering, cached version, or community channels.
+
+**Seeds:**
+- https://webcache.googleusercontent.com/search?q=cache:dorahacks.io/hackathon/fiber-network
+- https://archive.org/wayback/available?url=dorahacks.io/hackathon/fiber-network
+- https://raw.githubusercontent.com/nervosnetwork/awesome-nervos/main/README.md
+
+**Questions to answer:**
+1. What are the official judging criteria and their weightings?
+2. How is "agent-based" defined for this hackathon?
+3. What are the submission requirements (video length, repo format, live demo required?)?
+4. What is the prize pool structure?
+5. Any prior Fiber/Nervos hackathon winning entries we can reference?
+
+**Output:** `findings/fiberquest-hackathon-criteria.md`
