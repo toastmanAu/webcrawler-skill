@@ -2731,3 +2731,32 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 5. Any prior Fiber/Nervos hackathon winning entries we can reference?
 
 **Output:** `findings/fiberquest-hackathon-criteria.md`
+
+---
+
+## [PENDING] ckb-lora-proof-of-coverage
+
+**Priority:** MEDIUM
+**Tags:** lora, iot, meshtastic, proof-of-coverage, ckb, fiber, hardware
+
+**Seeds:**
+- https://meshtastic.org/docs/overview/
+- https://raw.githubusercontent.com/meshtastic/meshtastic/master/README.md
+- https://raw.githubusercontent.com/helium/HIP/main/0001-longfi-and-the-helium-network.md
+- https://docs.helium.com/iot/proof-of-coverage/
+- https://raw.githubusercontent.com/espressif/esp-idf/master/examples/protocols/README.md
+
+**Prompt:**
+Research a CKB-native "Proof of Coverage" / "Proof of Relay" protocol using LoRa mesh hardware (ESP32 + SX1276, e.g. TTGO LoRa32).
+
+Answer:
+1. How does Helium's proof-of-coverage work at a protocol level — what does a witness/beacon challenge look like technically?
+2. What are the known weaknesses/attack vectors of Helium PoC that a CKB-based design should avoid?
+3. How would Meshtastic mesh relay logs map to a CKB type script that validates coverage proofs?
+4. What's the minimal on-chain data structure for a coverage proof cell (node identity, RSSI, timestamp, neighbour witnesses)?
+5. How would Fiber micropayments fit — per-packet relay rewards vs per-epoch uptime rewards?
+6. TTGO LoRa32 / Heltec WiFi LoRa 32: what's the BOM cost, power consumption, solar viability?
+7. What's the simplest possible prototype: one sender + one receiver + one CKB testnet type script?
+8. Is there any existing CKB/Nervos LoRa work we'd be building on?
+
+**Output:** `findings/ckb-lora-proof-of-coverage.md`
