@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ckb-ai": {
+      "baseUrl": "https://mcp.ckbdev.com/ckbai"
+    }
+  },
+  "imports": []
+}
