@@ -2710,7 +2710,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] fiberquest-hackathon-criteria-scrape
+## [DONE] fiberquest-hackathon-criteria-scrape
 
 **Priority:** MEDIUM
 **Tags:** fiberquest, hackathon, dorahacks
