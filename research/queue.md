@@ -2660,7 +2660,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] fiberquest-fiber-rpc-live-test
+## [DONE] fiberquest-fiber-rpc-live-test
 
 **Priority:** HIGH
 **Tags:** fiberquest, fiber, rpc, nodejs, client

@@ -1,0 +1,142 @@
+# Research: fiberquest-fiber-rpc-live-test
+
+**Date:** 2026-03-11  
+**Status:** AUTO-CRAWLED (Gemini gemini-2.5-flash)  
+**Seeds:** http://127.0.0.1:18227, https://raw.githubusercontent.com/nervosnetwork/fiber/main/src/rpc/mod.rs, https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+
+---
+
+Date: 2026-03-11
+
+## Summary
+
+This research focuses on documenting the JSON-RPC request/response schemas for the Nervos Fiber Network node, specifically for the `fiberquest-fiber-rpc-live-test` project. Based on the provided `README.md` from the `nervosnetwork/fiber` repository, we can identify available RPC methods and some associated types. However, due to truncation of the `README.md` and `FETCH ERROR`s when attempting to access the live RPC endpoint and the full Rust RPC source, detailed parameter lists, exact JSON structures, and comprehensive error information are largely unavailable. The project's existing infrastructure includes a funded Fiber node on `ckbnode` (192.168.68.87:8227) and an unfunded one on N100 (192.168.68.91).
+
+## Questions to Answer
+
+### 1. What is the exact JSON-RPC schema for `list_channels` — response shape?
+
+The `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists `list_channels` under `Module Channel`. It also defines `Type `Channel`` and `Type `ChannelInfo``.
+
+**Known:**
+*   Method: `channel_list_channels` (inferred from `Module Channel` and `Method `list_channels``)
+*   The response is expected to contain information about channels, likely a list of `Channel` or `ChannelInfo` objects.
+
+**Unknown (due to truncation/absence in provided content):**
+*   The exact JSON-RPC request parameters (if any).
+*   The precise JSON structure of the response, including the specific fields within `Channel` or `ChannelInfo` objects (e.g., `channel_id`, `state`, `capacity`, `peer_id`, etc.). The `README.md` does not provide the definitions for `Type `Channel`` or `Type `ChannelInfo``.
+
+### 2. `open_channel`: required params, types (hex string vs decimal?), response shape including channel_id format
+
+The `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists `open_channel` under `Module Channel`. The description is truncated.
+
+**Known:**
+*   Method: `channel_open_channel` (inferred from `Module Channel` and `Method `open_channel``)
+
+**Unknown (due to truncation/absence in provided content):**
+*   Required parameters and their types (e.g., peer ID, capacity, funding amount, etc.).
+*   Whether parameters are hex strings or decimal numbers.
+*   The exact JSON structure of the response.
+*   The format of the `channel_id` within the response. The `README.md` is cut off immediately after "Attempts to open a channel with a peer. #", providing no further details.
+
+### 3. `send_payment`: invoice format, amount format, response shape and timing
+
+The `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists `send_payment` under `Module Payment`. No further details are provided for this method in the snippet.
+
+**Known:**
+*   Method: `payment_send_payment` (inferred from `Module Payment` and `Method `send_payment``)
+
+**Unknown (due to truncation/absence in provided content):**
+*   The expected invoice format (e.g., BOLT11-like string, JSON object).
+*   The format for specifying the amount.
+*   The exact JSON structure of the response.
+*   Information regarding the timing of the response (e.g., synchronous, asynchronous with a payment ID).
+
+### 4. `new_invoice`: amount param format, description, expiry — response shape
+
+The `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists `new_invoice` under `Module Invoice`. No further details are provided for this method in the snippet.
+
+**Known:**
+*   Method: `invoice_new_invoice` (inferred from `Module Invoice` and `Method `new_invoice``)
+
+**Unknown (due to truncation/absence in provided content):**
+*   The format for the amount parameter.
+*   How to specify a description for the invoice.
+*   How to set an expiry for the invoice.
+*   The exact JSON structure of the response. The `README.md` lists `Type `CkbInvoice`` and `Type `InvoiceData`` which are likely related to invoice responses, but their specific fields are not detailed.
+
+### 5. `get_node_info`: what fields are returned (peer_id, node_id, listening_addr)?
+
+The `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists `node_info` under `Module Info`. It also lists `Type `NodeInfo``.
+
+**Known:**
+*   Method: `info_node_info` (inferred from `Module Info` and `Method `node_info``)
+*   The response is expected to be of `Type `NodeInfo``.
+
+**Unknown (due to truncation/absence in provided content):**
+*   The exact fields returned within the `NodeInfo` object. Specifically, whether `peer_id`, `node_id`, and `listening_addr` are present and their formats are not detailed in the provided `README.md` snippet.
+
+### 6. Error codes: what do Fiber errors look like? JSON structure?
+
+The provided `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` does not contain any section or examples detailing Fiber RPC error codes or their JSON structure.
+
+**Unknown (due to absence in provided content):**
+*   The specific error codes used by Fiber.
+*   The JSON structure of error responses (e.g., `code`, `message`, `data` fields).
+
+### 7. Are there WebSocket RPC subscriptions for payment confirmations, or polling only?
+
+The provided `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists "RPC Methods" and "RPC Types" but does not mention any WebSocket RPC subscriptions, pub/sub mechanisms, or event streams for payment confirmations or other updates. The description focuses solely on traditional JSON-RPC methods.
+
+**Unknown (due to absence in provided content):**
+*   Whether WebSocket RPC subscriptions are supported for payment confirmations or any other events.
+*   Based on the provided content, polling via methods like `get_payment` or `get_invoice` would be the only apparent way to check status.
+
+## Gaps / Follow-Up
+
+1.  **Full RPC Schema Documentation:** The most significant gap is the lack of complete JSON-RPC request/response schemas for all methods. The provided `README.md` is truncated, and the `mod.rs` source file (which would define these) was inaccessible (`FETCH ERROR: HTTP Error 404`).
+2.  **Live RPC Interaction:** The `FETCH ERROR: HTTP Error 405: Method Not Allowed` for `http://127.0.0.1:18227` indicates that direct HTTP GET requests are not supported, and a proper JSON-RPC POST request would be needed to interact with the live node. This was not performed as part of this analysis, as the instruction was to analyze *provided web content*.
+3.  **Error Handling Details:** Comprehensive documentation on Fiber's error codes and their JSON structure is missing.
+4.  **WebSocket/Subscription Support:** Confirmation of whether Fiber supports WebSocket RPC for real-time updates is needed.
+5.  **`Type` Definitions:** The `README.md` lists many `Type` definitions (e.g., `ChannelInfo`, `NodeInfo`, `CkbInvoice`), but their internal fields and structures are not provided in the snippet.
+
+**Follow-up actions:**
+*   Attempt to access the `ckbnode` Fiber RPC (192.168.68.87:8227) with proper JSON-RPC POST requests to perform live testing as outlined in the research goal.
+*   Investigate the full `nervosnetwork/fiber` repository for complete RPC documentation or Rust source code if the `raw.githubusercontent.com` links are outdated or incorrect.
+
+## Relevant Code/API Snippets
+
+From `https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md`:
+
+**RPC Modules:**
+*   `Module Channel`: Contains `open_channel`, `accept_channel`, `abandon_channel`, `list_channels`, `shutdown_channel`, `update_channel`.
+*   `Module Info`: Contains `node_info`.
+*   `Module Invoice`: Contains `new_invoice`, `parse_invoice`, `get_invoice`, `cancel_invoice`, `settle_invoice`.
+*   `Module Payment`: Contains `send_payment`, `get_payment`, `build_router`, `send_payment_with_router`.
+
+**RPC Types (listed, but not defined in the snippet):**
+*   `Type `Channel``
+*   `Type `ChannelInfo``
+*   `Type `NodeInfo``
+*   `Type `CkbInvoice``
+*   `Type `CkbInvoiceStatus``
+*   `Type `Hash256``
+*   `Type `PaymentStatus``
+
+**Example of parameter/return type definition (from `send_btc` method):**
+```
+##### Params
+* `btc_pay_req` - `String` , Payment request string for the BTC Lightning payee. ...
+* `currency` - [Currency](#type-currency) , Request currency
+##### Returns
+* `timestamp` - `u64` , Seconds since epoch when the order is created
+* `expiry_delta_seconds` - `u64` , Relative expiry time in seconds from `created_at` that the order expires
+* `wrapped_btc_type_script` - `ckb_jsonrpc_types::Script` , Wrapped BTC type script
+* `incoming_invoice` - [CchInvoice](#type-cchinvoice) , Generated invoice for the incoming payment
+* `outgoing_pay_req` - `String` , The final payee to accept the payment. It has the different network with incoming invoice.
+* `payment_hash` - [Hash256](#type-hash256) , Payment hash for the HTLC for both CKB and BTC.
+* `amount_sats` - `u128` , Amount required to pay in Satoshis, including fee
+* `fee_sats` - `u128` , Fee in Satoshis
+* `status` - [CchOrderStatus](#type-cchorderstatus) , Order status
+```
+This snippet for `send_btc` (not directly asked in the questions but present in the source) demonstrates the general format for parameter and return type documentation within the `README.md`, including primitive types (`String`, `u64`, `u128`) and references to other defined types (`[Currency](#type-currency)`, `[Hash256](#type-hash256)`). It also shows the use of `ckb_jsonrpc_types::Script` for CKB-related structures.

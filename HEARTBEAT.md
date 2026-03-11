@@ -76,12 +76,8 @@ Check `systemctl --user is-active ckb-chat-bridge.service` — if inactive, rest
 - Service bridges: Nervos Nation TG (-1001623077152) ↔ Nervos Network Discord (#nervos-nation-bridge)
 - Config: /home/phill/ckb-chat-bridge/matterbridge.toml
 
-## Founding Member DOB Minter (check every heartbeat)
-Run: `node /home/phill/ckb-dob-minter-script/mint-queue-runner.js --mainnet 2>&1`
-- If output contains "Would mint" or "✅ Spore ID" → notify Phill: "🎉 Founding Member #X DOB minted → <address>", then update projects: `node /home/phill/kernel-dash/update-projects.js founding-member-dob done:add "Member #X minted: <spore-id>"`
-- If output contains "No pending entries" → silent (nothing to do)
-- If output contains error → alert Phill immediately
-- Track last mint in heartbeat-state.json under key `lastMint`
+## Founding Member DOB Minter
+✅ ALL 100 MINTED — 2026-03-10. Do NOT run mint-queue-runner.js. Cron is disabled. Skip this check entirely.
 
 
 Check `curl -sf http://localhost:8081/` — if down, run `systemctl --user restart ckb-stratum`
