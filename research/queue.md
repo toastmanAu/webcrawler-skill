@@ -2686,7 +2686,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] fiberquest-nodejs-client-design
+## [DONE] fiberquest-nodejs-client-design
 
 **Priority:** HIGH
 **Tags:** fiberquest, fiber, nodejs, client, npm

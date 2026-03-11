@@ -1,0 +1,164 @@
+# Research: fiberquest-nodejs-client-design
+
+**Date:** 2026-03-11  
+**Status:** AUTO-CRAWLED (Gemini gemini-2.5-flash)  
+**Seeds:** https://raw.githubusercontent.com/axios/axios/main/README.md, https://raw.githubusercontent.com/nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md
+
+---
+
+Date: 2026-03-11
+
+## Research Note: fiberquest-nodejs-client-design
+
+### Summary
+This research note outlines the design considerations for a clean, minimal Node.js Fiber RPC client class, intended as an ecosystem contribution for Wyltek Industries' FiberQuest project. The client will wrap Fiber Network Node (FNN) RPC methods, providing typed parameters, async/await support, and robust error handling. Key design decisions include using `throw` for error handling, `BigInt` for all `u64` and `u128` amounts to ensure precision, and a single HTTP client instance for connection management. The client will expose essential invoice fields and handle RPC-level timeouts and "channel not ready" errors, leaving logical payment timeouts to the consuming sidecar.
+
+### 1. Best error handling pattern: throw vs return { error } vs result type?
+
+For a Node.js Fiber RPC client utilizing `async/await`, the most idiomatic and clean error handling pattern is to **throw exceptions**.
+
+*   **Rationale:** The `axios` library, a strong candidate for HTTP requests in Node.js, explicitly states it "throws an `AxiosError`" when a request fails (e.g., network error, non-2xx HTTP status). Aligning with this behavior allows for consistent `try/catch` blocks when consuming the client's asynchronous methods.
+*   **Implementation:** The client should catch underlying HTTP errors (e.g., `AxiosError`) and Fiber RPC-specific errors (e.g., JSON-RPC error responses indicating "channel not ready" or invalid parameters) and re-throw them as custom, well-structured error objects (e.g., `FiberRpcError`, `FiberChannelError`). These custom errors should encapsulate relevant details like the original error message, code, and any specific Fiber context.
+
+### 2. Should amounts be BigInt, string (hex), or number? What does Fiber actually accept?
+
+Amounts corresponding to Fiber's `u64` and `u128` types **must be handled as `BigInt` in JavaScript** to ensure full precision.
+
+*   **Fiber's Acceptance:** The Fiber RPC documentation explicitly defines types like `u64` (unsigned 64-bit integer) and `u128` (unsigned 128-bit integer) for fields such as `timestamp`, `expiry_delta_seconds`, `amount_sats`, and `fee_sats` (e.g., in the `send_btc` method's return values).
+*   **JavaScript Limitations:** JavaScript's `Number` type is a 64-bit floating-point number, which can only safely represent integers up to `2^53 - 1` (`Number.MAX_SAFE_INTEGER`). Both `u64` (up to `2^64 - 1`) and `u128` (up to `2^128 - 1`) can significantly exceed this limit, leading to precision loss if represented as standard JavaScript numbers.
+*   **`BigInt` Solution:** JavaScript's `BigInt` primitive is designed for arbitrary-precision integers, making it the only suitable type for accurately representing `u64` and `u128` values.
+*   **Serialization:** While the Fiber RPC documentation specifies `u64`/`u128` as internal types, JSON-RPC commonly serializes large integers as strings to prevent precision issues across different client languages. The Node.js client should accept `BigInt` for input parameters and return `BigInt` for output values, handling the conversion to/from string representation during JSON serialization/deserialization if the Fiber node's RPC expects it.
+*   **String (hex):** `Hash256` is a distinct type used for `payment_hash` and would typically be represented as a hexadecimal string. This is separate from numerical amounts.
+
+### 3. Connection management: single HTTP client vs persistent WebSocket?
+
+A **single HTTP client instance** is the appropriate and most straightforward connection management strategy for this Node.js Fiber RPC client.
+
+*   **Rationale:** The Fiber Network Node (FNN) RPC documentation refers to "FNN binary RPC methods" and mentions an `rpc.listening_addr` configuration option, which strongly implies a standard JSON-RPC over HTTP interface. The `axios` library, a "Promise based HTTP client for the browser and node.js," is well-suited for this purpose.
+*   **RPC Nature:** The listed Fiber RPC methods (e.g., `open_channel`, `send_payment`, `new_invoice`, `get_invoice`) are typically one-shot requests that do not inherently require a persistent, bidirectional communication channel like a WebSocket.
+*   **Simplicity:** Using a single HTTP client instance (e.g., an `axios` instance configured with the Fiber node's RPC URL, `127.0.0.1:8227` on `ckbnode`) simplifies the client's design and resource management. Each RPC call will correspond to a new HTTP request.
+
+### 4. Invoice object design: what fields from Fiber's invoice response are useful for the sidecar?
+
+The Node.js sidecar for FiberQuest would find the following fields from a Fiber invoice response (e.g., from `new_invoice` or `get_invoice` for `CkbInvoice`, or `incoming_invoice` from `send_btc`/`receive_btc` for `CchInvoice`) most useful:
+
+1.  **Payment Request String (`outgoing_pay_req` for `CchInvoice`):** This is the encoded invoice that a payer would use to initiate a payment.
+2.  **Payment Hash (`payment_hash` - `Hash256`):** A unique identifier for the payment, crucial for tracking its status.
+3.  **Amount (`amount_sats` - `u128`):** The total amount of CKB or UDTs (in satoshis for BTC cross-chain) required for the payment. This is essential for the sidecar to know how much to pay or expect.
+4.  **Fee (`fee_sats` - `u128`):** Any associated fees, if applicable, for transparency.
+5.  **Status (`status` - `CchOrderStatus` or `CkbInvoiceStatus`):** The current state of the invoice (e.g., pending, paid, expired), allowing the sidecar to react to payment completion or failure.
+6.  **Expiry Information (`timestamp` - `u64`, `expiry_delta_seconds` - `u64`):** To determine the validity period of the invoice and prevent attempts to pay expired invoices.
+7.  **Additional Invoice Data:** Any other specific details within the `CkbInvoice` or `CchInvoice` types that might be necessary for display, logging, or specific cross-chain logic (e.g., `wrapped_btc_type_script` for CCH).
+
+The client class should provide a well-typed interface for these fields, using `BigInt` for `u64`/`u128` values and `string` for hashes and payment requests.
+
+### 5. How should the client handle payment timeout / channel not ready?
+
+The client should differentiate between RPC call timeouts and application-level errors from the Fiber node:
+
+1.  **RPC Call Timeout (Network/HTTP Level):**
+    *   The client should leverage the timeout mechanism of its underlying HTTP client (e.g., Axios's `timeout` option in `Request Config`).
+    *   If an RPC call (e.g., `send_payment`) exceeds this configured timeout, the client method should `throw` an error, ideally a custom `FiberRpcTimeoutError` that wraps the original `AxiosError` (as Axios explicitly handles timeouts by throwing).
+
+2.  **"Channel Not Ready" Error (Application Level):**
+    *   When methods like `open_channel` or `send_payment` are invoked, if the Fiber node determines the channel is not in a suitable state, it will likely return an error object within its JSON-RPC response (e.g., containing an error code and message).
+    *   The Node.js client should parse this RPC error response and `throw` a specific `FiberChannelError` (or similar custom error) containing the details provided by the Fiber node. This allows the FiberQuest sidecar to `catch` this specific error and implement appropriate recovery or retry logic (e.g., waiting for the channel to become active, attempting to reopen).
+
+3.  **Logical Payment Timeout (Fiber Network Level):**
+    *   This refers to a payment initiated on the Fiber network that fails to settle within a certain duration, even if the initial `send_payment` RPC call was successful.
+    *   Handling this type of timeout is primarily the responsibility of the **FiberQuest sidecar (the consumer of the client)**, not the RPC client itself.
+    *   The client's `send_payment` method would initiate the payment and return a payment identifier or initial status. The sidecar would then need to:
+        *   Periodically call the client's `get_payment` method with the payment identifier to query the `PaymentStatus`.
+        *   Implement its own timer and logic to determine if the payment has "timed out" based on the `PaymentStatus` and a predefined waiting period.
+
+### Gaps / Follow-up
+
+*   **Full RPC Type Definitions:** The provided `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md` lists RPC methods and types but does not provide the full JSON structure for complex types like `CkbInvoice`, `CchInvoice`, `Channel`, or `PaymentStatus`. To design robust, typed interfaces for the Node.js client, the complete JSON schema or example responses for these types would be required.
+*   **JSON-RPC Error Structure:** While Axios handles HTTP errors, the exact JSON-RPC error format returned by the Fiber node for application-level errors (e.g., "channel not ready") is not detailed. Knowing the specific error codes and message formats would allow for more precise error parsing and custom error class design.
+*   **`new_invoice` and `send_payment` Parameters/Returns:** The documentation lists these methods but does not detail their specific parameters or return types. This information is crucial for implementing these core functionalities in the client.
+*   **Authentication/Authorization:** The Fiber RPC `README.md` warns that "Allowing arbitrary machines to access the JSON-RPC port... is **dangerous and strongly discouraged**." This implies a need for secure access. The provided content does not specify any authentication or authorization mechanisms (e.g., API keys, mTLS) for the Fiber RPC. This would be a critical design consideration for a production-ready client.
+
+### Relevant Code/API Snippets
+
+*   **Axios for HTTP Requests:**
+    ```javascript
+    import axios, { AxiosError } from "axios";
+
+    // Creating an instance with a base URL and timeout
+    const fiberApiClient = axios.create({
+      baseURL: "http://127.0.0.1:8227", // Example for ckbnode Fiber RPC
+      timeout: 5000, // 5 seconds timeout for RPC calls
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    // Example of a client method using async/await and error handling
+    async function openChannel(peerId: string, capacity: BigInt): Promise<any> {
+      try {
+        const response = await fiberApiClient.post("/", {
+          jsonrpc: "2.0",
+          id: 1,
+          method: "channel_open_channel",
+          params: [peerId, capacity.toString()], // Convert BigInt to string for JSON
+        });
+        return response.data.result;
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          // Handle HTTP/network errors
+          if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
+            throw new FiberRpcTimeoutError("Fiber RPC call timed out", error);
+          }
+          throw new FiberNetworkError(`HTTP error: ${error.message}`, error);
+        } else if (error && typeof error === 'object' && 'jsonrpc' in error && 'error' in error) {
+          // Assuming Fiber RPC returns errors in JSON-RPC format
+          const rpcError = error.error;
+          if (rpcError.message.includes("channel not ready")) {
+            throw new FiberChannelError(`Channel not ready: ${rpcError.message}`, rpcError.code);
+          }
+          throw new FiberRpcError(`Fiber RPC error: ${rpcError.message}`, rpcError.code);
+        }
+        throw new UnknownFiberError("An unknown error occurred", error);
+      }
+    }
+    ```
+
+*   **Fiber RPC Types (from `nervosnetwork/fiber/main/crates/fiber-lib/src/rpc/README.md`):**
+    *   `u64`: Unsigned 64-bit integer (e.g., `timestamp`, `expiry_delta_seconds`) -> **Map to JavaScript `BigInt`**
+    *   `u128`: Unsigned 128-bit integer (e.g., `amount_sats`, `fee_sats`) -> **Map to JavaScript `BigInt`**
+    *   `String`: (e.g., `btc_pay_req`, `outgoing_pay_req`) -> **Map to JavaScript `string`**
+    *   `Hash256`: (e.g., `payment_hash`) -> **Map to JavaScript `string` (hex)**
+    *   `CchOrderStatus`, `CkbInvoiceStatus`, `PaymentStatus`: Enum-like types -> **Map to TypeScript enums or string literals**
+
+*   **Custom Error Classes (Example):**
+    ```typescript
+    class FiberRpcError extends Error {
+      code?: number;
+      constructor(message: string, code?: number, public originalError?: any) {
+        super(message);
+        this.name = "FiberRpcError";
+        this.code = code;
+      }
+    }
+
+    class FiberNetworkError extends FiberRpcError {
+      constructor(message: string, originalError?: AxiosError) {
+        super(message, undefined, originalError);
+        this.name = "FiberNetworkError";
+      }
+    }
+
+    class FiberRpcTimeoutError extends FiberNetworkError {
+      constructor(message: string, originalError?: AxiosError) {
+        super(message, originalError);
+        this.name = "FiberRpcTimeoutError";
+      }
+    }
+
+    class FiberChannelError extends FiberRpcError {
+      constructor(message: string, code?: number) {
+        super(message, code);
+        this.name = "FiberChannelError";
+      }
+    }
+    ```

@@ -149,18 +149,38 @@
   - Wallet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqtj5ses5f88ggyeggrz7f9zh0kch40ctxsas20ze
   - Key password: ckbnode-fiber-2026
   - 10,000 CKB funded and confirmed
-- **N100** fiber: RUNNING — systemd service, dir /home/phill/fiber/run/
+- **N100** fiber: RUNNING — systemd service, dir /home/phill/.fiber/ (moved from ~/fiber/run/ 2026-03-11)
   - P2P port 8229, RPC 127.0.0.1:8226
-  - Node ID: 0301ae73e52494ecb09d3cadad9ed164276662016862f7ba1c9cbe6a150d3ab07a
-  - PeerId: QmTh1V2gHqXKs59sGL24XpRHFGLch4J6wT4sdGB7EhRgAm
-  - Wallet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgzxfhhs329hf0lr3gnwxnzyn270drqr3csvq7pn
+  - Node ID: 03e920df66ed3ff214cb58cd65213ec1dc695091c177927e2a9b14f1679d87cc9e ← NEW (identity reset 2026-03-11)
+  - PeerId: (auto-derived from new key)
+  - Wallet: ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqvsg2ha206ae5lhjaxg9mp3mscg4s0k8ncy4ej9u ← NEW, NEEDS FUNDING
+  - Key: ~/.fiber/ckb/key (raw hex, no 0x), encrypted at first start to ~/.fiber/data/key
   - Key password: n100-fiber-2026
-  - NEEDS FUNDING (99+ CKB) to auto-accept channels
-- Channel between ckbnode↔N100: PENDING (N100 insufficient balance)
+  - Config: ~/.fiber/data/config.yml (private_key_path: ~/.fiber/ckb/key)
+  - Log: ~/.fiber/data/fiber.log (StandardOutput in service unit)
+  - OLD wallet (Phill sent CKB here — needs redirecting): ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqgzxfhhs329hf0lr3gnwxnzyn270drqr3csvq7pn
+  - NEEDS 99+ CKB at new wallet before channel with ckbnode will open
+- Channel between ckbnode↔N100: PENDING (new wallet unfunded)
 - Fiber dashboard: http://192.168.68.91:9091
 - SSH tunnel: N100:8237 → ckbnode:127.0.0.1:8227 (autossh service)
 - PeerId formula: base58(bytes([0x12,0x20]) + sha256(raw_compressed_pubkey))
 - IMPORTANT: always pkill -9 fnn before restarting service (DB lock issue)
+- **CKB node MUST have `Indexer` module enabled for fnn to fund channels** — without it, fnn fails with `error decoding response body` when calling send_transaction. Add `"Indexer"` to modules list in ckb.toml: `modules = ["Net", "Pool", "Miner", "Chain", "Stats", "Subscription", "Experiment", "Indexer"]`
+- ckbnode v0.204.0 Indexer enabled: done 2026-03-11 ✅
+- Channel funding still failing: `error decoding response body` on send_transaction — likely fnn v0.7.1 vs CKB v0.204.0 API mismatch. Options: downgrade ckbnode to v0.203.0, or wait for fnn v0.7.2
+- fnn store path must be correct: `store.path` in config.yml should point to where RocksDB data actually is (`~/.fiber/fiber/store` not `~/.fiber/data/store`)
+
+## ckb-access umbrella repository (2026-03-11)
+- URL: https://github.com/toastmanAu/ckb-access
+- One-command installers for Nervos CKB network tools
+- **fiber/**: v0.7.1 — payment channel node (Linux/macOS/Windows)
+- **ckb-light/**: v0.5.4 — light client (~50MB), arm64 build-from-source fallback
+- **ckb-node/**: v0.204.0 — full node (200GB+), all platforms prebuilt
+- **ckb-cli/**: v2.0.0 — command-line wallet tools
+- **ckb-miner/**: v0.25.0 — CPU/GPU miner (Eaglesong), CUDA/OpenCL variants
+- All installers: PS5.1 compliant, smoke-tested, auto-install dependencies
+- Platform support matrix in README.md
+- Upstream issue filed: nervosnetwork/ckb-light-client#272 (arm64 binary request)
 
 ## CKB Stratum Proxy
 - Repo: https://github.com/toastmanAu/ckb-stratum-proxy

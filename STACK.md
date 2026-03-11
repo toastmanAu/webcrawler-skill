@@ -3,7 +3,7 @@
 Canonical reference for all Wyltek projects. Read this before suggesting we build something.
 **If it's listed here as SHIPPED — it exists. Don't rebuild it, don't research it as missing.**
 
-Last updated: 2026-03-05
+Last updated: 2026-03-11
 
 ---
 
@@ -74,6 +74,18 @@ Last updated: 2026-03-05
 - **Member features:** DOB minter, CKBFS viewer, research page, devlog, flasher, ckb-sync, tests
 - **Bug reporter:** floating 🪲 button on all pages → bug-report.html → Cloudflare Worker → GitHub Issues (private: toastmanAu/wyltek-bug-reports)
 - **Founding members:** 100 max, DOB #1 minted for Phill
+
+### ckb-access (fiber installer)
+- **Repo:** github.com/toastmanAu/ckb-access (umbrella), fiber-installer subtree
+- **Old repo:** github.com/toastmanAu/fiber-installer (still works, not deleted)
+- **What:** One-command installer for Fiber Network payment channel node
+- **Platforms:** Linux · macOS · Windows 10+ (PS5.1)
+- **Version:** v1.1.0 (tagged on both repos)
+- **Features:** Auto-installs VC++ 2022 + Python 3.12 on Windows, both mainnet+testnet, smoke test, dashboard, NSSM service
+- **Dashboard:** Python HTTP server, Windows-compatible (tasklist/netstat/pure-Python log read)
+- **Install Linux/macOS:** `curl -fsSL https://raw.githubusercontent.com/toastmanAu/ckb-access/main/fiber/install.sh | bash`
+- **Install Windows:** `irm https://raw.githubusercontent.com/toastmanAu/ckb-access/main/fiber/install.ps1 | iex`
+- **Verified clean end-to-end:** 2026-03-11, EliteDesk HP 800 G1 DM, Windows 10 22H2
 
 ### Fiber Nodes (running infrastructure)
 - **ckbnode fiber:** mainnet, P2P 8228, RPC 127.0.0.1:8227, 10,000 CKB funded
