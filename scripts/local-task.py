@@ -24,9 +24,60 @@ Task tiers (auto-detected from --tier or keywords in --task):
 import sys, os, json, argparse, urllib.request, urllib.error, time
 
 MACHINES = {
-    'nucbox':     {'host': '192.168.68.79', 'port': 11434, 'model': 'qwen2.5:14b',    'tier': 'medium'},
-    'drivethree': {'host': '192.168.68.88', 'port': 11434, 'model': 'qwen2.5:14b',    'tier': 'heavy'},
-    'opi5':       {'host': '192.168.68.100','port': 11434, 'model': 'qwen2.5:3b',     'tier': 'simple'},
+    'nucbox': {
+        'host': '192.168.68.79', 'port': 11434,
+        'models': {
+            'default':   'qwen2.5:14b',
+            'code':      'qwen2.5-coder:14b',
+            'reasoning': 'deepseek-r1:14b',
+            'general':   'qwen2.5:14b',
+        },
+        'tier': 'medium',
+        'specialties': ['reasoning', 'general', 'code'],
+        'gpu': False, 'always_on': True,
+    },
+    'drivethree': {
+        'host': '192.168.68.88', 'port': 11434,
+        'models': {
+            'default':   'qwen2.5:14b',
+            'code':      'qwen2.5-coder:14b',
+            'vision':    'llava:13b',
+            'general':   'qwen2.5:14b',
+        },
+        'tier': 'heavy',
+        'specialties': ['code', 'vision', 'heavy'],
+        'gpu': True, 'always_on': False,
+    },
+    'opi5': {
+        'host': '192.168.68.100', 'port': 11434,
+        'models': {
+            'default': 'qwen2.5:3b',
+            'general': 'qwen2.5:3b',
+        },
+        'tier': 'simple',
+        'specialties': ['simple'],
+        'gpu': False, 'always_on': True,
+    },
+    'elitedesk': {
+        'host': '192.168.68.97', 'port': 11434,
+        'models': {
+            'default': 'qwen2.5:3b',
+            'general': 'qwen2.5:3b',
+        },
+        'tier': 'simple',
+        'specialties': ['simple', 'build'],
+        'gpu': False, 'always_on': False,
+    },
+}
+
+# Capability routing: task type → preferred machine order + model key
+CAPABILITY_ROUTES = {
+    'code':      [('drivethree','code'),   ('nucbox','code'),      ('nucbox','general')],
+    'vision':    [('drivethree','vision'),  ('nucbox','general')],
+    'reasoning': [('nucbox','reasoning'),  ('drivethree','general')],
+    'simple':    [('opi5','default'),       ('nucbox','general'),   ('drivethree','general')],
+    'medium':    [('nucbox','general'),     ('drivethree','general')],
+    'heavy':     [('drivethree','general'), ('nucbox','general')],
 }
 
 TIER_ORDER = {
@@ -35,13 +86,25 @@ TIER_ORDER = {
     'heavy':  ['drivethree', 'nucbox'],
 }
 
-SIMPLE_KEYWORDS  = ['summarise','summarize','list','classify','format','rename','label','count','extract','short']
-HEAVY_KEYWORDS   = ['refactor','redesign','architect','rewrite','debug','implement','generate','create','build']
+SIMPLE_KEYWORDS    = ['summarise','summarize','list','classify','format','rename','label','count','extract','short']
+HEAVY_KEYWORDS     = ['refactor','redesign','architect','rewrite','debug','implement','generate','create','build']
+CODE_KEYWORDS      = ['code','function','script','bug','syntax','refactor','implement','class','method','python','javascript','rust','c++','node','bash']
+REASONING_KEYWORDS = ['reason','think','analyse','analyze','evaluate','compare','trade-off','decision','should i','why','explain']
+VISION_KEYWORDS    = ['image','photo','picture','screenshot','describe','what is in','look at']
+
+def detect_capability(task: str) -> str:
+    t = task.lower()
+    if any(k in t for k in VISION_KEYWORDS):    return 'vision'
+    if any(k in t for k in CODE_KEYWORDS):      return 'code'
+    if any(k in t for k in REASONING_KEYWORDS): return 'reasoning'
+    if any(k in t for k in HEAVY_KEYWORDS):     return 'heavy'
+    if any(k in t for k in SIMPLE_KEYWORDS):    return 'simple'
+    return 'medium'
 
 def detect_tier(task: str) -> str:
-    t = task.lower()
-    if any(k in t for k in HEAVY_KEYWORDS):  return 'heavy'
-    if any(k in t for k in SIMPLE_KEYWORDS): return 'simple'
+    cap = detect_capability(task)
+    if cap in ('simple',):    return 'simple'
+    if cap in ('heavy',):     return 'heavy'
     return 'medium'
 
 def probe_machine(name: str, m: dict, timeout=3) -> dict:
@@ -118,29 +181,35 @@ def main():
     if context:
         prompt = f"{args.task}\n\n---\n{context}\n---"
 
-    # ── Select tier + machine order ─────────────────────────────────────────────
-    tier = args.tier or detect_tier(args.task)
-    order = [args.machine] if args.machine else TIER_ORDER[tier]
+    # ── Select capability + route ────────────────────────────────────────────────
+    cap = args.tier or detect_capability(args.task)
+    route = CAPABILITY_ROUTES.get(cap, CAPABILITY_ROUTES['medium'])
+
+    if args.machine:
+        m_cfg = MACHINES[args.machine]
+        model_key = cap if cap in m_cfg['models'] else 'default'
+        route = [(args.machine, model_key)]
 
     if not args.json:
-        print(f"[local-task] tier={tier}  trying: {' → '.join(order)}", file=sys.stderr)
+        route_str = ' → '.join(f"{m}/{k}" for m, k in route)
+        print(f"[local-task] capability={cap}  route: {route_str}", file=sys.stderr)
 
-    # ── Try machines in order ───────────────────────────────────────────────────
-    for name in order:
-        m = MACHINES[name].copy()
-        if args.model:
-            m['model'] = args.model
+    # ── Try route in order ──────────────────────────────────────────────────────
+    for machine_name, model_key in route:
+        m = MACHINES[machine_name]
+        model = args.model or m['models'].get(model_key, m['models']['default'])
+        cfg = {'host': m['host'], 'port': m['port'], 'model': model}
         if not args.json:
-            print(f"[local-task] → {name} ({m['host']}) model={m['model']}", file=sys.stderr)
-        ok, result = run_on_machine(name, m, prompt)
+            print(f"[local-task] → {machine_name} ({m['host']}) model={model}", file=sys.stderr)
+        ok, result = run_on_machine(machine_name, cfg, prompt)
         if ok:
             if args.json:
-                print(json.dumps({'ok': True, 'machine': name, 'model': m['model'], 'result': result}))
+                print(json.dumps({'ok': True, 'machine': machine_name, 'model': model, 'result': result}))
             else:
                 print(result)
             return
         else:
-            print(f"[local-task] ✗ {name}: {result}", file=sys.stderr)
+            print(f"[local-task] ✗ {machine_name}: {result}", file=sys.stderr)
 
     # All failed
     if args.json:
