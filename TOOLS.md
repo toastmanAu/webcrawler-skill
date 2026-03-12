@@ -66,3 +66,11 @@ Add whatever helps you do your job. This is your cheat sheet.
 - Key models: minicpm-v (vision), qwen2.5:14b, deepseek-r1:14b, gemma3:12b, qwen2.5-coder:14b, llama3.1:8b
 - OpenClaw provider: "ryzen" → imageModel = ryzen/minicpm-v:latest
 - Auto-suspend permanently masked
+
+## EliteDesk Build Box
+- HP EliteDesk 800 G1 DM, i5-4670 @ 3.40GHz, 16GB RAM, 229GB NVMe (115GB free)
+- Ubuntu 22.04 x86_64 (dual-boot Windows/Linux — keep in Linux for build tasks)
+- SSH alias: `elitedesk` · IP: 192.168.68.97 · user: phill · passwordless ✅
+- Role: dedicated build node — Docker, arm64 cross-compile, orangepi-build
+- Ollama: phi3:mini (CPU-only) — build queries only (compile errors, CMake, linker issues)
+- No OpenClaw installed

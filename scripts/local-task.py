@@ -58,8 +58,17 @@ MACHINES = {
         'specialties': ['simple'],
         'gpu': False, 'always_on': True,
     },
-    # EliteDesk excluded from inference — i5-4670 too slow, build node only
-    # 'elitedesk': { ... }
+    'elitedesk': {
+        'host': '192.168.68.97', 'port': 11434,
+        'models': {
+            'default': 'phi3:mini',
+            'build':   'phi3:mini',   # explain compile errors, CMake, linker issues
+            'simple':  'phi3:mini',
+        },
+        'tier': 'simple',
+        'specialties': ['build', 'simple'],
+        'gpu': False, 'always_on': False,
+    },
 }
 
 # Capability routing: task type → preferred machine order + model key
