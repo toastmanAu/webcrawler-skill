@@ -58,16 +58,8 @@ MACHINES = {
         'specialties': ['simple'],
         'gpu': False, 'always_on': True,
     },
-    'elitedesk': {
-        'host': '192.168.68.97', 'port': 11434,
-        'models': {
-            'default': 'qwen2.5:3b',
-            'general': 'qwen2.5:3b',
-        },
-        'tier': 'simple',
-        'specialties': ['simple', 'build'],
-        'gpu': False, 'always_on': False,
-    },
+    # EliteDesk excluded from inference — i5-4670 too slow, build node only
+    # 'elitedesk': { ... }
 }
 
 # Capability routing: task type → preferred machine order + model key
