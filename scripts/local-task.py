@@ -21,7 +21,7 @@ Task tiers (auto-detected from --tier or keywords in --task):
   heavy    → drivethree first, nucbox fall  (refactor, design, debug complex, generate large)
 """
 
-import sys, os, json, argparse, urllib.request, urllib.error, time
+import sys, os, json, argparse, urllib.request, urllib.error, time, subprocess
 
 MACHINES = {
     'nucbox': {
@@ -85,17 +85,40 @@ MACHINES = {
         'specialties': ['build', 'simple'],
         'gpu': False, 'always_on': False,
     },
+    'github': {
+        # GitHub Models (Azure-hosted, OpenAI‑compatible API)
+        # Uses gh auth token for authentication, free tier rate‑limited.
+        'host': 'models.inference.ai.azure.com',
+        'port': 443,
+        'type': 'openai',
+        'endpoint': 'https://models.inference.ai.azure.com/v1/chat/completions',
+        'token_source': 'gh',
+        'models': {
+            'default':   'phi-4',
+            'code':      'gpt-4o',
+            'reasoning': 'llama-3.3-70b',
+            'heavy':     'gpt-4o',
+            'medium':    'gpt-4o-mini',
+            'simple':    'phi-4',
+        },
+        'tier': 'heavy',
+        'specialties': ['code', 'reasoning', 'heavy', 'medium', 'simple'],
+        'gpu': False, 'always_on': True,
+        'cloud': True,
+        'rate_limit_rpm': 15,   # small models
+        'rate_limit_large_rpm': 8,  # large models
+    },
 }
 
 # Capability routing: task type → preferred machine order + model key
 CAPABILITY_ROUTES = {
-    # aitk = AI Toolkit (driveThree, tunnelled) — tried first when loaded, skipped gracefully if not
-    'code':      [('aitk','code'),      ('drivethree','code'),   ('nucbox','code'),      ('nucbox','general')],
-    'vision':    [('drivethree','vision'),                        ('nucbox','general')],
-    'reasoning': [('aitk','reasoning'), ('nucbox','reasoning'),  ('drivethree','general')],
-    'simple':    [('opi5','default'),   ('nucbox','general'),    ('drivethree','general')],
-    'medium':    [('nucbox','general'), ('aitk','general'),      ('drivethree','general')],
-    'heavy':     [('aitk','heavy'),     ('drivethree','general'), ('nucbox','general')],
+    # github = GitHub Models (Azure‑hosted, free tier, rate‑limited) — tried first, falls back gracefully
+    'code':      [('github','code'),      ('aitk','code'),      ('drivethree','code'),   ('nucbox','code'),      ('nucbox','general')],
+    'vision':    [('drivethree','vision'),                                                               ('nucbox','general')],
+    'reasoning': [('github','reasoning'), ('aitk','reasoning'), ('nucbox','reasoning'),  ('drivethree','general')],
+    'simple':    [('github','simple'),    ('opi5','default'),   ('nucbox','general'),    ('drivethree','general')],
+    'medium':    [('github','medium'),    ('nucbox','general'), ('aitk','general'),      ('drivethree','general')],
+    'heavy':     [('github','heavy'),     ('aitk','heavy'),     ('drivethree','general'), ('nucbox','general')],
 }
 
 TIER_ORDER = {
@@ -139,6 +162,10 @@ def resolve_model(m: dict, timeout=3) -> str | None:
     return None
 
 def probe_machine(name: str, m: dict, timeout=3) -> dict:
+    # Cloud provider (GitHub Models) — no probe, just show available models
+    if m.get('cloud'):
+        models = list(m['models'].values())
+        return {'ok': True, 'models': list(set(models)), 'ms': 0}
     # AI Toolkit uses OpenAI-style /v1/models; Ollama uses /api/tags
     endpoint = '/v1/models' if m.get('dynamic') else '/api/tags'
     url = f"http://{m['host']}:{m['port']}{endpoint}"
@@ -163,7 +190,53 @@ def call_ollama(host: str, port: int, model: str, prompt: str, timeout=120) -> s
         data = json.loads(r.read())
     return data.get('response', '').strip()
 
+def get_github_token() -> str | None:
+    """Return GitHub token from gh auth token, cache for this run."""
+    try:
+        result = subprocess.run(['gh', 'auth', 'token'], capture_output=True, text=True, timeout=5)
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return None
+
+def call_openai(endpoint: str, model: str, prompt: str, token: str, timeout=30) -> str:
+    """Call OpenAI-compatible endpoint (GitHub Models)."""
+    headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json',
+    }
+    body = json.dumps({
+        'model': model,
+        'messages': [{'role': 'user', 'content': prompt}],
+    })
+    req = urllib.request.Request(endpoint, data=body.encode(), headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            data = json.loads(r.read())
+        # OpenAI format: choices[0].message.content
+        return data['choices'][0]['message']['content'].strip()
+    except urllib.error.HTTPError as e:
+        # Return error details for debugging
+        body = e.read().decode('utf-8', errors='ignore')
+        raise Exception(f'HTTP {e.code}: {body[:200]}')
+
 def run_on_machine(name: str, m: dict, prompt: str) -> tuple[bool, str]:
+    # Cloud provider (GitHub Models)
+    if m.get('cloud'):
+        token = get_github_token()
+        if not token:
+            return False, 'no GitHub token'
+        try:
+            result = call_openai(m['endpoint'], m['model'], prompt, token)
+            return True, result
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                return False, 'rate limit (429)'
+            return False, f'HTTP {e.code}: {e.reason}'
+        except Exception as e:
+            return False, str(e)
+    # Local Ollama
     try:
         result = call_ollama(m['host'], m['port'], m['model'], prompt)
         return True, result
