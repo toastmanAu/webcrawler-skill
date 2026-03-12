@@ -1,0 +1,14 @@
+[2026-03-12 04:01:42] Sync watcher started
+[2026-03-12 04:01:42] Sync watcher started
+[2026-03-12 04:01:43] Local: 18811561 | Tip: 18818050 | Behind: 6489 blocks
+[2026-03-12 04:01:43] Local: 18811561 | Tip: 18818050 | Behind: 6489 blocks
+[2026-03-12 04:02:43] Sync watcher started
+[2026-03-12 04:02:43] Sync watcher started
+[2026-03-12 04:02:44] Local: 18818055 | Tip: 18818055 | Behind: 0
+[2026-03-12 04:02:44] Local: 18818055 | Tip: 18818055 | Behind: 0
+[2026-03-12 04:02:44] Synced at 18818055 — stopping CKB node...
+[2026-03-12 04:02:44] Synced at 18818055 — stopping CKB node...
+[2026-03-12 04:02:45] Node stopped. Launching snapshot pipeline...
+[2026-03-12 04:02:45] Node stopped. Launching snapshot pipeline...
+[2026-03-12 04:02:45] Snapshot pipeline launched. Done.
+[2026-03-12 04:02:45] Snapshot pipeline launched. Done.
