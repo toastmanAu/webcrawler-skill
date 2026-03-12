@@ -58,6 +58,22 @@ MACHINES = {
         'specialties': ['simple'],
         'gpu': False, 'always_on': True,
     },
+    'aitk': {
+        # Microsoft AI Toolkit on driveThree — tunnelled via Pi:5273 → driveThree:5272
+        # Only available when VS Code + AI Toolkit has a model loaded
+        # Models are discovered dynamically at runtime via /v1/models
+        'host': '127.0.0.1', 'port': 5273,
+        'models': {
+            'default':   'auto',   # resolved at runtime from /v1/models
+            'code':      'auto',
+            'reasoning': 'auto',
+            'general':   'auto',
+        },
+        'tier': 'heavy',
+        'specialties': ['code', 'heavy', 'reasoning'],
+        'gpu': True, 'always_on': False,
+        'dynamic': True,  # probe /v1/models before use to get real model id
+    },
     'elitedesk': {
         'host': '192.168.68.97', 'port': 11434,
         'models': {
@@ -73,12 +89,13 @@ MACHINES = {
 
 # Capability routing: task type → preferred machine order + model key
 CAPABILITY_ROUTES = {
-    'code':      [('drivethree','code'),   ('nucbox','code'),      ('nucbox','general')],
-    'vision':    [('drivethree','vision'),  ('nucbox','general')],
-    'reasoning': [('nucbox','reasoning'),  ('drivethree','general')],
-    'simple':    [('opi5','default'),       ('nucbox','general'),   ('drivethree','general')],
-    'medium':    [('nucbox','general'),     ('drivethree','general')],
-    'heavy':     [('drivethree','general'), ('nucbox','general')],
+    # aitk = AI Toolkit (driveThree, tunnelled) — tried first when loaded, skipped gracefully if not
+    'code':      [('aitk','code'),      ('drivethree','code'),   ('nucbox','code'),      ('nucbox','general')],
+    'vision':    [('drivethree','vision'),                        ('nucbox','general')],
+    'reasoning': [('aitk','reasoning'), ('nucbox','reasoning'),  ('drivethree','general')],
+    'simple':    [('opi5','default'),   ('nucbox','general'),    ('drivethree','general')],
+    'medium':    [('nucbox','general'), ('aitk','general'),      ('drivethree','general')],
+    'heavy':     [('aitk','heavy'),     ('drivethree','general'), ('nucbox','general')],
 }
 
 TIER_ORDER = {
@@ -108,15 +125,32 @@ def detect_tier(task: str) -> str:
     if cap in ('heavy',):     return 'heavy'
     return 'medium'
 
+def resolve_model(m: dict, timeout=3) -> str | None:
+    """For dynamic machines, call /v1/models and return first available model id."""
+    url = f"http://{m['host']}:{m['port']}/v1/models"
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as r:
+            data = json.loads(r.read())
+        models = data.get('data', [])
+        if models:
+            return models[0].get('id') or models[0].get('name')
+    except Exception:
+        pass
+    return None
+
 def probe_machine(name: str, m: dict, timeout=3) -> dict:
-    url = f"http://{m['host']}:{m['port']}/api/tags"
+    # AI Toolkit uses OpenAI-style /v1/models; Ollama uses /api/tags
+    endpoint = '/v1/models' if m.get('dynamic') else '/api/tags'
+    url = f"http://{m['host']}:{m['port']}{endpoint}"
     try:
         start = time.time()
         with urllib.request.urlopen(url, timeout=timeout) as r:
             data = json.loads(r.read())
         ms = int((time.time() - start) * 1000)
-        models = [x['name'] for x in data.get('models', [])]
-        return {'ok': True, 'models': models, 'ms': ms}
+        raw = data.get('models') or data.get('data') or []
+        models = [x.get('name') or x.get('id', '?') for x in raw if x.get('name') or x.get('id')]
+        status = models if models else ['(no model loaded)']
+        return {'ok': True, 'models': status, 'ms': ms}
     except Exception as e:
         return {'ok': False, 'error': str(e)}
 
@@ -199,9 +233,16 @@ def main():
     for machine_name, model_key in route:
         m = MACHINES[machine_name]
         model = args.model or m['models'].get(model_key, m['models']['default'])
+        # Dynamic model resolution (AI Toolkit etc.)
+        if model == 'auto' or m.get('dynamic'):
+            resolved = resolve_model(m)
+            if not resolved:
+                print(f"[local-task] ✗ {machine_name}: no model loaded (dynamic)", file=sys.stderr)
+                continue
+            model = resolved
         cfg = {'host': m['host'], 'port': m['port'], 'model': model}
         if not args.json:
-            print(f"[local-task] → {machine_name} ({m['host']}) model={model}", file=sys.stderr)
+            print(f"[local-task] → {machine_name} ({m['host']}:{m['port']}) model={model}", file=sys.stderr)
         ok, result = run_on_machine(machine_name, cfg, prompt)
         if ok:
             if args.json:
