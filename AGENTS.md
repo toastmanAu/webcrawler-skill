@@ -114,6 +114,62 @@ Reactions are lightweight social signals. Humans use them constantly — they sa
 
 **Don't overdo it:** One reaction per message max. Pick the one that fits best.
 
+## 🖥️ Local Inference Routing — Offload to LAN Hardware
+
+**Before using Claude (API credit), ask: can a local 14b model do this?**
+
+### Machines
+| Name | IP | Model | Speed | Status |
+|---|---|---|---|---|
+| drivethree | 192.168.68.88 | qwen2.5:14b | GPU ~20 tok/s | on-demand |
+| nucbox | 192.168.68.79 | qwen2.5:14b | CPU ~5 tok/s | always on |
+| opi5 | 192.168.68.100 | qwen2.5:3b | CPU ~3 tok/s | always on |
+
+### What to offload (use `scripts/local-task.py`)
+✅ **Always offload:**
+- Summarise files / docs / findings
+- Write or improve docstrings, comments, READMEs
+- Classify / categorise / label lists
+- Format / transform data (JSON → Markdown, etc.)
+- Simple code review (style, obvious bugs)
+- Generate boilerplate from a template
+- RAM event interpretation (already in ram-watcher.js)
+- PR validation (already in pr-validator.js)
+- Research crawl analysis (already in research-crawl.py)
+
+🔶 **Offload if low stakes:**
+- Moderate code review / explanation
+- Writing test cases for known functions
+- Translating between formats / languages
+- Analysing log files for patterns
+
+❌ **Keep on Claude:**
+- Architecture decisions
+- Complex debugging across multiple files
+- Anything where being wrong has real consequences
+- First-time implementation of a novel feature
+- Reasoning about trade-offs with significant impact
+
+### How to call
+```bash
+# Auto-selects machine based on task keywords
+python3 ~/.openclaw/workspace/scripts/local-task.py \
+  --task "summarise this file" --file foo.py
+
+# Force machine + tier
+python3 ~/.openclaw/workspace/scripts/local-task.py \
+  --task "review this code for bugs" --machine drivethree < foo.js
+
+# Probe all machines
+python3 ~/.openclaw/workspace/scripts/local-task.py --probe
+```
+
+### Decision rule (apply every turn)
+1. Classify the task: simple / medium / heavy
+2. If simple or medium AND output quality doesn't need to be perfect → call local-task.py
+3. If heavy OR high-stakes OR needs my full context → use Claude
+4. **Never** call local-task.py for tasks that require access to secrets, private memory, or external APIs
+
 ## Tools
 
 Skills provide your tools. When you need one, check its `SKILL.md`. Keep local notes (camera names, SSH details, voice preferences) in `TOOLS.md`.
