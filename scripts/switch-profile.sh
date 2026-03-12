@@ -104,9 +104,9 @@ EOF
     ;;
 
   local-only)
-    echo "Switching to LOCAL-ONLY profile (driveThree MiniCPM-V primary)..."
+    echo "Switching to LOCAL-ONLY profile (driveThree Qwen2.5‑14B primary)..."
     echo "⚠️  WARNING: This uses local Ollama instances only — no API calls."
-    echo "   Quality will be lower but zero cost."
+    echo "   Quality will be lower but zero cost. Ensure driveThree (192.168.68.88) is on."
 
     cp "$CONFIG" "$BACKUP_DIR/openclaw-$(date +%Y%m%d-%H%M%S).json"
 
@@ -117,16 +117,17 @@ CONFIG = "/home/phill/.openclaw/openclaw.json"
 with open(CONFIG) as f:
     d = json.load(f)
 
-d['agents']['defaults']['model']['primary'] = 'drivethree/minicpm-v:latest'
+d['agents']['defaults']['model']['primary'] = 'drivethree/qwen2.5:14b'
 d['agents']['defaults']['model']['fallbacks'] = [
+    'drivethree/minicpm-v:latest',
     'ollama/qwen2.5:14b',
 ]
 
 with open(CONFIG, 'w') as f:
     json.dump(d, f, indent=2)
-print("✅ Profile: LOCAL-ONLY — drivethree/minicpm-v:latest primary")
-print("   Zero API cost, runs on driveThree GPU + NucBox CPU")
-print("   Use when APIs are down or for low-stakes debugging")
+print("✅ Profile: LOCAL-ONLY — drivethree/qwen2.5:14b primary")
+print("   Zero API cost, runs on driveThree GPU (Qwen2.5‑14B)")
+print("   Fallback: driveThree MiniCPM‑V (vision), NucBox Qwen2.5‑14B (CPU)")
 EOF
     ;;
 
