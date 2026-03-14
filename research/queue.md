@@ -2734,7 +2734,7 @@ The goal: if the CKB node already stores MMR internally (it does — it's in the
 
 ---
 
-## [PENDING] ckb-lora-proof-of-coverage
+## [DONE] ckb-lora-proof-of-coverage
 
 **Priority:** MEDIUM
 **Tags:** lora, iot, meshtastic, proof-of-coverage, ckb, fiber, hardware

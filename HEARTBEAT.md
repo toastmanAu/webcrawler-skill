@@ -108,6 +108,14 @@ Check `systemctl --user is-active wyltek-lounge-relay` — if inactive, restart:
 Check `curl -sf http://localhost:9988/` — if down, run:
 `cd /home/phill/uv-tracker && setsid python3 -m http.server 9988 --bind 0.0.0.0 >> /tmp/uv-server.log 2>&1 &`
 
+## RAM Viewer Log Cleanup (daily — ~1am ACST)
+Run `ssh phill@192.168.68.79 "bash ~/ram-viewer/cleanup-logs.sh"` — track last run in heartbeat-state.json under key `ramViewerCleanup`.
+- Rotates events file when it hits 500MB
+- Compresses old logs (.gz)
+- Deletes logs older than 7 days
+- Shows current disk usage
+- Script: `~/ram-viewer/cleanup-logs.sh`
+
 ## Whale Bot
 Check `ps aux | grep whale-bot | grep -v grep` — if not running, run /home/phill/ckb-whale-bot/start.sh
 PID file: /home/phill/ckb-whale-bot/whale-bot.pid

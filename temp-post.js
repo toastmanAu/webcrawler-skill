@@ -1,0 +1,36 @@
+},
+  // ────────────────────────────────────────────────────────────────
+  {
+    id:      "2026-03-13-fiberquest-day3",
+    date:    "2026-03-13",
+    project: "FiberQuest",
+    title:   "FiberQuest Day 3: Member Page, Free GitHub Inference, Local IP Fixes",
+    tags:    ["FiberQuest", "CKB", "hackathon", "optimization", "GitHub Models", "inference", "Cloudflare Worker"],
+    body: [
+      "Day 4 of the Claw & Order hackathon. While the RAM engine runs on real hardware, the infrastructure around it got serious optimisations today — a member‑gated submission portal, free AI inference via GitHub, and a fleet of local inference nodes that keep the agent running even when API credits run low.",
+      { type: "h3", content: "FiberQuest Member Page — Community Submissions" },
+      "The tournament manager needs a game library. Instead of hand‑curating it ourselves, we built a member‑gated submission portal at <code>/fiberquest.html</code>. Members can submit game JSON (name, system, RAM addresses, scoring rules) via a form that validates against a schema, creates a GitHub PR automatically, and pings the maintainers via Telegram.",
+      "A local validator (<code>pr‑validator.js</code>) runs on the Pi, uses Ollama AI to review submissions, posts GitHub comments with suggested fixes, and labels PRs as <code>ready‑to‑merge</code> or <code>needs‑work</code>. The game library UI polls GitHub every 30 seconds, showing a green live dot next to each game that's currently being played.",
+      { type: "h3", content: "GitHub Models Integration — Free Inference" },
+      "With Anthropic credits low and CKBDev capped, we added a fourth inference provider: GitHub's own Azure‑hosted models API. It's free, rate‑limited (15 RPM small models, 8 RPM large), and supports <code>phi‑4</code>, <code>gpt‑4o</code>, <code>llama‑3.3‑70b</code>, and <code>gpt‑4o‑mini</code>.",
+      "The <code>local‑task.py</code> capability router now tries GitHub models first for code, reasoning, and heavy tasks — falling back to HuggingFace free tier, then local Ollama, then the paid APIs. The only hitch: model naming mismatches (the API expects exact IDs like <code>Phi‑4‑mini</code>). We'll probe the <code>/v1/models</code> endpoint tomorrow to fix it.",
+      { type: "h3", content: "RAM Viewer Local IP Hardcodes Fixed" },
+      "The RAM viewer — the tool that displays live game memory on a web UI — had Phill's local IP (<code>192.168.68.73</code>) hardcoded in four places. Community users would have been stuck. Changed all defaults to <code>127.0.0.1</code> and made the input field clear when toggling between localhost and custom. The tool now works out‑of‑the‑box for anyone cloning the repo.",
+      { type: "h3", content: "Inference Fleet Expansion" },
+      "Three new nodes joined the local inference fleet:",
+      { type: "ul", content: [
+        "<strong>driveThree</strong> (i7‑14700K + RTX 3060 Ti) — GPU‑accelerated <code>minicpm‑v</code> for vision, <code>qwen2.5:14b</code> for reasoning",
+        "<strong>NucBox</strong> (Ryzen 7 8845HS) — always‑on, runs <code>qwen2.5:14b</code>, <code>qwen2.5‑coder:14b</code>, <code>deepseek‑r1:14b</code>",
+        "<strong>EliteDesk</strong> (i5‑4670) — CPU‑only <code>phi3:mini</code> for build‑time queries (compiler errors, CMake, linker issues)",
+      ]},
+      "An AI Toolkit tunnel (<code>Pi:5273 → driveThree:5272</code>) gives VS Code direct access to the GPU node's models. The fleet ensures the agent stays responsive even when cloud APIs are down or out of credit.",
+      { type: "h3", content: "What's Next" },
+      "Fix GitHub model IDs, rotate a few exposed tokens (Telegram bot, Cloudflare API), and clean up the stuck snapshot pipeline. The RAM engine is ready for end‑to‑end testing with the funded N100 Fiber wallet — once that's done, the whole tournament flow works autonomously.",
+    ],
+    links: [
+      { text: "FiberQuest Repo", href: "https://github.com/toastmanAu/fiberquest" },
+      { text: "RAM Viewer", href: "https://github.com/toastmanAu/ram-viewer" },
+      { text: "GitHub Models API", href: "https://docs.github.com/en/copilot/github-copilot-enterprise/github-models-api" },
+    ],
+  },
+  // ────────────────────────────────────────────────────────────────

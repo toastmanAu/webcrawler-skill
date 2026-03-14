@@ -1,19 +1,19 @@
 {
   "lastChecks": {
-    "modelCheck": 1773333686556,
+    "modelCheck": 1773365928429,
     "dashboard": 1773322961015,
     "ckbNode": 1773322961015,
     "whaleBot": 1773322961015,
     "stratum": 1773322961015,
     "uvTracker": 1773322961015,
     "chatBridge": 1773322961015,
-    "antiScam": 1773326663303,
+    "antiScam": 1773365928429,
     "backup": 1773308080313,
     "vaultUpdate": 1773315200656,
-    "lastResearchCrawl": 1773328476,
-    "testResults": 1773313074186,
-    "bugReports": 1773326663303,
-    "siteStats": 1773313074186,
+    "lastResearchCrawl": 1773339446,
+    "testResults": 1773349401369,
+    "bugReports": 1773362330353,
+    "siteStats": 1773360456908,
     "antiscamDailySummary": 1773313074186,
     "snapshot": 1773315200656,
     "loungRelay": 1773314874022,
@@ -21,7 +21,7 @@
     "kernelDash": 1773314874022,
     "mintQueue": 1773202770659,
     "loungeRelay": 1773322961015,
-    "lastReseedCheck": 1773328476365
+    "lastReseedCheck": 0
   },
   "telegramSerialPRDone": true,
   "telegramSerialPR": {
@@ -39,6 +39,9 @@
   "snapshotV5Ready": true,
   "snapshotV5StartedAt": 1772813935141,
   "snapshotV5RestartedAt": 1772872177729,
-  "lastReseedCheck": 1773322151638,
-  "lastResearchCrawl": 1773202770
+  "lastReseedCheck": 1773343656590,
+  "modelCheck": 1773365928,
+  "bugReports": 1773362373,
+  "lastResearchCrawl": 1773202770,
+  "siteStats": 1773360456
 }

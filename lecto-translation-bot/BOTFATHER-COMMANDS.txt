@@ -1,0 +1,6 @@
+start - Start the bot
+translate - Translate replied message
+setkey - Set Lecto API key (owner only)
+allowgroup - Whitelist this group
+disallowgroup - Remove group whitelist
+groups - List whitelisted groups

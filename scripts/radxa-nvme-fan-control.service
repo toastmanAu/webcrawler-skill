@@ -1,0 +1,31 @@
+[Unit]
+Description=Radxa X4 NVMe Active Cooling Control
+Documentation=https://github.com/radxa/docs
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=/usr/local/bin/radxa-nvme-fan-control.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment variables (adjust paths if needed)
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# Security: run with minimal privileges after startup
+PrivateTmp=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/sys /var/log
+
+# Resource limits
+MemoryLimit=50M
+CPUQuota=5%
+
+[Install]
+WantedBy=multi-user.target

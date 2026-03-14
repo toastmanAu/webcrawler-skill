@@ -1,0 +1,10 @@
+lecto-translation-bot/
+├── src/
+│   └── index.ts
+├── package.json
+├── wrangler.toml
+├── tsconfig.json
+├── .gitignore
+├── README.md
+├── BOTFATHER-COMMANDS.txt
+└── DEPLOYMENT.md

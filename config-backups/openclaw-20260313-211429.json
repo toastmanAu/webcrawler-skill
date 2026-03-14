@@ -1,0 +1,493 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.12",
+    "lastTouchedAt": "2026-03-13T10:43:47.291Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-12T07:42:30.914Z",
+    "lastRunVersion": "2026.3.8",
+    "lastRunCommand": "configure",
+    "lastRunMode": "local"
+  },
+  "browser": {
+    "executablePath": "/usr/bin/brave-browser",
+    "noSandbox": false,
+    "defaultProfile": "openclaw"
+  },
+  "auth": {
+    "profiles": {
+      "anthropic:default": {
+        "provider": "anthropic",
+        "mode": "api_key"
+      },
+      "huggingface:default": {
+        "provider": "huggingface",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "ckbdev": {
+        "baseUrl": "https://share-ai.ckbdev.com",
+        "apiKey": "${CKBDEV_API_KEY}",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "claude-sonnet-4-6",
+            "name": "Claude Sonnet 4.6"
+          },
+          {
+            "id": "claude-haiku-4-5-20251001",
+            "name": "Claude Haiku 4.5"
+          }
+        ]
+      },
+      "ryzen": {
+        "baseUrl": "http://192.168.68.79:11434",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "minicpm-v:latest",
+            "name": "MiniCPM-V Vision (Ryzen)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "qwen2.5:14b",
+            "name": "Qwen2.5 14B (Ryzen)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          }
+        ]
+      },
+      "drivethree": {
+        "baseUrl": "http://192.168.68.88:11434",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "qwen2.5:14b",
+            "name": "Qwen2.5 14B (driveThree GPU)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "minicpm-v:latest",
+            "name": "MiniCPM-V (driveThree GPU)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          }
+        ]
+      },
+      "ollama": {
+        "baseUrl": "http://192.168.68.79:11434",
+        "apiKey": "ollama-local",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "minicpm-v:latest",
+            "name": "MiniCPM-V Vision (NucBox)",
+            "reasoning": false,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "qwen2.5:14b",
+            "name": "Qwen2.5 14B (NucBox)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          }
+        ]
+      },
+      "huggingface": {
+        "baseUrl": "https://router.huggingface.co/v1",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek-ai/DeepSeek-R1",
+            "name": "DeepSeek R1",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 3,
+              "output": 7,
+              "cacheRead": 3,
+              "cacheWrite": 3
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-ai/DeepSeek-V3.1",
+            "name": "DeepSeek V3.1",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.6,
+              "output": 1.25,
+              "cacheRead": 0.6,
+              "cacheWrite": 0.6
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+            "name": "Llama 3.3 70B Instruct Turbo",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.88,
+              "output": 0.88,
+              "cacheRead": 0.88,
+              "cacheWrite": 0.88
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "openai/gpt-oss-120b",
+            "name": "GPT-OSS 120B",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "openrouter": {
+        "baseUrl": "https://openrouter.ai/api/v1",
+        "apiKey": "${OPENROUTER_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek/deepseek-v3.2",
+            "name": "DeepSeek V3.2 (OpenRouter)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.26,
+              "output": 0.38,
+              "cacheRead": 0.26,
+              "cacheWrite": 0.26
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen/qwen3-coder:free",
+            "name": "Qwen3 Coder FREE (OpenRouter)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen/qwen2.5-coder-7b-instruct",
+            "name": "Qwen2.5 Coder 7B (OpenRouter, $0.03/M)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.03,
+              "output": 0.06,
+              "cacheRead": 0.03,
+              "cacheWrite": 0.03
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "meta-llama/llama-3.3-70b-instruct:free",
+            "name": "Llama 3.3 70B FREE (OpenRouter)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "google/gemini-2.0-flash-001",
+            "name": "Gemini 2.0 Flash (OpenRouter)",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0.1,
+              "output": 0.4,
+              "cacheRead": 0.025,
+              "cacheWrite": 0.025
+            },
+            "contextWindow": 1048576,
+            "maxTokens": 8192
+          },
+          {
+            "id": "anthropic/claude-sonnet-4-5",
+            "name": "Claude Sonnet 4.5 via OpenRouter",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 3,
+              "output": 15,
+              "cacheRead": 0.3,
+              "cacheWrite": 3.75
+            },
+            "contextWindow": 200000,
+            "maxTokens": 16000
+          }
+        ]
+      }
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openrouter/deepseek/deepseek-v3.2",
+        "fallbacks": [
+          "openrouter/qwen/qwen3-coder:free",
+          "openrouter/meta-llama/llama-3.3-70b-instruct:free",
+          "openrouter/qwen/qwen2.5-coder-7b-instruct",
+          "openrouter/google/gemini-2.0-flash-001",
+          "drivethree/qwen2.5:14b",
+          "ckbdev/claude-haiku-4-5-20251001",
+          "ckbdev/claude-sonnet-4-6",
+          "drivethree/minicpm-v:latest",
+          "ollama/qwen2.5:14b"
+        ]
+      },
+      "imageModel": {
+        "primary": "ollama/minicpm-v:latest",
+        "fallbacks": []
+      },
+      "models": {
+        "anthropic/claude-sonnet-4-6": {},
+        "ckbdev/claude-sonnet-4-6": {
+          "alias": "Claude Sonnet (CKBDev shared — primary)"
+        },
+        "anthropic/claude-sonnet-4-5": {},
+        "anthropic/claude-opus-4-6": {},
+        "openai/gpt-5.4": {},
+        "anthropic/claude-3-7-sonnet-latest": {},
+        "anthropic/claude-opus-4-5": {},
+        "huggingface/deepseek-ai/DeepSeek-R1-0528": {},
+        "drivethree/qwen2.5:14b": {},
+        "drivethree/minicpm-v:latest": {}
+      },
+      "workspace": "/home/phill/.openclaw/workspace",
+      "memorySearch": {
+        "provider": "local",
+        "fallback": "none",
+        "local": {
+          "modelPath": "hf:ggml-org/embeddinggemma-300m-qat-q8_0-GGUF/embeddinggemma-300m-qat-Q8_0.gguf"
+        }
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "model": "openrouter/deepseek/deepseek-v3.2"
+      },
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "model": "ckbdev/claude-sonnet-4-6"
+      }
+    ]
+  },
+  "tools": {
+    "web": {
+      "search": {
+        "enabled": true,
+        "provider": "brave",
+        "apiKey": "BSA8PzhZafM5ddwE9gO-s9zDRjSQT7d"
+      },
+      "fetch": {
+        "enabled": true
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "bootstrap-extra-files": {
+          "enabled": true
+        },
+        "command-logger": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "botToken": "8063604310:AAELSIVS02p0AJa73LH6iZPRz4yxmm--hCU",
+      "groupPolicy": "allowlist",
+      "streaming": "partial",
+      "mediaMaxMb": 20,
+      "network": {
+        "autoSelectFamily": false
+      },
+      "webhookUrl": "https://webhook.wyltekindustries.com/telegram-webhook",
+      "webhookSecret": "569a21b12375971658a48e61d9918c1ffce5ca0b534d313e7d1e7231d1c5a83c",
+      "webhookPath": "/telegram-webhook"
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "auto",
+    "auth": {
+      "mode": "token",
+      "token": "c36847f3eb3596ba67e50328d39c6a6c6f1456dbd9e0d125"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "remote": {
+      "url": "wss://192.168.68.82:18789"
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "calendar.add",
+        "contacts.add",
+        "reminders.add"
+      ]
+    }
+  },
+  "skills": {
+    "install": {
+      "nodeManager": "npm"
+    },
+    "entries": {}
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
+    }
+  }
+}
