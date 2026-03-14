@@ -1,0 +1,35 @@
+{
+  "version": "1.0.0",
+  "description": "FiberQuest Games Database Configuration",
+  "note": "This file is LOCAL ONLY. Not version-controlled. User-customizable.",
+  "gamesDbSource": {
+    "provider": "local_file",
+    "path": "~/.fiberquest/games-db.json",
+    "refreshInterval": 86400,
+    "lastUpdated": null
+  },
+  "theGamesDBConfig": {
+    "enabled": true,
+    "apiKey": "${THEGAMESDB_API_KEY}",
+    "apiEndpoint": "https://thegamesdb.net/api",
+    "cacheDir": "~/.fiberquest/cache/thegamesdb",
+    "cacheTTL": 604800
+  },
+  "igdbConfig": {
+    "enabled": false,
+    "clientId": "${IGDB_CLIENT_ID}",
+    "accessToken": "${IGDB_ACCESS_TOKEN}",
+    "apiEndpoint": "https://api.igdb.com/v4",
+    "cacheDir": "~/.fiberquest/cache/igdb"
+  },
+  "localMetadataPath": "~/.fiberquest/games-db-custom.json",
+  "romValidation": {
+    "enableCRCCheck": true,
+    "allowModdedROMs": true,
+    "warnOnCRCMismatch": true
+  },
+  "supported": {
+    "systems": ["snes", "gba", "n64", "genesis"],
+    "extensions": [".gba", ".smc", ".z64", ".bin", ".zip"]
+  }
+}

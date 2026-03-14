@@ -2,20 +2,17 @@ name = "lecto-translation-bot"
 main = "src/index.ts"
 compatibility_date = "2024-06-12"
 
+[[kv_namespaces]]
+binding = "lecto_kv"
+id = "ccdbe5fb39844713915e8668bd463819"
+
 [env.production]
 name = "lecto-translation-bot"
-routes = [
-  { pattern = "example.com/webhook", zone_name = "example.com" }
-]
 
-[[kv_namespaces]]
-binding = "KV_STORE"
-id = "YOUR_KV_NAMESPACE_ID"
-
-[env.production.kv_namespaces]
-KV_STORE = { id = "YOUR_KV_NAMESPACE_ID" }
+[[env.production.kv_namespaces]]
+binding = "lecto_kv"
+id = "ccdbe5fb39844713915e8668bd463819"
 
 [env.production.vars]
-TELEGRAM_BOT_TOKEN = "YOUR_BOT_TOKEN"
-TELEGRAM_OWNER_ID = "YOUR_OWNER_ID"
-LECTO_API_KEY = "YOUR_LECTO_KEY"
+TELEGRAM_BOT_TOKEN = "8654126349:AAFMOODllKqJ7eFf2SrP0vhEETK91mjQ6FU"
+LECTO_API_KEY = "W7BP1Z5-3A04H0W-QQJJ6QY-VQ1PKG0"

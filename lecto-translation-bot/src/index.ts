@@ -5,9 +5,9 @@ const router = Router();
 // Types
 interface Env {
   TELEGRAM_BOT_TOKEN: string;
-  TELEGRAM_OWNER_ID: string;
+  TELEGRAM_OWNER_ID?: string;
   LECTO_API_KEY?: string;
-  KV_STORE: KVNamespace;
+  lecto_kv: KVNamespace;
 }
 
 interface TelegramUpdate {
@@ -33,21 +33,57 @@ interface TelegramCallbackQuery {
 
 // Language list (code, display name)
 const LANGUAGES = [
-  { code: 'en', name: '🇬🇧 English' },
-  { code: 'es', name: '🇪🇸 Spanish' },
-  { code: 'fr', name: '🇫🇷 French' },
-  { code: 'de', name: '🇩🇪 German' },
-  { code: 'it', name: '🇮🇹 Italian' },
-  { code: 'pt', name: '🇵🇹 Portuguese' },
-  { code: 'ru', name: '🇷🇺 Russian' },
-  { code: 'ja', name: '🇯🇵 Japanese' },
-  { code: 'zh', name: '🇨🇳 Chinese' },
-  { code: 'ko', name: '🇰🇷 Korean' },
-  { code: 'ar', name: '🇸🇦 Arabic' },
-  { code: 'hi', name: '🇮🇳 Hindi' },
-  { code: 'tr', name: '🇹🇷 Turkish' },
-  { code: 'pl', name: '🇵🇱 Polish' },
-  { code: 'nl', name: '🇳🇱 Dutch' },
+  // European
+  { code: 'en', name: '🇬🇧 English', cmd: 'en' },
+  { code: 'es', name: '🇪🇸 Spanish', cmd: 'es' },
+  { code: 'fr', name: '🇫🇷 French', cmd: 'fr' },
+  { code: 'de', name: '🇩🇪 German', cmd: 'de' },
+  { code: 'it', name: '🇮🇹 Italian', cmd: 'it' },
+  { code: 'pt', name: '🇵🇹 Portuguese', cmd: 'pt' },
+  { code: 'ru', name: '🇷🇺 Russian', cmd: 'ru' },
+  { code: 'pl', name: '🇵🇱 Polish', cmd: 'pl' },
+  { code: 'nl', name: '🇳🇱 Dutch', cmd: 'nl' },
+  { code: 'sv', name: '🇸🇪 Swedish', cmd: 'sv' },
+  { code: 'no', name: '🇳🇴 Norwegian', cmd: 'no' },
+  { code: 'da', name: '🇩🇰 Danish', cmd: 'da' },
+  { code: 'fi', name: '🇫🇮 Finnish', cmd: 'fi' },
+  { code: 'cs', name: '🇨🇿 Czech', cmd: 'cs' },
+  { code: 'sk', name: '🇸🇰 Slovak', cmd: 'sk' },
+  { code: 'hu', name: '🇭🇺 Hungarian', cmd: 'hu' },
+  { code: 'ro', name: '🇷🇴 Romanian', cmd: 'ro' },
+  { code: 'bg', name: '🇧🇬 Bulgarian', cmd: 'bg' },
+  { code: 'hr', name: '🇭🇷 Croatian', cmd: 'hr' },
+  { code: 'el', name: '🇬🇷 Greek', cmd: 'el' },
+  { code: 'tr', name: '🇹🇷 Turkish', cmd: 'tr' },
+  
+  // Asian
+  { code: 'zh', name: '🇨🇳 Chinese', cmd: 'zh' },
+  { code: 'ja', name: '🇯🇵 Japanese', cmd: 'ja' },
+  { code: 'ko', name: '🇰🇷 Korean', cmd: 'ko' },
+  { code: 'vi', name: '🇻🇳 Vietnamese', cmd: 'vi' },
+  { code: 'th', name: '🇹🇭 Thai', cmd: 'th' },
+  { code: 'hi', name: '🇮🇳 Hindi', cmd: 'hi' },
+  { code: 'bn', name: '🇧🇩 Bengali', cmd: 'bn' },
+  { code: 'pa', name: '🇵🇰 Punjabi', cmd: 'pa' },
+  { code: 'ta', name: '🇮🇳 Tamil', cmd: 'ta' },
+  { code: 'te', name: '🇮🇳 Telugu', cmd: 'te' },
+  { code: 'kn', name: '🇮🇳 Kannada', cmd: 'kn' },
+  { code: 'ml', name: '🇮🇳 Malayalam', cmd: 'ml' },
+  { code: 'id', name: '🇮🇩 Indonesian', cmd: 'id' },
+  { code: 'ms', name: '🇲🇾 Malay', cmd: 'ms' },
+  { code: 'tl', name: '🇵🇭 Tagalog', cmd: 'tl' },
+  
+  // Middle East & Africa
+  { code: 'ar', name: '🇸🇦 Arabic', cmd: 'ar' },
+  { code: 'he', name: '🇮🇱 Hebrew', cmd: 'he' },
+  { code: 'fa', name: '🇮🇷 Persian', cmd: 'fa' },
+  { code: 'ur', name: '🇵🇰 Urdu', cmd: 'ur' },
+  { code: 'sw', name: '🇹🇿 Swahili', cmd: 'sw' },
+  { code: 'af', name: '🇿🇦 Afrikaans', cmd: 'af' },
+  
+  // Americas
+  { code: 'es-mx', name: '🇲🇽 Spanish (Mexico)', cmd: 'es-mx' },
+  { code: 'pt-br', name: '🇧🇷 Portuguese (Brazil)', cmd: 'pt-br' },
 ];
 
 const LANGS_PER_PAGE = 5;
@@ -95,8 +131,21 @@ async function answerCallbackQuery(
 
 // Helper: Escape MarkdownV2
 function escapeMarkdown(text: string): string {
-  const chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
   return text.replace(/[_*[\]()~`>#\+\-=|{}\.!]/g, (c) => `\\${c}`);
+}
+
+// Helper: Clean text for translation (remove emoji, URLs)
+function cleanText(text: string): string {
+  // Remove emoji
+  let cleaned = text.replace(
+    /(\u00d7|\u20e3|[\u0300-\u036f]|[\u2600-\u27BF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\u2300-\u23FF]|[\u2B50-\u2B55]|[\u200D\u200C\u200B])/g,
+    ''
+  );
+  
+  // Remove URLs (http, https, www, etc.)
+  cleaned = cleaned.replace(/https?:\/\/[^\s]+/g, '').replace(/www\.[^\s]+/g, '').trim();
+  
+  return cleaned;
 }
 
 // Helper: Translate via Lecto
@@ -106,6 +155,13 @@ async function translateText(
   targetLang: string
 ): Promise<string | null> {
   try {
+    // Clean text before sending
+    const cleanedText = cleanText(text);
+    
+    if (!cleanedText) {
+      return null; // Empty after cleaning
+    }
+
     const response = await fetch('https://api.lecto.ai/v1/translate/text', {
       method: 'POST',
       headers: {
@@ -114,7 +170,7 @@ async function translateText(
         Accept: 'application/json',
       },
       body: JSON.stringify({
-        texts: [text],
+        texts: [cleanedText],
         to: [targetLang],
       }),
     });
@@ -125,8 +181,11 @@ async function translateText(
     }
 
     const data = await response.json<any>();
-    if (data.result?.[0]?.[0]?.text) {
-      return data.result[0][0].text;
+    console.log('Lecto response:', JSON.stringify(data));
+    
+    // Correct response format
+    if (data.translations?.[0]?.translated?.[0]) {
+      return data.translations[0].translated[0];
     }
     return null;
   } catch (error) {
@@ -171,123 +230,59 @@ function buildLanguageKeyboard(page = 0) {
   };
 }
 
-// Handle /start command
-async function handleStart(env: Env, chatId: number, userId: number): Promise<Response> {
-  const isOwner = userId.toString() === env.TELEGRAM_OWNER_ID;
-  const welcome = `Welcome to Lecto Translation Bot\\!
-
-🌍 *Features:*
-• Reply to any message and use /translate to translate it
-• Owner only: /setkey, /allowgroup, /disallowgroup, /groups
-
-${isOwner ? '👑 *You are the owner*' : ''}`;
-
-  return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, welcome);
+// Extract text to translate (from reply or command text)
+function getTextToTranslate(message: TelegramMessage): string | null {
+  // Prefer replied message
+  if (message.reply_to_message?.text) {
+    return message.reply_to_message.text;
+  }
+  // Skip if reply is media (no caption)
+  if (message.reply_to_message && !message.reply_to_message.text) {
+    return null;
+  }
+  return null;
 }
 
-// Handle /translate command
-async function handleTranslate(
+// Handle direct language command (/en, /es, /zh, etc.)
+async function handleLanguageCommand(
   env: Env,
   chatId: number,
   message: TelegramMessage,
-  userId: number
+  langCode: string
 ): Promise<Response> {
-  // Check authorization
-  if (message.chat.type === 'private') {
-    if (userId.toString() !== env.TELEGRAM_OWNER_ID) {
-      return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Private chat: owner only');
-    }
-  } else {
-    // Group: check whitelist
-    const allowed = await env.KV_STORE.get(`group_${chatId}`);
-    if (!allowed) {
-      return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'This group is not whitelisted for translations');
-    }
+  const sourceText = getTextToTranslate(message);
+
+  if (!sourceText) {
+    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Please reply to a text message');
   }
 
-  // Check for reply
-  if (!message.reply_to_message?.text) {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Please reply to a text message and then use /translate');
+  // Get API key
+  const kvKey = await env.lecto_kv.get('lecto_api_key');
+  const apiKey = env.LECTO_API_KEY || kvKey;
+
+  if (!apiKey) {
+    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, '❌ API key not configured');
   }
 
-  const sourceText = message.reply_to_message.text;
+  // Translate
+  const translated = await translateText(apiKey, sourceText, langCode);
 
-  // Store source text in KV (TTL: 5 minutes = 300 seconds)
-  const storeKey = `translate_${chatId}_${message.message_id}`;
-  await env.KV_STORE.put(storeKey, sourceText, { expirationTtl: 300 });
+  if (!translated) {
+    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, '❌ Translation failed');
+  }
 
-  // Show language picker
-  const keyboard = buildLanguageKeyboard(0);
-  return sendTelegram(
-    env.TELEGRAM_BOT_TOKEN,
-    chatId,
-    'Select target language:',
-    keyboard,
-    message.message_id
-  );
+  // Add language flag on output (emoji will be stripped if forwarded, preventing recursion)
+  const lang = LANGUAGES.find((l) => l.code === langCode);
+  const flag = lang?.name.split(' ')[0] || ''; // Extract just the emoji
+  const result = `${flag} ${escapeMarkdown(translated)}`;
+
+  return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, result);
 }
 
-// Handle /setkey command (owner only)
-async function handleSetKey(env: Env, chatId: number, text: string, userId: number): Promise<Response> {
-  if (userId.toString() !== env.TELEGRAM_OWNER_ID) {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Owner only command');
-  }
-
-  const parts = text.split(' ');
-  if (parts.length < 2) {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Usage: /setkey <lecto_api_key>');
-  }
-
-  const apiKey = parts.slice(1).join(' ').trim();
-  await env.KV_STORE.put('lecto_api_key', apiKey);
-
-  return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, '✅ Lecto API key stored');
-}
-
-// Handle /allowgroup command (owner only)
-async function handleAllowGroup(env: Env, chatId: number, userId: number, chatType: string): Promise<Response> {
-  if (userId.toString() !== env.TELEGRAM_OWNER_ID) {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Owner only command');
-  }
-
-  if (chatType === 'private') {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Use this command in a group');
-  }
-
-  await env.KV_STORE.put(`group_${chatId}`, 'true');
-  return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, `✅ Group ${chatId} whitelisted`);
-}
-
-// Handle /disallowgroup command (owner only)
-async function handleDisallowGroup(env: Env, chatId: number, userId: number): Promise<Response> {
-  if (userId.toString() !== env.TELEGRAM_OWNER_ID) {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Owner only command');
-  }
-
-  await env.KV_STORE.delete(`group_${chatId}`);
-  return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, `✅ Group ${chatId} removed from whitelist`);
-}
-
-// Handle /groups command (owner only)
-async function handleGroups(env: Env, chatId: number, userId: number): Promise<Response> {
-  if (userId.toString() !== env.TELEGRAM_OWNER_ID) {
-    return sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, 'Owner only command');
-  }
-
-  // KV doesn't support listing, so we'd need to track groups separately
-  // For now, return a note
-  return sendTelegram(
-    env.TELEGRAM_BOT_TOKEN,
-    chatId,
-    '_Groups feature: KV doesn\'t support listing\\. Use /allowgroup in each group to whitelist it\\._'
-  );
-}
-
-// Handle callback query (language selection)
+// Handle callback query (language selection from picker)
 async function handleCallback(
   env: Env,
-  callbackQuery: TelegramCallbackQuery,
-  userId: number
+  callbackQuery: TelegramCallbackQuery
 ): Promise<Response> {
   const callbackId = callbackQuery.id;
   const chatId = callbackQuery.message?.chat.id;
@@ -297,27 +292,11 @@ async function handleCallback(
     return new Response('OK', { status: 200 });
   }
 
-  // Pagination
-  if (callbackQuery.data.startsWith('lang_page_')) {
-    const page = parseInt(callbackQuery.data.split('_')[2], 10);
-    const keyboard = buildLanguageKeyboard(page);
-    await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        message_id: messageId,
-        reply_markup: keyboard,
-      }),
-    });
-    return new Response('OK', { status: 200 });
-  }
-
   // Language translation
   if (callbackQuery.data.startsWith('translate_')) {
     const targetLang = callbackQuery.data.split('_')[1];
     const storeKey = `translate_${chatId}_${messageId}`;
-    const sourceText = await env.KV_STORE.get(storeKey);
+    const sourceText = await env.lecto_kv.get(storeKey);
 
     if (!sourceText) {
       await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callbackId, 'Translation expired', true);
@@ -325,7 +304,7 @@ async function handleCallback(
     }
 
     // Get API key
-    const kvKey = await env.KV_STORE.get('lecto_api_key');
+    const kvKey = await env.lecto_kv.get('lecto_api_key');
     const apiKey = env.LECTO_API_KEY || kvKey;
 
     if (!apiKey) {
@@ -341,13 +320,15 @@ async function handleCallback(
       return new Response('OK', { status: 200 });
     }
 
-    // Send result
-    const langName = LANGUAGES.find((l) => l.code === targetLang)?.name || targetLang;
-    const result = `*${langName}:*\n${escapeMarkdown(translated)}`;
+    // Add language flag on output (emoji stripped if forwarded, preventing recursion)
+    const lang = LANGUAGES.find((l) => l.code === targetLang);
+    const flag = lang?.name.split(' ')[0] || ''; // Extract just the emoji
+    const result = `${flag} ${escapeMarkdown(translated)}`;
+    
     await sendTelegram(env.TELEGRAM_BOT_TOKEN, chatId, result);
 
     // Answer callback
-    await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callbackId, '✅ Translated');
+    await answerCallbackQuery(env.TELEGRAM_BOT_TOKEN, callbackId, '✅');
     return new Response('OK', { status: 200 });
   }
 
@@ -363,36 +344,19 @@ router.post('/webhook', async (request: Request, env: Env) => {
 
     if (message) {
       const chatId = message.chat.id;
-      const userId = message.from?.id || 0;
       const text = message.text || '';
 
-      if (text.startsWith('/start')) {
-        return await handleStart(env, chatId, userId);
-      }
-
-      if (text.startsWith('/translate')) {
-        return await handleTranslate(env, chatId, message, userId);
-      }
-
-      if (text.startsWith('/setkey')) {
-        return await handleSetKey(env, chatId, text, userId);
-      }
-
-      if (text.startsWith('/allowgroup')) {
-        return await handleAllowGroup(env, chatId, userId, message.chat.type);
-      }
-
-      if (text.startsWith('/disallowgroup')) {
-        return await handleDisallowGroup(env, chatId, userId);
-      }
-
-      if (text.startsWith('/groups')) {
-        return await handleGroups(env, chatId, userId);
+      // Check for language commands (with or without @botname)
+      for (const lang of LANGUAGES) {
+        const cmdPattern = new RegExp(`^/${lang.cmd}(@WyTranslateBot)?$`);
+        if (cmdPattern.test(text)) {
+          return await handleLanguageCommand(env, chatId, message, lang.code);
+        }
       }
     }
 
     if (callbackQuery) {
-      return await handleCallback(env, callbackQuery, callbackQuery.from.id);
+      return await handleCallback(env, callbackQuery);
     }
 
     return new Response('OK', { status: 200 });

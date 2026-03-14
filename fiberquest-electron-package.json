@@ -1,0 +1,47 @@
+{
+  "name": "fiberquest-electron",
+  "version": "1.0.0",
+  "description": "FiberQuest Demo Machine - Electron Sidecar UI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "keywords": [
+    "fiberquest",
+    "ckb",
+    "blockchain",
+    "tournament",
+    "pi5"
+  ],
+  "author": "Wyltek",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^latest",
+    "electron-builder": "^latest"
+  },
+  "build": {
+    "appId": "com.wyltek.fiberquest",
+    "productName": "FiberQuest Demo",
+    "files": [
+      "main.js",
+      "preload.js",
+      "index.html",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "./icon.png"
+    },
+    "win": {
+      "target": [
+        "portable"
+      ]
+    }
+  }
+}

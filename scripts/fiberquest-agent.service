@@ -1,0 +1,35 @@
+[Unit]
+Description=FiberQuest Agent - Tournament Escrow & Settlement Service
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=phill
+WorkingDirectory=%h/fiberquest-agent
+ExecStart=/usr/bin/node dist/index.js
+
+# Environment
+Environment="NODE_ENV=production"
+Environment="CKB_RPC_URL=https://testnet.ckb.dev"
+Environment="FIBER_RPC_URL=http://192.168.68.79:8227"
+Environment="DATABASE_URL=postgres://localhost/fiberquest"
+Environment="INFERENCE_URL=http://192.168.68.79:11434"
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# Resource limits
+MemoryLimit=512M
+CPUQuota=50%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=fiberquest-agent
+
+[Install]
+WantedBy=multi-user.target
