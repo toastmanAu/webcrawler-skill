@@ -364,11 +364,11 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - Fix: `git reset --hard origin/master` in the stats repo, then re-run script
 - Long-term: consolidate to one checkout
 
-## Fiber Node — FiberQuest Pi (192.168.68.65) (2026-03-15)
-- Mainnet node connected to N100 + ckbnode network
+## Fiber Node — FiberQuest Pi (192.168.68.65) (2026-03-15 — TESTNET)
+- **TESTNET** node using official testnet config (bootnodes, scripts, RPC URL `https://testnet.ckbapp.dev/`)
 - Binary: `/home/phill/.fiber-mainnet/bin/fnn` (v0.7.1)
-- Config: `/home/phill/.fiber-mainnet/data/config.yml.template` (N100 config as base, adjusted for local ports/paths)
-- RPC: `127.0.0.1:8227` (biscuit auth attempted but needs debug — fnn reports "invalid biscuit public key" error)
+- Config: `/home/phill/.fiber-mainnet/data/config.yml.template` (official testnet config from fiber repo)
+- RPC: `127.0.0.1:8227` (biscuit auth enabled — returns "Unauthorized" for missing/invalid token)
 - Dashboard: port 8229 (fiber-dash.py)
 - **Security setup completed 2026-03-15:**
   - Biscuit secrets in `~/.fiber-mainnet/.secrets/` (chmod 700) — never hardcoded
@@ -376,8 +376,5 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
   - `fiber-dash-wrapper.sh`: reads token from secrets, passes as CLI arg to dashboard
   - Both wrappers set FIBER_SECRET_KEY_PASSWORD env var needed to decrypt key file
   - Systemd services updated to use wrappers instead of direct binary calls
-- **Known issue:** RPC fails with "invalid biscuit public key" even when config has no such line. N100 also lacks it but works. May be:
-  - Fiber version mismatch (check fnn --version)
-  - Token expiration or caveat mismatch
-  - Biscuit validation bug
-  - Needs: RUST_BACKTRACE=full debugging or check upstream fiber issues
+- **Known issue:** Biscuit token validation failing (RPC returns "Unauthorized"). Likely token generation mismatch or biscuit public key missing from config. N100 config also lacks biscuit_public_key but works — may be due to token caveats or expiration.
+- **Next:** Deploy testnet CKB full node on ckbnode, update fiber config to local testnet RPC, debug biscuit auth.
