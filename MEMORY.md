@@ -377,7 +377,7 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
   - Both wrappers set FIBER_SECRET_KEY_PASSWORD env var needed to decrypt key file
   - Systemd services updated to use wrappers instead of direct binary calls
 - **Known issue:** Biscuit token validation failing (RPC returns "Unauthorized"). Likely token generation mismatch or biscuit public key missing from config. N100 config also lacks biscuit_public_key but works — may be due to token caveats or expiration.
-- **Next:** Deploy testnet CKB full node on ckbnode, update fiber config to local testnet RPC, debug biscuit auth.
+- RPC working — **no biscuit token needed** (private addr, biscuit_public_key absent = auth disabled). Correct method: `node_info` (not `get_node_info`). Confirmed: list_channels, list_peers all respond.
 
 ## Orange Pi 5+ (OPi5+) — New IP: 192.168.68.89 (2026-03-15)
 - Hostname: `ollama-opi5p`
