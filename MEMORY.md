@@ -378,3 +378,14 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
   - Systemd services updated to use wrappers instead of direct binary calls
 - **Known issue:** Biscuit token validation failing (RPC returns "Unauthorized"). Likely token generation mismatch or biscuit public key missing from config. N100 config also lacks biscuit_public_key but works — may be due to token caveats or expiration.
 - **Next:** Deploy testnet CKB full node on ckbnode, update fiber config to local testnet RPC, debug biscuit auth.
+
+## Orange Pi 5+ (OPi5+) — New IP: 192.168.68.89 (2026-03-15)
+- Hostname: `ollama-opi5p`
+- User: `phill` (SSH key auth works)
+- Disk: 465GB total, 449GB free (3% used)
+- RAM: 15GB
+- CPU: Cortex-A55 + Cortex-A76 (ARM)
+- Ollama: installed but service not running (inactive)
+- No OpenClaw installed
+- No CKB/fiber installed
+- **Purpose:** Snapshot automation, testnet CKB node candidate, agent host
