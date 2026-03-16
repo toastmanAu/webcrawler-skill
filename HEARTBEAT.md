@@ -48,12 +48,12 @@ Check http://localhost:8080/health (CKB node dashboard proxy — lightweight hea
 - After restart, verify it responds, then notify Phill it was restarted
 - If block number hasn't advanced in >2h: alert Phill
 - Normal state: ~6s block time, 20+ peers, no warnings
-- Port: 8080 · Node: 192.168.68.87:8114
+- Port: 8080 · Node: 192.168.68.105:8114
 
 ## CKB Node Service (ckbnode)
 Check via SSH: `ssh ckbnode 'systemctl is-active ckb'`
 - If inactive: `ssh ckbnode 'sudo systemctl start ckb'` then notify Phill
-- Node: orangepi@192.168.68.87 · CKB v0.204.0 · systemd service enabled
+- Node: orangepi@192.168.68.105 · CKB v0.204.0 · systemd service enabled
 
 ## Model Health
 Run `bash /home/phill/.openclaw/workspace/scripts/check-models.sh --quiet` — check every ~1 hour (track last check in heartbeat-state.json under key `modelCheck`).
@@ -85,8 +85,9 @@ Alert Phill if it can't be restarted.
 Mode: SOLO — direct to ckbnode (192.168.68.87:8114). Rewards go to Phill's address.
 
 ## Snapshot Pipeline Monitor (while snapshotInProgress in heartbeat-state.json)
+**Host:** OPi5+ (192.168.68.89) — dual-chain snapshot host (mainnet + testnet)
 If `snapshotInProgress` key exists in heartbeat-state.json:
-- Check: `ssh phill@192.168.68.79 'du -sh /tmp/ckb-snapshot-staging/ 2>/dev/null && tail -3 ~/ckb-snapshot.log'`
+- Check: `ssh phill@192.168.68.89 'du -sh /home/phill/ckb-snapshot-staging/ 2>/dev/null && tail -3 ~/ckb-snapshot.log'`
 - If rsync finished (log shows "Compressing\|Uploading\|DONE\|complete"): update projects.json → `node /home/phill/kernel-dash/update-projects.js ckb-snapshot status live`, set progress 90, clear blocked, notify Phill
 - If still running: update `node /home/phill/kernel-dash/update-projects.js ckb-snapshot in_progress:clear` then add current size/total line — silent
 - If log shows ERROR: notify Phill immediately

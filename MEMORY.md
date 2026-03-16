@@ -379,13 +379,37 @@ When deploying OpenClaw with Telegram on a fresh machine (`onboard --non-interac
 - **Known issue:** Biscuit token validation failing (RPC returns "Unauthorized"). Likely token generation mismatch or biscuit public key missing from config. N100 config also lacks biscuit_public_key but works — may be due to token caveats or expiration.
 - RPC working — **no biscuit token needed** (private addr, biscuit_public_key absent = auth disabled). Correct method: `node_info` (not `get_node_info`). Confirmed: list_channels, list_peers all respond.
 
-## Orange Pi 5+ (OPi5+) — New IP: 192.168.68.89 (2026-03-15)
+## Orange Pi 5+ (OPi5+) — Testnet Node (2026-03-16 — RUNNING SYNC)
 - Hostname: `ollama-opi5p`
 - User: `phill` (SSH key auth works)
-- Disk: 465GB total, 449GB free (3% used)
+- Disk: 465GB total
 - RAM: 15GB
 - CPU: Cortex-A55 + Cortex-A76 (ARM)
-- Ollama: installed but service not running (inactive)
-- No OpenClaw installed
-- No CKB/fiber installed
-- **Purpose:** Snapshot automation, testnet CKB node candidate, agent host
+- **OpenClaw v2026.2.22-2 RUNNING** — Telegram bot @Wyltek_n100_bot active ✅
+- **CKB Testnet Node:**
+  - **Binary:** v0.204.0 (installed at `/usr/local/bin/ckb`) ✅
+  - **Config:** Testnet chainspec, bootnodes configured ✅
+  - **Status:** RUNNING and syncing from block 0 (initial sync from peers)
+  - **Data dir:** `/home/phill/ckb-testnet/data/` (189GB snapshot extracted, but RocksDB format incompatible with v0.202.0)
+  - **RPC:** http://192.168.68.89:8114
+  - **Snapshot:** 140GB testnet snapshot downloaded + extracted. Snapshot was v0.202.0 format, so RocksDB didn't load it directly. Node syncing with peers instead (will take time but will eventually catch up).
+  - **ckb-cli:** v2.0.0 installed ✅
+- **Purpose:** Testnet node for FiberQuest (192.168.68.84) to use locally. Will eventually replace public RPC.
+- **Next:** Continue syncing. Once enough blocks synced, will be ready for FiberQuest to use.
+
+## Fiber Node — FiberQuest Pi (192.168.68.84) (2026-03-16 — TESTNET, PUBLIC RPC)
+- **Config:** Testnet (chain: testnet, bootnodes, RPC: https://testnet.ckbapp.dev/)
+- **Binary:** fnn v0.7.1 at `~/.fiber-mainnet/bin/fnn`
+- **Private key:** `~/.fiber-mainnet/ckb/key` (77 bytes, **encrypted** with password `fiberquest-fiber-2026`)
+  - Encryption applied automatically by fnn on first run (good security)
+  - Password stored in `fnn-wrapper.sh` as env var `FIBER_SECRET_KEY_PASSWORD`
+  - Not readable by ckb-cli directly — must query fnn or decrypt to get address
+- **RPC:** 127.0.0.1:8227 (biscuit auth enabled but currently returns "Unauthorized" — token missing `read("node")` fact)
+- **Dashboard:** port 8229 (fiber-dash.py) — shows wallet address once node has network connectivity
+- **ckb-cli:** v2.0.0 installed at `~/.ckb-cli/bin/ckb-cli` ✅
+- **Testnet wallet address:** Pending. Can derive from:
+  1. Online CKB tool (with encrypted key + password `fiberquest-fiber-2026`)
+  2. Once OPi5+ testnet node syncs, query fnn RPC
+  3. fnn dashboard (port 8229) shows address once connected to network
+- **Status:** Running and connected to public testnet RPC. Ready to fund and open channels once address is known.
+- **Next:** Await OPi5+ testnet sync or use online tool to derive address → fund wallet → open channels with ckbnode fiber
