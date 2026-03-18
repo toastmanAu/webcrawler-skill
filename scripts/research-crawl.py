@@ -70,12 +70,52 @@ NOTIFY_CMD   = os.environ.get('NOTIFY_CMD',   '')
 _script_dir = os.path.dirname(os.path.abspath(__file__))
 JSDOCS_SCRIPT = os.environ.get('JSDOCS_SCRIPT', os.path.join(_script_dir, 'jsdocs-fetch.js'))
 
-GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash')
-GEMINI_API   = 'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}'
-
 MAX_URL_CHARS    = 40000
 MAX_URLS_PER_TASK = 6
 JS_DETECT_THRESHOLD = 300  # chars — if static text < this, try Playwright
+
+# ─── Model provider config ────────────────────────────────────────────────────
+#
+# MODEL_PROVIDER controls which AI backend to use:
+#
+#   gemini      — Google Gemini (default). Needs GEMINI_API_KEY.
+#                 Free tier: 1500 req/day. Key: https://aistudio.google.com/apikey
+#                 MODEL env var default: gemini-2.5-flash
+#
+#   ollama      — Local Ollama (no API key needed).
+#                 OLLAMA_BASE_URL default: http://localhost:11434
+#                 MODEL env var default: qwen2.5:14b
+#
+#   openai      — OpenAI or any OpenAI-compatible API (OpenRouter, LM Studio, etc).
+#                 Needs OPENAI_API_KEY. OPENAI_BASE_URL default: https://api.openai.com/v1
+#                 MODEL env var default: gpt-4o-mini
+#
+# Examples in .env:
+#   MODEL_PROVIDER=gemini
+#   GEMINI_API_KEY=AIza...
+#   MODEL=gemini-2.5-flash
+#
+#   MODEL_PROVIDER=ollama
+#   OLLAMA_BASE_URL=http://192.168.68.79:11434
+#   MODEL=qwen2.5:14b
+#
+#   MODEL_PROVIDER=openai
+#   OPENAI_API_KEY=sk-...
+#   OPENAI_BASE_URL=https://openrouter.ai/api/v1
+#   MODEL=anthropic/claude-3-haiku
+
+MODEL_PROVIDER   = os.environ.get('MODEL_PROVIDER', 'gemini').lower()
+MODEL            = os.environ.get('MODEL', '')  # provider-specific default applied below
+OLLAMA_BASE_URL  = os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')
+OPENAI_BASE_URL  = os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')
+
+# Apply provider defaults for MODEL
+if not MODEL:
+    MODEL = {
+        'gemini': 'gemini-2.5-flash',
+        'ollama': 'qwen2.5:14b',
+        'openai': 'gpt-4o-mini',
+    }.get(MODEL_PROVIDER, 'gemini-2.5-flash')
 
 
 # ─── JS-aware fetch ───────────────────────────────────────────────────────────
@@ -144,10 +184,25 @@ def fetch_url(url, max_chars=MAX_URL_CHARS):
     return text
 
 
-# ─── Gemini ───────────────────────────────────────────────────────────────────
+# ─── LLM abstraction ─────────────────────────────────────────────────────────
 
-def gemini_query(api_key, prompt):
-    url = GEMINI_API.format(model=GEMINI_MODEL, key=api_key)
+def llm_query(prompt):
+    """Query the configured LLM provider. Raises on error."""
+    if MODEL_PROVIDER == 'gemini':
+        return _query_gemini(prompt)
+    elif MODEL_PROVIDER == 'ollama':
+        return _query_ollama(prompt)
+    elif MODEL_PROVIDER == 'openai':
+        return _query_openai(prompt)
+    else:
+        raise ValueError(f"Unknown MODEL_PROVIDER: {MODEL_PROVIDER!r}. Use gemini, ollama, or openai.")
+
+
+def _query_gemini(prompt):
+    api_key = os.environ.get('GEMINI_API_KEY', '')
+    if not api_key:
+        raise ValueError('GEMINI_API_KEY not set. Get one free at https://aistudio.google.com/apikey')
+    url = f'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={api_key}'
     payload = json.dumps({
         'contents': [{'parts': [{'text': prompt}]}],
         'generationConfig': {'temperature': 0.3, 'maxOutputTokens': 16384},
@@ -156,6 +211,45 @@ def gemini_query(api_key, prompt):
     with urllib.request.urlopen(req, timeout=120) as resp:
         data = json.load(resp)
         return data['candidates'][0]['content']['parts'][0]['text']
+
+
+def _query_ollama(prompt):
+    url = f'{OLLAMA_BASE_URL.rstrip("/")}/api/generate'
+    payload = json.dumps({
+        'model': MODEL,
+        'prompt': prompt,
+        'stream': False,
+        'options': {'temperature': 0.3, 'num_predict': 8192},
+    }).encode()
+    req = urllib.request.Request(url, data=payload, headers={'Content-Type': 'application/json'})
+    with urllib.request.urlopen(req, timeout=300) as resp:
+        data = json.load(resp)
+        return data['response']
+
+
+def _query_openai(prompt):
+    api_key = os.environ.get('OPENAI_API_KEY', '')
+    if not api_key:
+        raise ValueError('OPENAI_API_KEY not set.')
+    url = f'{OPENAI_BASE_URL.rstrip("/")}/chat/completions'
+    payload = json.dumps({
+        'model': MODEL,
+        'messages': [{'role': 'user', 'content': prompt}],
+        'temperature': 0.3,
+        'max_tokens': 8192,
+    }).encode()
+    req = urllib.request.Request(url, data=payload, headers={
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {api_key}',
+    })
+    with urllib.request.urlopen(req, timeout=120) as resp:
+        data = json.load(resp)
+        return data['choices'][0]['message']['content']
+
+
+# Legacy alias
+def gemini_query(api_key, prompt):
+    return llm_query(prompt)
 
 
 # ─── Claim locking ────────────────────────────────────────────────────────────
@@ -236,7 +330,7 @@ def load_synthesis_context(task_id=None):
 
 # ─── Task runner ─────────────────────────────────────────────────────────────
 
-def run_task(task, api_key, dry_run=False):
+def run_task(task, api_key=None, dry_run=False):
     print(f"\n{'='*60}")
     print(f"Task:  {task['id']} [{task['priority']}]")
     print(f"Goal:  {task['goal'][:80]}...")
@@ -322,12 +416,12 @@ Date: {time.strftime('%Y-%m-%d')}
 """
 
     if dry_run:
-        print('  [DRY RUN] Would call Gemini here')
+        print('  [DRY RUN] Would call LLM here')
         finding = '# DRY RUN\n\nNo actual analysis performed.'
     else:
-        print('  Calling Gemini...')
+        print(f'  Calling {MODEL_PROVIDER}/{MODEL}...')
         t0 = time.time()
-        finding = gemini_query(api_key, prompt)
+        finding = llm_query(prompt)
         print(f'  ✓ {len(finding)} chars in {time.time()-t0:.1f}s')
 
     # Save finding
@@ -376,13 +470,16 @@ def main():
     args = parser.parse_args()
 
     # API key check
-    api_key = os.environ.get('GEMINI_API_KEY', '')
-    if not api_key and not args.dry_run and not args.list:
+    if MODEL_PROVIDER == 'gemini' and not os.environ.get('GEMINI_API_KEY') and not args.dry_run and not args.list:
         print('ERROR: GEMINI_API_KEY not set.')
         print('Get a free key at https://aistudio.google.com/apikey')
-        print('Then set it: export GEMINI_API_KEY=your_key_here')
-        print('Or add it to a .env file in your workspace.')
+        print('Or switch provider: MODEL_PROVIDER=ollama (no key needed)')
         sys.exit(1)
+    elif MODEL_PROVIDER == 'openai' and not os.environ.get('OPENAI_API_KEY') and not args.dry_run and not args.list:
+        print('ERROR: OPENAI_API_KEY not set.')
+        sys.exit(1)
+
+    print(f'Provider: {MODEL_PROVIDER} / Model: {MODEL}')
 
     if not os.path.exists(QUEUE_FILE):
         print(f'ERROR: Queue file not found: {QUEUE_FILE}')
@@ -431,7 +528,7 @@ def main():
             print(f'  Skipping {task["id"]} — claimed by another worker')
             continue
         try:
-            run_task(task, api_key, dry_run=args.dry_run)
+            run_task(task, dry_run=args.dry_run)
         except Exception as e:
             print(f'  ERROR on {task["id"]}: {e}')
             release_claim(task['id'])

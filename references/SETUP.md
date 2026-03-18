@@ -43,25 +43,37 @@ npx playwright install chromium
 Create a `.env` file in your workspace directory (e.g. `~/.openclaw/workspace/.env`):
 
 ```env
-# Required for research-crawl.py
+# ── Model provider (choose one) ──────────────────────────────────────────────
+
+# Option A: Google Gemini (default, free tier = 1500 req/day)
+MODEL_PROVIDER=gemini
 GEMINI_API_KEY=AIzaSy...your_key_here
+MODEL=gemini-2.5-flash
 
-# Optional — override defaults
-WORKSPACE_DIR=~/.openclaw/workspace
-QUEUE_FILE=~/.openclaw/workspace/research/queue.md
-FINDINGS_DIR=~/.openclaw/workspace/research/findings
-CLAIMS_DIR=~/.openclaw/workspace/research/claims
-MEMORY_FILE=~/.openclaw/workspace/MEMORY.md
-STACK_FILE=~/.openclaw/workspace/STACK.md
+# Option B: Local Ollama (no API key, fully private)
+# MODEL_PROVIDER=ollama
+# OLLAMA_BASE_URL=http://localhost:11434   # or remote: http://192.168.1.x:11434
+# MODEL=qwen2.5:14b
 
-# Optional — shell command to notify on task completion
-# {msg} is replaced with the completion message
-# NOTIFY_CMD=curl -s -X POST https://api.telegram.org/bot{TOKEN}/sendMessage -d "chat_id={ID}&text={msg}"
-```
+# Option C: OpenAI or any OpenAI-compatible API (OpenRouter, LM Studio, etc.)
+# MODEL_PROVIDER=openai
+# OPENAI_API_KEY=sk-...
+# OPENAI_BASE_URL=https://api.openai.com/v1        # OpenAI
+# OPENAI_BASE_URL=https://openrouter.ai/api/v1     # OpenRouter
+# OPENAI_BASE_URL=http://localhost:1234/v1          # LM Studio
+# MODEL=gpt-4o-mini
 
-The `.env` file is loaded automatically. You can also export variables in your shell:
-```bash
-export GEMINI_API_KEY=AIzaSy...your_key_here
+# ── Paths (optional, defaults shown) ─────────────────────────────────────────
+# WORKSPACE_DIR=~/.openclaw/workspace
+# QUEUE_FILE=~/.openclaw/workspace/research/queue.md
+# FINDINGS_DIR=~/.openclaw/workspace/research/findings
+# CLAIMS_DIR=~/.openclaw/workspace/research/claims
+# MEMORY_FILE=~/.openclaw/workspace/MEMORY.md
+# STACK_FILE=~/.openclaw/workspace/STACK.md
+
+# ── Notifications (optional) ─────────────────────────────────────────────────
+# Shell command to run on task completion. {msg} is replaced with status text.
+# NOTIFY_CMD=curl -s "https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={ID}&text={msg}"
 ```
 
 ---
