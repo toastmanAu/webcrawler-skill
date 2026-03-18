@@ -11,6 +11,10 @@ DATE=$(date +%Y-%m-%d_%H-%M)
 
 echo "[$DATE] Starting backup..." | tee -a $LOG
 
+# 0. Pull Shannon's completed research findings
+echo "[0/3] Syncing findings from Shannon..." | tee -a $LOG
+python3 /home/phill/.openclaw/workspace/scripts/sync-shannon-findings.py 2>&1 | tee -a $LOG || true
+
 # 1. Push workspace to GitHub
 echo "[1/3] Pushing workspace to GitHub..." | tee -a $LOG
 cd /home/phill/.openclaw/workspace
