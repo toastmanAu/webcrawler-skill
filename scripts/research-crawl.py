@@ -222,7 +222,7 @@ def _query_ollama(prompt):
         'options': {'temperature': 0.3, 'num_predict': 8192},
     }).encode()
     req = urllib.request.Request(url, data=payload, headers={'Content-Type': 'application/json'})
-    with urllib.request.urlopen(req, timeout=300) as resp:
+    with urllib.request.urlopen(req, timeout=1800) as resp:  # 30min — large local models can be slow
         data = json.load(resp)
         return data['response']
 
