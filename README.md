@@ -8,6 +8,166 @@ An AI-powered research toolkit combining JS-rendered docs fetching with Gemini-b
 |--------|---------|
 | `scripts/jsdocs-fetch.js` | Fetch JS-rendered docs (Playwright auto-detect) |
 | `scripts/research-crawl.py` | AI research crawler — Gemini, Ollama, or OpenAI-compatible |
+| `scripts/queue-intake.py` | Intake processor — validates + normalises task files dropped in `research/intake/` |
+| `scripts/research-intake-bot.py` | Interactive `/research` bot — guided Telegram Q&A for task submission |
+
+## /research Command — Interactive Task Intake
+
+The `/research` command lets you submit research tasks via Telegram using a guided
+Q&A flow — no formatting knowledge required. It requires a one-time hook setup.
+
+### How it works
+
+1. Send `/research` to your OpenClaw bot
+2. The bot asks: Task ID → Priority → Goal → Seeds → Questions → Tags → Confirm
+3. On confirm it writes a validated task file to `research/intake/`
+4. `queue-intake.py` picks it up, validates, and appends it to `research/queue.md`
+5. The crawler picks it up on the next run
+
+### Prerequisites
+
+- OpenClaw installed and running (with Telegram or another channel configured)
+- `python3` on PATH
+- `research/intake/` directory (auto-created on first run)
+
+### Step 1 — Create the hook directory
+
+```bash
+mkdir -p ~/.openclaw/hooks/research-intake
+```
+
+### Step 2 — Create `HOOK.md`
+
+```bash
+cat > ~/.openclaw/hooks/research-intake/HOOK.md << 'EOF'
+---
+name: research-intake
+description: "Interactive /research command — guided Q&A for submitting research tasks to the crawler queue"
+metadata:
+  {
+    "openclaw":
+      {
+        "emoji": "🔬",
+        "events": ["message:received"],
+        "requires": { "bins": ["python3"] },
+      },
+  }
+---
+
+# Research Intake Hook
+
+Intercepts /research commands and follow-up messages, running them through
+the interactive research-intake-bot.py Q&A flow.
+EOF
+```
+
+### Step 3 — Create `handler.ts`
+
+Save the following as `~/.openclaw/hooks/research-intake/handler.ts`:
+
+```typescript
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import * as os from "os";
+
+const SKILL_SCRIPT = path.join(
+  os.homedir(),
+  ".openclaw/workspace/skills/webcrawler/scripts/research-intake-bot.py"
+);
+
+const handler = async (event: any) => {
+  if (event.type !== "message" || event.action !== "received") return;
+
+  const content: string = (event.context?.content ?? "").trim();
+  const senderId: string = event.context?.senderId ?? event.context?.from ?? "unknown";
+
+  const safeId = senderId.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const sessionFile = `/tmp/research-intake-${safeId}.json`;
+
+  const isCommand = content === "/research" || content.startsWith("/research ");
+  const sessionActive = fs.existsSync(sessionFile);
+
+  if (!isCommand && !sessionActive) return;
+
+  // /research with active session → reset
+  if (isCommand && sessionActive) fs.unlinkSync(sessionFile);
+
+  const userInput = isCommand ? "/research" : content;
+
+  try {
+    const output = execSync(
+      `python3 ${SKILL_SCRIPT} --session ${sessionFile} --input ${JSON.stringify(userInput)}`,
+      { encoding: "utf-8", timeout: 15000 }
+    );
+    const result = JSON.parse(output);
+    if (result.reply) event.messages.push(result.reply);
+    event.context.handled = true;
+  } catch (err: any) {
+    console.error("[research-intake] Error:", err.message);
+    if (fs.existsSync(sessionFile)) fs.unlinkSync(sessionFile);
+    event.messages.push("❌ Research intake error. Session reset — type /research to try again.");
+    event.context.handled = true;
+  }
+};
+
+export default handler;
+```
+
+### Step 4 — Enable the hook
+
+```bash
+openclaw hooks list          # verify it's discovered (should show 🔬 research-intake)
+openclaw hooks enable research-intake
+```
+
+### Step 5 — Restart the gateway
+
+```bash
+openclaw gateway restart
+# or: systemctl --user restart openclaw-gateway
+```
+
+### Step 6 — Test it
+
+Send `/research` to your bot. You should receive:
+
+```
+🔬 New research task
+
+I'll walk you through it step by step.
+
+First, give me a task ID — short, lowercase, hyphenated.
+Example: fiber-payment-routing or ckb-vm-opcodes
+```
+
+### Session state
+
+Each user's session is stored at `/tmp/research-intake-<user_id>.json` between
+messages. It's auto-deleted on completion or cancellation. Send `/research` at
+any time to reset a stuck session.
+
+### Running the intake processor (optional — for auto-pickup)
+
+The bot drops files into `research/intake/`. To auto-process them into the queue:
+
+```bash
+# Run once manually
+python3 scripts/queue-intake.py
+
+# Or watch for new files (poll every 30s)
+python3 scripts/queue-intake.py --watch
+
+# Preview without making changes
+python3 scripts/queue-intake.py --dry-run
+```
+
+Or add a cron job to process intake every few minutes:
+
+```bash
+# Crontab entry — process intake every 5 minutes
+*/5 * * * * cd ~/.openclaw/workspace && python3 skills/webcrawler/scripts/queue-intake.py
+```
 
 ## Quick install (OpenClaw)
 
