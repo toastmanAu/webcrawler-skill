@@ -1,6 +1,7 @@
 ---
 name: webcrawler
-description: "AI-powered research crawler combining JS-rendered docs fetching (Playwright) with Gemini-based research task processing. Use when fetching documentation from JS-rendered sites (React/Next.js/Docusaurus) that web_fetch can't read, running research crawl tasks from a queue file with Gemini analysis, or saving docs sites as local markdown references. Includes auto-detection of JS-rendered pages, claim-based multi-worker locking, SYNTHESIS tasks, and automatic queuing of new tasks from findings. See references/SETUP.md for initial setup and references/QUEUE_FORMAT.md for queue file format."
+version: 1.2.0
+description: "AI-powered research crawler combining JS-rendered docs fetching (Playwright) with Gemini-based research task processing. Use when fetching documentation from JS-rendered sites (React/Next.js/Docusaurus) that web_fetch can't read, running research crawl tasks from a queue file with Gemini analysis, or saving docs sites as local markdown references. Includes auto-detection of JS-rendered pages, claim-based multi-worker locking, SYNTHESIS tasks, automatic queuing of new tasks from findings, and /research interactive task intake via Telegram bot. See references/SETUP.md for initial setup and references/QUEUE_FORMAT.md for queue file format."
 ---
 
 # webcrawler
