@@ -2760,3 +2760,48 @@ Answer:
 8. Is there any existing CKB/Nervos LoRa work we'd be building on?
 
 **Output:** `findings/ckb-lora-proof-of-coverage.md`
+
+---
+
+[PENDING] hackintosh-drivethree
+**Priority:** MEDIUM
+**Output:** findings/hackintosh-drivethree.md
+**Tags:** hackintosh, macos, drivethree, infrastructure
+**Goal:** Research a Hackintosh build for driveThree (i7-14700K, 64GB RAM, RTX 3060 Ti) — specifically OpenCore bootloader setup for Raptor Lake on a clean secondary drive, macOS version compatibility, and what we can test/develop on it. Dual-boot with existing Ubuntu 22.04 on other drive.
+**Seeds:**
+- https://raw.githubusercontent.com/acidanthera/OpenCorePkg/master/README.md
+- https://dortania.github.io/OpenCore-Install-Guide/
+- https://raw.githubusercontent.com/dortania/OpenCore-Install-Guide/master/config.plist/comet-lake.md
+- https://raw.githubusercontent.com/dortania/getting-started-with-acpi/master/README.md
+- https://raw.githubusercontent.com/dortania/OpenCore-Post-Install/master/README.md
+**Questions to answer:**
+1. Is the i7-14700K (Raptor Lake) supported by OpenCore — what's the recommended macOS version and any known issues?
+2. What SMBIOS should be used for i7-14700K (iMac Pro 1,1? MacPro7,1? iMacPro1,1?)?
+3. Does the RTX 3060 Ti work in macOS — what's the GPU situation (no Nvidia support post-Mojave)?
+4. What are the exact steps to install OpenCore on a clean secondary drive without touching the Ubuntu drive?
+5. What kexts are required for i7-14700K: ethernet (which chipset?), audio (AppleALC layout?), USB mapping?
+6. What macOS versions are installable — is Sonoma/Sequoia possible or should we target Ventura?
+7. What developer tools / Apple-specific testing workflows justify having macOS (Xcode, iOS sim, Safari testing, notarisation)?
+8. Is there anything CKB/blockchain specific that benefits from macOS access (Ledger, JoyID, wallet UX testing)?
+
+
+---
+
+[PENDING] nemoclaw-openshell-networking
+**Priority:** HIGH
+**Output:** findings/nemoclaw-openshell-networking.md
+**Tags:** nemoclaw, openshell, networking, sandbox
+**Goal:** Understand OpenShell's k3s sandbox networking model — specifically whether containers can reach LAN IPs directly (192.168.x.x), how `host.openshell.internal` DNS resolves, and whether Tailscale works from inside the sandbox. This determines how to configure NemoClaw to reach our NucBox Ollama (192.168.68.79) and OPi5+ orchestrator (192.168.68.89) from inside the sandboxed agent.
+**Seeds:**
+- https://raw.githubusercontent.com/NVIDIA/OpenShell/main/README.md
+- https://raw.githubusercontent.com/NVIDIA/OpenShell/main/docs/networking.md
+- https://raw.githubusercontent.com/NVIDIA/OpenShell/main/docs/reference/network-policies.md
+- https://raw.githubusercontent.com/NVIDIA/NemoClaw/main/nemoclaw-blueprint/policies/openclaw-sandbox.yaml
+- https://raw.githubusercontent.com/NVIDIA/NemoClaw/main/docs/network-policy/customize-network-policy.md
+**Questions to answer:**
+1. Can a container inside OpenShell's k3s sandbox reach LAN IPs (192.168.x.x) directly, or does all traffic route through the host?
+2. What does `host.openshell.internal` resolve to — is it the host machine's LAN IP or a bridge address?
+3. Does the network policy use hostnames or IPs — and if IPs, are LAN IPs valid entries?
+4. Can Tailscale be installed/used inside an OpenShell sandbox, or only on the host?
+5. Is there a `--network host` or host-networking mode available for OpenShell sandboxes?
+

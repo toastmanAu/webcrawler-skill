@@ -58,6 +58,15 @@ Add whatever helps you do your job. This is your cheat sheet.
 - Start: bash ~/ckb-light-testnet/start.sh
 - Stop: bash ~/ckb-light-testnet/stop.sh
 
+## Tailscale Network
+| Machine | LAN IP | Tailscale IP | Notes |
+|---------|--------|-------------|-------|
+| Pi 5 (Kernel) | 192.168.68.x | 100.115.197.42 | Primary agent |
+| OPi5+ (Shannon) | 192.168.68.89 | 100.81.155.8 | Research crawler |
+| ckbnode | 192.168.68.105 | 100.119.144.2 | CKB node (orangepi user) |
+| btcnode | 192.168.68.106 | 100.96.111.54 | Bitcoin node (orangepi user) |
+| fiberquest | 192.168.68.84 | 100.99.68.27 | Fiber testnet node (phill user) |
+
 ## NucBox K8 Plus (Ryzen — Primary Inference Node)
 - Hostname: phill-NucBox-K8-Plus · IP: 192.168.68.79 · user: phill
 - SSH: ssh phill@192.168.68.79 (NOPASSWD sudo)
